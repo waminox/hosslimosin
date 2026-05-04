@@ -14,10 +14,20 @@ const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
 const crypto = require('crypto');
+const https = require('https');
+const nodemailer = require('nodemailer');
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+
+const SMTP_HOST = process.env.SMTP_HOST || '';
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
+const SMTP_USER = process.env.SMTP_USER || '';
+const SMTP_PASSWORD = process.env.SMTP_PASSWORD || '';
+const CONTACT_RECEIVER_EMAIL = process.env.CONTACT_RECEIVER_EMAIL || SMTP_USER;
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '';
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY || '';
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, 'data');
@@ -59,11 +69,12 @@ app.use(
       useDefaults: true,
       directives: {
         'default-src': ["'self'"],
-        'script-src': ["'self'", "https://cdn.jsdelivr.net", "https://unpkg.com"],
+        'script-src': ["'self'", "https://cdn.jsdelivr.net", "https://unpkg.com", "https://www.google.com", "https://www.gstatic.com"],
         'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         'font-src': ["'self'", "https://fonts.gstatic.com", 'data:'],
         'img-src': ["'self'", 'data:', 'blob:', 'https:'],
-        'connect-src': ["'self'"],
+        'connect-src': ["'self'", "https://www.google.com"],
+        'frame-src': ["https://www.google.com"],
         'frame-ancestors': ["'none'"],
       },
     },
@@ -113,6 +124,133 @@ async function writeJsonAtomic(file, data) {
   await fsp.rename(tmp, file);
 }
 
+// ----- Email & reCAPTCHA helpers -------------------------------------------
+
+function createMailer() {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) return null;
+  return nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465,
+    auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+  });
+}
+
+async function verifyRecaptcha(token) {
+  if (!RECAPTCHA_SECRET_KEY) return true;  // not configured → skip check
+  if (!token) return false;
+  return new Promise((resolve) => {
+    const body =
+      'secret=' + encodeURIComponent(RECAPTCHA_SECRET_KEY) +
+      '&response=' + encodeURIComponent(String(token).slice(0, 2048));
+    const req = https.request(
+      {
+        hostname: 'www.google.com',
+        path: '/recaptcha/api/siteverify',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Length': Buffer.byteLength(body),
+        },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (c) => (data += c));
+        res.on('end', () => {
+          try {
+            const r = JSON.parse(data);
+            resolve(r.success === true && (r.score === undefined || r.score >= 0.5));
+          } catch {
+            resolve(false);
+          }
+        });
+      }
+    );
+    req.on('error', () => resolve(true)); // network error → allow through
+    req.write(body);
+    req.end();
+  });
+}
+
+function buildPlainText(e) {
+  const line = (label, val) => (val ? `${label}: ${val}\n` : '');
+  return [
+    `Neue Anfrage – Hosslimo`,
+    '='.repeat(50),
+    `Eingegangen: ${new Date(e.receivedAt).toLocaleString('de-AT')}`,
+    '',
+    '--- Kontakt ---',
+    line('Name', e.name),
+    line('E-Mail', e.email),
+    line('Telefon', e.phone),
+    '',
+    '--- Fahrtwunsch ---',
+    line('Fahrzeug', e.vehicle),
+    line('Datum / Uhrzeit', e.datetime),
+    line('Abholung', e.pickup),
+    line('Ziel', e.dropoff),
+    '',
+    '--- Nachricht ---',
+    e.message,
+    '',
+    '='.repeat(50),
+    `ID: ${e.id}`,
+  ].join('\n');
+}
+
+function buildHtmlEmail(e) {
+  const row = (label, val) =>
+    val
+      ? `<tr><td style="padding:6px 16px 6px 0;color:#888;white-space:nowrap;font-size:13px;vertical-align:top">${label}</td><td style="padding:6px 0;color:#1a1a1a;font-size:13px">${val}</td></tr>`
+      : '';
+  const esc = (s) =>
+    String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  const tripSection =
+    e.vehicle || e.datetime || e.pickup || e.dropoff
+      ? `<h3 style="margin:24px 0 12px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Fahrtwunsch</h3>
+         <table cellpadding="0" cellspacing="0" style="width:100%">
+           ${row('Fahrzeug', esc(e.vehicle))}
+           ${row('Datum / Uhrzeit', esc(e.datetime))}
+           ${row('Abholung', esc(e.pickup))}
+           ${row('Ziel', esc(e.dropoff))}
+         </table>`
+      : '';
+  return `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"></head>
+<body style="margin:0;padding:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f2f2f2;padding:32px 0">
+<tr><td align="center">
+<table width="580" cellpadding="0" cellspacing="0" style="background:#fff;max-width:580px;width:100%">
+  <tr><td style="background:#050505;padding:26px 36px 24px">
+    <span style="font-family:'Times New Roman',serif;font-style:italic;font-size:22px;color:#f1ece2;letter-spacing:1px">Hosslimo</span>
+    <span style="display:block;font-size:10px;color:#c9a86a;letter-spacing:3px;text-transform:uppercase;margin-top:5px">Neue Anfrage</span>
+  </td></tr>
+  <tr><td style="padding:32px 36px">
+    <p style="margin:0 0 24px;font-size:12px;color:#999">Eingegangen am ${esc(new Date(e.receivedAt).toLocaleString('de-AT'))}</p>
+    <h3 style="margin:0 0 12px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Kontakt</h3>
+    <table cellpadding="0" cellspacing="0" style="width:100%">
+      ${row('Name', esc(e.name))}
+      ${row('E-Mail', `<a href="mailto:${esc(e.email)}" style="color:#c9a86a">${esc(e.email)}</a>`)}
+      ${e.phone ? row('Telefon', `<a href="tel:${esc(e.phone)}" style="color:#c9a86a">${esc(e.phone)}</a>`) : ''}
+    </table>
+    ${tripSection}
+    <h3 style="margin:24px 0 12px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Nachricht</h3>
+    <div style="background:#f9f9f9;border-left:3px solid #c9a86a;padding:14px 18px;font-size:13px;color:#333;line-height:1.75;white-space:pre-wrap">${esc(e.message)}</div>
+  </td></tr>
+  <tr><td style="background:#f9f9f9;padding:14px 36px;border-top:1px solid #eee">
+    <p style="margin:0;font-size:11px;color:#bbb">ID: ${esc(e.id)} · Automatisch gesendet von der Hosslimo-Website.</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
 function requireAuth(req, res, next) {
   if (req.session && req.session.user) return next();
   if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'unauthorized' });
@@ -131,16 +269,30 @@ app.get('/api/content', async (req, res, next) => {
   }
 });
 
+// Public config — exposes only the reCAPTCHA site key (never the secret).
+app.get('/api/config', (req, res) => {
+  res.json({ recaptchaSiteKey: RECAPTCHA_SITE_KEY });
+});
+
 // Contact submission — stored as a flat JSON log file. Owner views from dashboard.
 const contactLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 8, standardHeaders: true });
 app.post('/api/contact', contactLimiter, async (req, res) => {
-  const { name, email, phone, message, pickup, dropoff, datetime, vehicle, hp } = req.body || {};
+  const { name, email, phone, message, pickup, dropoff, datetime, vehicle, hp, recaptchaToken } = req.body || {};
+
   // Honeypot — silent drop.
   if (hp) return res.json({ ok: true });
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'name, email and message are required' });
+
+  // reCAPTCHA verification (skipped when RECAPTCHA_SECRET_KEY is not configured).
+  const captchaOk = await verifyRecaptcha(recaptchaToken);
+  if (!captchaOk) {
+    return res.status(400).json({ error: 'Sicherheitsüberprüfung fehlgeschlagen. Bitte versuchen Sie es erneut.' });
   }
-  if (String(message).length > 4000) return res.status(400).json({ error: 'message too long' });
+
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Name, E-Mail und Nachricht sind erforderlich.' });
+  }
+  if (String(message).length > 4000) return res.status(400).json({ error: 'Nachricht zu lang.' });
+
   const entry = {
     id: crypto.randomBytes(8).toString('hex'),
     receivedAt: new Date().toISOString(),
@@ -154,13 +306,28 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
     message: String(message).slice(0, 4000),
     ip: req.ip,
   };
+
   const file = path.join(DATA_DIR, 'inquiries.json');
   let list = [];
-  try {
-    list = await readJson(file);
-  } catch {}
+  try { list = await readJson(file); } catch {}
   list.unshift(entry);
   await writeJsonAtomic(file, list.slice(0, 1000));
+
+  // Send email notification — fire-and-forget; a save error must not block the response.
+  const mailer = createMailer();
+  if (mailer && CONTACT_RECEIVER_EMAIL) {
+    mailer
+      .sendMail({
+        from: `"Hosslimo Anfrage" <${SMTP_USER}>`,
+        to: CONTACT_RECEIVER_EMAIL,
+        replyTo: entry.email,
+        subject: `Neue Anfrage: ${entry.name}`,
+        text: buildPlainText(entry),
+        html: buildHtmlEmail(entry),
+      })
+      .catch((err) => console.error('[mail] send error:', err.message));
+  }
+
   res.json({ ok: true });
 });
 
