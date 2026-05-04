@@ -196,6 +196,30 @@
     });
   }
 
+  // ---------- reCAPTCHA v3 (optional) ----------------------------------------
+  let _rcSiteKey = '';
+
+  function loadRecaptcha(siteKey) {
+    if (!siteKey || document.querySelector('script[data-rc]')) return;
+    const s = document.createElement('script');
+    s.dataset.rc = '1';
+    s.async = true;
+    s.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(siteKey);
+    document.head.appendChild(s);
+  }
+
+  async function getRecaptchaToken(action) {
+    if (!_rcSiteKey || !window.grecaptcha) return '';
+    return new Promise((resolve) => {
+      window.grecaptcha.ready(() => {
+        window.grecaptcha
+          .execute(_rcSiteKey, { action })
+          .then(resolve)
+          .catch(() => resolve(''));
+      });
+    });
+  }
+
   // ---------- Contact form ---------------------------------------------------
   function setupContactForm() {
     const form = document.getElementById('contactForm');
@@ -207,6 +231,7 @@
       status.textContent = '';
       const data = Object.fromEntries(new FormData(form).entries());
       try {
+        data.recaptchaToken = await getRecaptchaToken('contact');
         const res = await fetch('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -214,11 +239,11 @@
         });
         const json = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(json.error || 'Senden fehlgeschlagen.');
-        status.textContent = 'Vielen Dank! Wir melden uns kürze bei Ihnen.';
+        status.textContent = 'Vielen Dank! Wir melden uns in Kürze bei Ihnen.';
         status.classList.add('is-ok');
         form.reset();
       } catch (err) {
-        status.textContent = 'Es ist ein Fehler aufgetreten. Bitte rufen Sie uns an oder versuchen Sie es erneut.';
+        status.textContent = err.message || 'Es ist ein Fehler aufgetreten. Bitte rufen Sie uns an oder versuchen Sie es erneut.';
         status.classList.add('is-err');
       }
     });
@@ -277,6 +302,17 @@
   // ---------- Boot ------------------------------------------------------------
   setupNav();
   setupParallax();
+
+  // Load public config (reCAPTCHA site key etc.) — non-blocking, best-effort.
+  fetch('/api/config')
+    .then((r) => (r.ok ? r.json() : {}))
+    .then((cfg) => {
+      if (cfg && cfg.recaptchaSiteKey) {
+        _rcSiteKey = cfg.recaptchaSiteKey;
+        loadRecaptcha(_rcSiteKey);
+      }
+    })
+    .catch(() => {});
 
   fetch('/api/content')
     .then((r) => (r.ok ? r.json() : Promise.reject(r.statusText)))

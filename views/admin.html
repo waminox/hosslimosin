@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin · Hosslimo</title>
+<style>
+/* ============================================================
+   Admin dashboard — all styles scoped to this standalone page.
+   Class prefix: adm-
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: #080808; color: #d8d0c4;
+  font-size: 13px; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; border: 0; background: transparent; color: inherit; padding: 0; }
+textarea, input, select { font: inherit; }
+
+.adm-layout {
+  display: flex; min-height: 100vh;
+}
+
+/* Sidebar */
+.adm-sidebar {
+  width: 220px; flex-shrink: 0;
+  background: #0d0d0d; border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.adm-brand {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.adm-wordmark {
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  font-style: italic; font-size: 1.4rem; font-weight: 500; color: #f1ece2;
+}
+.adm-wordmark::first-letter { color: #c9a86a; }
+.adm-tag {
+  display: block; font-size: 0.6rem; letter-spacing: 0.36em;
+  text-transform: uppercase; color: #6f6759; margin-top: 3px;
+}
+
+.adm-nav { flex: 1; padding: 12px 0; }
+.adm-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px; font-size: 0.8rem;
+  color: #6f6759; letter-spacing: 0.04em;
+  transition: color 0.2s, background 0.2s;
+  cursor: pointer; width: 100%; text-align: left;
+}
+.adm-nav-item:hover { color: #d8d0c4; background: rgba(255,255,255,0.03); }
+.adm-nav-item.is-active { color: #c9a86a; background: rgba(201,168,106,0.08); }
+.adm-nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.adm-sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.adm-user-name { font-size: 0.75rem; color: #6f6759; margin-bottom: 10px; }
+.adm-logout {
+  display: block; width: 100%; padding: 8px 12px;
+  background: transparent; border: 1px solid rgba(255,255,255,0.1);
+  color: #6f6759; font-size: 0.7rem; letter-spacing: 0.2em;
+  text-transform: uppercase; text-align: center; cursor: pointer;
+  transition: all 0.2s;
+}
+.adm-logout:hover { border-color: #c9a86a; color: #c9a86a; }
+
+/* Main content */
+.adm-content { flex: 1; overflow-y: auto; min-width: 0; }
+
+.adm-panel { display: none; padding: 36px 40px; max-width: 900px; }
+.adm-panel.is-active { display: block; }
+
+.adm-panel-title {
+  font-size: 1.05rem; font-weight: 600; color: #f1ece2;
+  margin: 0 0 6px; letter-spacing: 0.02em;
+}
+.adm-panel-desc { font-size: 0.8rem; color: #6f6759; margin: 0 0 32px; }
+
+/* Section groups */
+.adm-section {
+  margin-bottom: 36px; padding-bottom: 36px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.adm-section:last-child { border-bottom: 0; margin-bottom: 0; }
+.adm-section-title {
+  font-size: 0.65rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: #c9a86a; font-weight: 600; margin: 0 0 20px;
+}
+
+/* Form fields */
+.adm-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.adm-field:last-child { margin-bottom: 0; }
+.adm-field-label {
+  font-size: 0.62rem; letter-spacing: 0.32em; text-transform: uppercase;
+  color: #6f6759; font-weight: 500;
+}
+.adm-input, .adm-textarea, .adm-select {
+  background: #111; border: 1px solid rgba(255,255,255,0.08);
+  color: #d8d0c4; padding: 10px 12px; font: inherit; font-size: 0.88rem;
+  transition: border-color 0.2s; outline: none; width: 100%;
+}
+.adm-input:focus, .adm-textarea:focus, .adm-select:focus {
+  border-color: rgba(201,168,106,0.5);
+}
+.adm-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.adm-select { appearance: none; cursor: pointer; }
+.adm-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* Buttons */
+.adm-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 9px 18px; font-size: 0.7rem; letter-spacing: 0.22em;
+  text-transform: uppercase; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.adm-btn--gold { background: #c9a86a; color: #0c0a06; border: 1px solid #c9a86a; }
+.adm-btn--gold:hover { background: #e6cb8a; border-color: #e6cb8a; }
+.adm-btn--ghost { background: transparent; border: 1px solid rgba(255,255,255,0.12); color: #6f6759; }
+.adm-btn--ghost:hover { border-color: #c9a86a; color: #c9a86a; }
+.adm-btn--danger { background: transparent; border: 1px solid rgba(200,80,80,0.3); color: #c85050; font-size: 0.65rem; padding: 5px 10px; letter-spacing: 0.1em; }
+.adm-btn--danger:hover { border-color: #c85050; background: rgba(200,80,80,0.08); }
+.adm-btn--small { padding: 6px 12px; font-size: 0.65rem; }
+.adm-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+.adm-save-bar {
+  display: flex; align-items: center; gap: 14px; margin-top: 24px; flex-wrap: wrap;
+}
+.adm-save-msg { font-size: 0.78rem; color: #c9a86a; min-height: 1.2em; }
+.adm-save-msg.is-err { color: #d97a7a; }
+
+/* Array list items */
+.adm-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.adm-item {
+  background: #111; border: 1px solid rgba(255,255,255,0.07);
+  padding: 16px 16px 12px;
+}
+.adm-item-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.adm-item-num { font-size: 0.65rem; color: #c9a86a; letter-spacing: 0.2em; text-transform: uppercase; }
+.adm-item-fields { display: flex; flex-direction: column; gap: 10px; }
+
+/* Inquiries */
+.adm-inquiry {
+  background: #111; border: 1px solid rgba(255,255,255,0.07);
+  padding: 20px; margin-bottom: 12px;
+}
+.adm-inquiry-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px; margin-bottom: 12px; flex-wrap: wrap;
+}
+.adm-inquiry-who { font-size: 0.9rem; color: #f1ece2; font-weight: 500; }
+.adm-inquiry-meta { font-size: 0.72rem; color: #6f6759; margin-top: 2px; }
+.adm-inquiry-time { font-size: 0.7rem; color: #6f6759; }
+.adm-inquiry-detail { font-size: 0.8rem; color: #a89f8f; line-height: 1.6; margin-top: 8px; }
+.adm-inquiry-msg {
+  margin-top: 12px; padding: 12px 14px;
+  background: rgba(255,255,255,0.03); border-left: 2px solid rgba(201,168,106,0.3);
+  font-size: 0.82rem; color: #d8d0c4; white-space: pre-wrap; line-height: 1.65;
+}
+.adm-empty { color: #6f6759; font-size: 0.82rem; padding: 20px 0; }
+
+/* Media grid */
+.adm-media-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.adm-media-item {
+  position: relative; width: 120px;
+}
+.adm-media-item img {
+  width: 120px; height: 80px; object-fit: cover; display: block;
+  background: #111; border: 1px solid rgba(255,255,255,0.08);
+}
+.adm-media-name {
+  font-size: 0.6rem; color: #6f6759; margin-top: 4px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px;
+}
+.adm-media-del {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,0.7); border: 1px solid rgba(200,80,80,0.4);
+  color: #c85050; font-size: 11px; padding: 2px 6px; cursor: pointer;
+  transition: background 0.2s;
+}
+.adm-media-del:hover { background: rgba(200,80,80,0.15); }
+
+/* Upload zone */
+.adm-upload-zone {
+  border: 1px dashed rgba(255,255,255,0.12); padding: 24px;
+  text-align: center; color: #6f6759; font-size: 0.78rem;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.adm-upload-zone:hover { border-color: rgba(201,168,106,0.4); }
+.adm-upload-input { display: none; }
+
+/* Toast */
+.adm-toast {
+  position: fixed; bottom: 28px; right: 28px;
+  background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1);
+  color: #f1ece2; padding: 12px 20px; font-size: 0.82rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s; z-index: 999;
+}
+.adm-toast.is-visible { opacity: 1; pointer-events: auto; }
+.adm-toast.is-ok { border-color: rgba(201,168,106,0.4); }
+.adm-toast.is-err { border-color: rgba(200,80,80,0.4); color: #d97a7a; }
+
+/* City tags editor */
+.adm-city-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.adm-city-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border: 1px solid rgba(255,255,255,0.1);
+  background: #111; font-size: 0.75rem; color: #d8d0c4;
+}
+.adm-city-remove {
+  color: #6f6759; font-size: 0.9rem; line-height: 1; cursor: pointer;
+  background: transparent; border: 0; padding: 0;
+}
+.adm-city-remove:hover { color: #c85050; }
+.adm-city-add { display: flex; gap: 8px; }
+.adm-city-input { flex: 1; }
+
+@media (max-width: 700px) {
+  .adm-layout { flex-direction: column; }
+  .adm-sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; }
+  .adm-nav { display: flex; flex-wrap: wrap; padding: 8px; }
+  .adm-nav-item { padding: 8px 12px; }
+  .adm-panel { padding: 20px 16px; }
+  .adm-grid2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="adm-layout">
+  <!-- Sidebar -->
+  <aside class="adm-sidebar">
+    <div class="adm-brand">
+      <span class="adm-wordmark">Hosslimo</span>
+      <span class="adm-tag">Admin</span>
+    </div>
+    <nav class="adm-nav" id="admNav">
+      <button class="adm-nav-item is-active" data-panel="general">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Allgemein
+      </button>
+      <button class="adm-nav-item" data-panel="services">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        Services
+      </button>
+      <button class="adm-nav-item" data-panel="fleet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="9" width="20" height="9" rx="2"/><path d="M6 9V7a4 4 0 0 1 12 0v2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+        Flotte
+      </button>
+      <button class="adm-nav-item" data-panel="voices">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Stimmen
+      </button>
+      <button class="adm-nav-item" data-panel="contact">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4h3l2 5-2 1c1 3 3 5 6 6l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+        Kontakt
+      </button>
+      <button class="adm-nav-item" data-panel="legal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        Rechtliches
+      </button>
+      <button class="adm-nav-item" data-panel="seo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        SEO
+      </button>
+      <button class="adm-nav-item" data-panel="inquiries">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/></svg>
+        Anfragen
+      </button>
+      <button class="adm-nav-item" data-panel="media">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        Medien
+      </button>
+      <button class="adm-nav-item" data-panel="account">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+        Konto
+      </button>
+    </nav>
+    <div class="adm-sidebar-footer">
+      <div class="adm-user-name" id="admUserName">–</div>
+      <button class="adm-logout" id="admLogout">Abmelden</button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="adm-content">
+
+    <!-- GENERAL -->
+    <div class="adm-panel is-active" id="panel-general">
+      <h1 class="adm-panel-title">Allgemein</h1>
+      <p class="adm-panel-desc">Marke, Hero, About-Text, Reichweite und Call-to-Action.</p>
+
+      <div class="adm-section">
+        <p class="adm-section-title">Marke</p>
+        <div class="adm-grid2">
+          <div class="adm-field"><label class="adm-field-label">Name</label><input class="adm-input" id="brandName" maxlength="80" /></div>
+          <div class="adm-field"><label class="adm-field-label">Logo-Text</label><input class="adm-input" id="brandLogoText" maxlength="40" /></div>
+        </div>
+        <div class="adm-field"><label class="adm-field-label">Tagline</label><input class="adm-input" id="brandTagline" maxlength="160" /></div>
+      </div>
+
+      <div class="adm-section">
+        <p class="adm-section-title">Hero</p>
+        <div class="adm-grid2">
+          <div class="adm-field"><label class="adm-field-label">Eyebrow</label><input class="adm-input" id="heroEyebrow" maxlength="80" /></div>
+          <div class="adm-field"><label class="adm-field-label">Primärer Button</label><input class="adm-input" id="heroPrimaryCta" maxlength="60" /></div>
+        </div>
+        <div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" id="heroTitle" maxlength="240" /></div>
+        <div class="adm-field"><label class="adm-field-label">Untertitel</label><textarea class="adm-textarea" id="heroSubtitle" maxlength="400" rows="3"></textarea></div>
+        <div class="adm-grid2">
+          <div class="adm-field"><label class="adm-field-label">Sekundärer Button</label><input class="adm-input" id="heroSecondaryCta" maxlength="60" /></div>
+          <div class="adm-field"><label class="adm-field-label">Hintergrundbild (URL)</label><input class="adm-input" id="heroBackground" placeholder="/img/hero.jpg" /></div>
+        </div>
+      </div>
+
+      <div class="adm-section">
+        <p class="adm-section-title">Über Hosslimo</p>
+        <div class="adm-grid2">
+          <div class="adm-field"><label class="adm-field-label">Eyebrow</label><input class="adm-input" id="aboutEyebrow" maxlength="80" /></div>
+          <div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" id="aboutTitle" maxlength="240" /></div>
+        </div>
+        <div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" id="aboutBody" maxlength="4000" rows="5"></textarea></div>
+        <p style="font-size:0.72rem;color:#6f6759;margin:4px 0 16px">Highlights: im Tab "Services" verwalten oder hier als JSON (für Entwickler).</p>
+      </div>
+
+      <div class="adm-section">
+        <p class="adm-section-title">Reichweite</p>
+        <div class="adm-grid2">
+          <div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" id="coverageTitle" maxlength="240" /></div>
+        </div>
+        <div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" id="coverageBody" maxlength="1200" rows="3"></textarea></div>
+        <p class="adm-section-title" style="margin-top:16px">Städte</p>
+        <div class="adm-city-tags" id="cityTags"></div>
+        <div class="adm-city-add">
+          <input class="adm-input adm-city-input" id="cityInput" placeholder="Stadt hinzufügen …" maxlength="80" />
+          <button class="adm-btn adm-btn--ghost adm-btn--small" id="cityAddBtn">Hinzufügen</button>
+        </div>
+      </div>
+
+      <div class="adm-section">
+        <p class="adm-section-title">Call-to-Action</p>
+        <div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" id="ctaTitle" maxlength="240" /></div>
+        <div class="adm-field"><label class="adm-field-label">Untertitel</label><textarea class="adm-textarea" id="ctaSubtitle" maxlength="400" rows="3"></textarea></div>
+        <div class="adm-field"><label class="adm-field-label">Button-Text</label><input class="adm-input" id="ctaButton" maxlength="60" /></div>
+      </div>
+
+      <div class="adm-save-bar">
+        <button class="adm-btn adm-btn--gold" id="saveGeneral">Speichern</button>
+        <span class="adm-save-msg" id="msgGeneral"></span>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="adm-panel" id="panel-services">
+      <h1 class="adm-panel-title">Services</h1>
+      <p class="adm-panel-desc">Leistungen auf der Homepage verwalten.</p>
+      <div class="adm-list" id="servicesList"></div>
+      <button class="adm-btn adm-btn--ghost adm-btn--small" id="addService">+ Service hinzufügen</button>
+      <div class="adm-save-bar">
+        <button class="adm-btn adm-btn--gold" id="saveServices">Speichern</button>
+        <span class="adm-save-msg" id="msgServices"></span>
+      </div>
+    </div>
+
+    <!-- FLEET -->
+    <div class="adm-panel" id="panel-fleet">
+      <h1 class="adm-panel-title">Flotte</h1>
+      <p class="adm-panel-desc">Fahrzeuge verwalten.</p>
+      <div class="adm-list" id="fleetList"></div>
+      <button class="adm-btn adm-btn--ghost adm-btn--small" id="addFleet">+ Fahrzeug hinzufügen</button>
+      <div class="adm-save-bar">
+        <button class="adm-btn adm-btn--gold" id="saveFleet">Speichern</button>
+        <span class="adm-save-msg" id="msgFleet"></span>
+      </div>
+    </div>
+
+    <!-- VOICES -->
+    <div class="adm-panel" id="panel-voices">
+      <h1 class="adm-panel-title">Kundenstimmen</h1>
+      <p class="adm-panel-desc">Referenzen und Bewertungen.</p>
+      <div class="adm-list" id="voicesList"></div>
+      <button class="adm-btn adm-btn--ghost adm-btn--small" id="addVoice">+ Kundenstimme hinzufügen</button>
+      <div class="adm-save-bar">
+        <button class="adm-btn adm-btn--gold" id="saveVoices">Speichern</button>
+        <span class="adm-save-msg" id="msgVoices"></span>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="adm-panel" id="panel-contact">
+      <h1 class="adm-panel-title">Kontakt</h1>
+      <p class="adm-panel-desc">Telefon, E-Mail, Adresse und Öffnungszeiten.</p>
+      <div class="adm-grid2">
+        <div class="adm-field"><label class="adm-field-label">Telefon (Anzeige)</label><input class="adm-input" id="contactPhone" maxlength="60" placeholder="+43 660 000 0000" /></div>
+        <div class="adm-field"><label class="adm-field-label">Telefon (tel: Link)</label><input class="adm-input" id="contactPhoneHref" maxlength="60" placeholder="+436600000000" /></div>
+      </div>
+      <div class="adm-grid2">
+        <div class="adm-field"><label class="adm-field-label">E-Mail</label><input class="adm-input" id="contactEmail" type="email" maxlength="120" /></div>
+        <div class="adm-field"><label class="adm-field-label">Adresse</label><input class="adm-input" id="contactAddress" maxlength="240" /></div>
+      </div>
+      <div class="adm-grid2">
+        <div class="adm-field"><label class="adm-field-label">WhatsApp (Anzeige)</label><input class="adm-input" id="contactWhatsapp" maxlength="60" placeholder="WhatsApp" /></div>
+        <div class="adm-field"><label class="adm-field-label">WhatsApp (wa.me Link)</label><input class="adm-input" id="contactWhatsappHref" maxlength="200" placeholder="https://wa.me/43…" /></div>
+      </div>
+      <div class="adm-field"><label class="adm-field-label">Verfügbarkeitszeiten</label><input class="adm-input" id="contactHours" maxlength="200" placeholder="24 / 7 für Sie erreichbar" /></div>
+      <div class="adm-save-bar">
+        <button class="adm-btn adm-btn--gold" id="saveContact">Speichern</button>
+        <span class="adm-save-msg" id="msgContact"></span>
+      </div>
+    </div>
+
+    <!-- LEGAL -->
+    <div class="adm-panel" id="panel-legal">
+      <h1 class="adm-panel-title">Rechtliches</h1>
+      <p class="adm-panel-desc">Impressum, Datenschutzerklärung und AGB.</p>
+      <div class="adm-section">
+        <p class="adm-section-title">Impressum</p>
+        <div class="adm-field"><textarea class="adm-textarea" id="legalImpressum" maxlength="8000" rows="10"></textarea></div>
+      </div>
+      <div class="adm-section">
+        <p class="adm-section-title">Datenschutzerklärung</p>
+        <div class="adm-field"><textarea class="adm-textarea" id="legalDatenschutz" maxlength="16000" rows="12"></textarea></div>
+      </div>
+      <div class="adm-section">
+        <p class="adm-section-title">AGB</p>
+        <div class="adm-field"><textarea class="adm-textarea" id="legalAgb" maxlength="16000" rows="12"></textarea></div>
+      </div>
+      <div class="adm-save-bar">
+        <button class="adm-btn adm-btn--gold" id="saveLegal">Speichern</button>
+        <span class="adm-save-msg" id="msgLegal"></span>
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div class="adm-panel" id="panel-seo">
+      <h1 class="adm-panel-title">SEO</h1>
+      <p class="adm-panel-desc">Meta-Titel, Beschreibung und Open-Graph-Bild.</p>
+      <div class="adm-field"><label class="adm-field-label">Seiten-Titel (max. 60 Zeichen)</label><input class="adm-input" id="seoTitle" maxlength="120" /></div>
+      <div class="adm-field"><label class="adm-field-label">Meta-Beschreibung (max. 160 Zeichen)</label><textarea class="adm-textarea" id="seoDescription" maxlength="320" rows="3"></textarea></div>
+      <div class="adm-field"><label class="adm-field-label">OG-Bild (URL)</label><input class="adm-input" id="seoOgImage" placeholder="/img/og.jpg" /></div>
+      <div class="adm-save-bar">
+        <button class="adm-btn adm-btn--gold" id="saveSeo">Speichern</button>
+        <span class="adm-save-msg" id="msgSeo"></span>
+      </div>
+    </div>
+
+    <!-- INQUIRIES -->
+    <div class="adm-panel" id="panel-inquiries">
+      <h1 class="adm-panel-title">Anfragen</h1>
+      <p class="adm-panel-desc">Eingehende Kontaktformular-Nachrichten.</p>
+      <div id="inquiriesList"></div>
+    </div>
+
+    <!-- MEDIA -->
+    <div class="adm-panel" id="panel-media">
+      <h1 class="adm-panel-title">Medien</h1>
+      <p class="adm-panel-desc">Bilder hochladen und verwalten.</p>
+      <div class="adm-upload-zone" id="uploadZone">
+        <p>Bild hier ablegen oder klicken zum Auswählen</p>
+        <p style="font-size:0.7rem;margin:4px 0 0">JPG, PNG, WebP, AVIF, GIF, SVG · max. 10 MB</p>
+      </div>
+      <input type="file" class="adm-upload-input" id="uploadInput" accept="image/*" />
+      <p class="adm-save-msg" id="msgMedia" style="margin-top:12px"></p>
+      <div class="adm-media-grid" id="mediaGrid"></div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="adm-panel" id="panel-account">
+      <h1 class="adm-panel-title">Konto</h1>
+      <p class="adm-panel-desc">Passwort ändern.</p>
+      <div class="adm-section" style="max-width:400px">
+        <p class="adm-section-title">Passwort ändern</p>
+        <div class="adm-field"><label class="adm-field-label">Aktuelles Passwort</label><input class="adm-input" type="password" id="pwCurrent" autocomplete="current-password" /></div>
+        <div class="adm-field"><label class="adm-field-label">Neues Passwort (min. 10 Zeichen)</label><input class="adm-input" type="password" id="pwNew" autocomplete="new-password" /></div>
+        <div class="adm-field"><label class="adm-field-label">Neues Passwort bestätigen</label><input class="adm-input" type="password" id="pwConfirm" autocomplete="new-password" /></div>
+        <div class="adm-save-bar">
+          <button class="adm-btn adm-btn--gold" id="changePw">Passwort ändern</button>
+          <span class="adm-save-msg" id="msgPw"></span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="adm-toast" id="admToast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var csrfToken = '';
+  var content = {};
+  var cities = [];
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  function toast(msg, ok) {
+    var el = document.getElementById('admToast');
+    el.textContent = msg;
+    el.className = 'adm-toast is-visible ' + (ok === false ? 'is-err' : 'is-ok');
+    clearTimeout(el._t);
+    el._t = setTimeout(function () { el.className = 'adm-toast'; }, 3200);
+  }
+
+  function setMsg(id, msg, err) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'adm-save-msg' + (err ? ' is-err' : '');
+    if (msg) {
+      clearTimeout(el._t);
+      el._t = setTimeout(function () { el.textContent = ''; el.className = 'adm-save-msg'; }, 4000);
+    }
+  }
+
+  async function api(method, path, body) {
+    var opts = {
+      method: method,
+      headers: { 'x-csrf-token': csrfToken },
+    };
+    if (body !== undefined) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    var r = await fetch(path, opts);
+    if (r.status === 401) { window.location.href = '/admin/login'; return null; }
+    var data = await r.json().catch(function () { return {}; });
+    if (!r.ok) throw new Error(data.error || r.statusText);
+    if (data.csrfToken) csrfToken = data.csrfToken; // refresh if server rotates
+    return data;
+  }
+
+  function val(id) { var el = document.getElementById(id); return el ? el.value : ''; }
+  function setVal(id, v) { var el = document.getElementById(id); if (el) el.value = v || ''; }
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
+
+  async function init() {
+    try {
+      var csrfData = await fetch('/api/csrf').then(function (r) { return r.json(); });
+      csrfToken = csrfData.csrfToken || '';
+
+      var me = await fetch('/api/me').then(function (r) {
+        if (!r.ok) { window.location.href = '/admin/login'; return null; }
+        return r.json();
+      });
+      if (!me) return;
+      document.getElementById('admUserName').textContent = me.user.username;
+
+      content = await fetch('/api/content').then(function (r) { return r.json(); });
+      populateForms();
+    } catch (err) {
+      console.error('Init error:', err);
+    }
+
+    setupNav();
+    setupSaveHandlers();
+    setupCityEditor();
+    setupArrayEditors();
+    setupInquiries();
+    setupMedia();
+    setupAccount();
+    setupLogout();
+  }
+
+  // ─── Tab navigation ──────────────────────────────────────────────────────
+
+  function setupNav() {
+    var nav = document.getElementById('admNav');
+    nav.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-panel]');
+      if (!btn) return;
+      var panelId = btn.dataset.panel;
+      // Update active button
+      nav.querySelectorAll('.adm-nav-item').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      // Show panel
+      document.querySelectorAll('.adm-panel').forEach(function (p) {
+        p.classList.toggle('is-active', p.id === 'panel-' + panelId);
+      });
+      // Lazy-load inquiries and media when their tab is opened
+      if (panelId === 'inquiries') loadInquiries();
+      if (panelId === 'media') loadMedia();
+    });
+  }
+
+  // ─── Populate forms ──────────────────────────────────────────────────────
+
+  function populateForms() {
+    var c = content;
+    // Brand
+    setVal('brandName', c.brand && c.brand.name);
+    setVal('brandTagline', c.brand && c.brand.tagline);
+    setVal('brandLogoText', c.brand && c.brand.logoText);
+    // Hero
+    setVal('heroEyebrow', c.hero && c.hero.eyebrow);
+    setVal('heroTitle', c.hero && c.hero.title);
+    setVal('heroSubtitle', c.hero && c.hero.subtitle);
+    setVal('heroPrimaryCta', c.hero && c.hero.primaryCta);
+    setVal('heroSecondaryCta', c.hero && c.hero.secondaryCta);
+    setVal('heroBackground', c.hero && c.hero.backgroundImage);
+    // About
+    setVal('aboutEyebrow', c.about && c.about.eyebrow);
+    setVal('aboutTitle', c.about && c.about.title);
+    setVal('aboutBody', c.about && c.about.body);
+    // Coverage
+    setVal('coverageTitle', c.coverage && c.coverage.title);
+    setVal('coverageBody', c.coverage && c.coverage.body);
+    cities = (c.coverage && Array.isArray(c.coverage.cities)) ? c.coverage.cities.slice() : [];
+    renderCityTags();
+    // CTA
+    setVal('ctaTitle', c.cta && c.cta.title);
+    setVal('ctaSubtitle', c.cta && c.cta.subtitle);
+    setVal('ctaButton', c.cta && c.cta.button);
+    // Contact
+    setVal('contactPhone', c.contact && c.contact.phone);
+    setVal('contactPhoneHref', c.contact && c.contact.phoneHref);
+    setVal('contactEmail', c.contact && c.contact.email);
+    setVal('contactWhatsapp', c.contact && c.contact.whatsapp);
+    setVal('contactWhatsappHref', c.contact && c.contact.whatsappHref);
+    setVal('contactAddress', c.contact && c.contact.address);
+    setVal('contactHours', c.contact && c.contact.hours);
+    // Legal
+    setVal('legalImpressum', c.legal && c.legal.impressum);
+    setVal('legalDatenschutz', c.legal && c.legal.datenschutz);
+    setVal('legalAgb', c.legal && c.legal.agb);
+    // SEO
+    setVal('seoTitle', c.seo && c.seo.title);
+    setVal('seoDescription', c.seo && c.seo.description);
+    setVal('seoOgImage', c.seo && c.seo.ogImage);
+    // Array editors
+    renderServices();
+    renderFleet();
+    renderVoices();
+  }
+
+  // ─── City editor ─────────────────────────────────────────────────────────
+
+  function renderCityTags() {
+    var host = document.getElementById('cityTags');
+    host.innerHTML = '';
+    cities.forEach(function (city, i) {
+      var span = document.createElement('span');
+      span.className = 'adm-city-tag';
+      span.textContent = city;
+      var btn = document.createElement('button');
+      btn.className = 'adm-city-remove';
+      btn.textContent = '×';
+      btn.setAttribute('aria-label', city + ' entfernen');
+      btn.addEventListener('click', function () {
+        cities.splice(i, 1);
+        renderCityTags();
+      });
+      span.appendChild(btn);
+      host.appendChild(span);
+    });
+  }
+
+  function setupCityEditor() {
+    var input = document.getElementById('cityInput');
+    var btn = document.getElementById('cityAddBtn');
+    function addCity() {
+      var v = input.value.trim();
+      if (v && !cities.includes(v)) { cities.push(v); renderCityTags(); }
+      input.value = '';
+      input.focus();
+    }
+    btn.addEventListener('click', addCity);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addCity(); } });
+  }
+
+  // ─── Services editor ──────────────────────────────────────────────────────
+
+  var ICON_OPTIONS = ['plane','briefcase','ring','users','route','star','shield','clock','sparkle','globe'];
+
+  function renderServices() {
+    var services = (content.services && Array.isArray(content.services)) ? content.services : [];
+    renderItemList('servicesList', services, buildServiceItem);
+  }
+
+  function buildServiceItem(item, i) {
+    var div = document.createElement('div');
+    div.className = 'adm-item';
+    div.innerHTML =
+      '<div class="adm-item-header"><span class="adm-item-num">Service ' + (i + 1) + '</span>' +
+      '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
+      '<div class="adm-item-fields">' +
+        '<div class="adm-grid2">' +
+          '<div class="adm-field"><label class="adm-field-label">Icon</label>' +
+          '<select class="adm-select adm-input" data-svc-icon>' +
+          ICON_OPTIONS.map(function (ic) {
+            return '<option value="' + ic + '"' + (item.icon === ic ? ' selected' : '') + '>' + ic + '</option>';
+          }).join('') +
+          '</select></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" data-svc-title maxlength="120" value="' + esc(item.title) + '" /></div>' +
+        '</div>' +
+        '<div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" data-svc-text maxlength="600" rows="3">' + esc(item.text) + '</textarea></div>' +
+      '</div>';
+    div.querySelector('[data-remove]').addEventListener('click', function () {
+      content.services = readServices();
+      content.services.splice(i, 1);
+      renderServices();
+    });
+    return div;
+  }
+
+  function readServices() {
+    var host = document.getElementById('servicesList');
+    var items = [];
+    host.querySelectorAll('.adm-item').forEach(function (item) {
+      items.push({
+        icon: item.querySelector('[data-svc-icon]').value,
+        title: item.querySelector('[data-svc-title]').value,
+        text: item.querySelector('[data-svc-text]').value,
+      });
+    });
+    return items;
+  }
+
+  document.getElementById('addService').addEventListener('click', function () {
+    content.services = readServices();
+    content.services.push({ icon: 'star', title: '', text: '' });
+    renderServices();
+  });
+
+  // ─── Fleet editor ─────────────────────────────────────────────────────────
+
+  function renderFleet() {
+    var fleet = (content.fleet && Array.isArray(content.fleet)) ? content.fleet : [];
+    renderItemList('fleetList', fleet, buildFleetItem);
+  }
+
+  function buildFleetItem(item, i) {
+    var feats = Array.isArray(item.features) ? item.features.join(', ') : '';
+    var div = document.createElement('div');
+    div.className = 'adm-item';
+    div.innerHTML =
+      '<div class="adm-item-header"><span class="adm-item-num">Fahrzeug ' + (i + 1) + '</span>' +
+      '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
+      '<div class="adm-item-fields">' +
+        '<div class="adm-grid2">' +
+          '<div class="adm-field"><label class="adm-field-label">Name</label><input class="adm-input" data-fl-name maxlength="80" value="' + esc(item.name) + '" /></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Kategorie</label><input class="adm-input" data-fl-cat maxlength="60" value="' + esc(item.category) + '" /></div>' +
+        '</div>' +
+        '<div class="adm-grid2">' +
+          '<div class="adm-field"><label class="adm-field-label">Passagiere</label><input class="adm-input" data-fl-pax maxlength="20" value="' + esc(item.passengers) + '" /></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Gepäck</label><input class="adm-input" data-fl-lug maxlength="20" value="' + esc(item.luggage) + '" /></div>' +
+        '</div>' +
+        '<div class="adm-field"><label class="adm-field-label">Features (kommagetrennt)</label><input class="adm-input" data-fl-feats maxlength="800" value="' + esc(feats) + '" /></div>' +
+        '<div class="adm-field"><label class="adm-field-label">Bild (URL)</label><input class="adm-input" data-fl-img value="' + esc(item.image) + '" /></div>' +
+      '</div>';
+    div.querySelector('[data-remove]').addEventListener('click', function () {
+      content.fleet = readFleet();
+      content.fleet.splice(i, 1);
+      renderFleet();
+    });
+    return div;
+  }
+
+  function readFleet() {
+    var host = document.getElementById('fleetList');
+    var items = [];
+    host.querySelectorAll('.adm-item').forEach(function (item) {
+      var featsRaw = item.querySelector('[data-fl-feats]').value;
+      items.push({
+        name: item.querySelector('[data-fl-name]').value,
+        category: item.querySelector('[data-fl-cat]').value,
+        passengers: item.querySelector('[data-fl-pax]').value,
+        luggage: item.querySelector('[data-fl-lug]').value,
+        features: featsRaw.split(',').map(function (f) { return f.trim(); }).filter(Boolean),
+        image: item.querySelector('[data-fl-img]').value,
+      });
+    });
+    return items;
+  }
+
+  document.getElementById('addFleet').addEventListener('click', function () {
+    content.fleet = readFleet();
+    content.fleet.push({ name: '', category: '', passengers: '', luggage: '', features: [], image: '' });
+    renderFleet();
+  });
+
+  // ─── Voices editor ────────────────────────────────────────────────────────
+
+  function renderVoices() {
+    var voices = (content.testimonials && Array.isArray(content.testimonials)) ? content.testimonials : [];
+    renderItemList('voicesList', voices, buildVoiceItem);
+  }
+
+  function buildVoiceItem(item, i) {
+    var div = document.createElement('div');
+    div.className = 'adm-item';
+    div.innerHTML =
+      '<div class="adm-item-header"><span class="adm-item-num">Stimme ' + (i + 1) + '</span>' +
+      '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
+      '<div class="adm-item-fields">' +
+        '<div class="adm-grid2">' +
+          '<div class="adm-field"><label class="adm-field-label">Name</label><input class="adm-input" data-vc-author maxlength="120" value="' + esc(item.author) + '" /></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Rolle</label><input class="adm-input" data-vc-role maxlength="120" value="' + esc(item.role) + '" /></div>' +
+        '</div>' +
+        '<div class="adm-field"><label class="adm-field-label">Zitat</label><textarea class="adm-textarea" data-vc-quote maxlength="800" rows="3">' + esc(item.quote) + '</textarea></div>' +
+      '</div>';
+    div.querySelector('[data-remove]').addEventListener('click', function () {
+      content.testimonials = readVoices();
+      content.testimonials.splice(i, 1);
+      renderVoices();
+    });
+    return div;
+  }
+
+  function readVoices() {
+    var host = document.getElementById('voicesList');
+    var items = [];
+    host.querySelectorAll('.adm-item').forEach(function (item) {
+      items.push({
+        author: item.querySelector('[data-vc-author]').value,
+        role: item.querySelector('[data-vc-role]').value,
+        quote: item.querySelector('[data-vc-quote]').value,
+      });
+    });
+    return items;
+  }
+
+  document.getElementById('addVoice').addEventListener('click', function () {
+    content.testimonials = readVoices();
+    content.testimonials.push({ author: '', role: '', quote: '' });
+    renderVoices();
+  });
+
+  // ─── Generic item list renderer ───────────────────────────────────────────
+
+  function renderItemList(hostId, items, buildFn) {
+    var host = document.getElementById(hostId);
+    host.innerHTML = '';
+    items.forEach(function (item, i) {
+      host.appendChild(buildFn(item, i));
+    });
+  }
+
+  // ─── Save handlers ────────────────────────────────────────────────────────
+
+  function setupSaveHandlers() {
+    document.getElementById('saveGeneral').addEventListener('click', saveGeneral);
+    document.getElementById('saveServices').addEventListener('click', saveServices);
+    document.getElementById('saveFleet').addEventListener('click', saveFleet);
+    document.getElementById('saveVoices').addEventListener('click', saveVoices);
+    document.getElementById('saveContact').addEventListener('click', saveContact);
+    document.getElementById('saveLegal').addEventListener('click', saveLegal);
+    document.getElementById('saveSeo').addEventListener('click', saveSeo);
+  }
+
+  function setupArrayEditors() {}
+
+  async function saveSection(msgId, patchFn) {
+    var btn = document.querySelector('[id="save' + msgId.replace('msg','') + '"]');
+    try {
+      setMsg(msgId, '');
+      patchFn();
+      var result = await api('PUT', '/api/content', content);
+      if (result) {
+        content = result.content || content;
+        populateForms();
+        setMsg(msgId, 'Gespeichert.');
+        toast('Gespeichert', true);
+      }
+    } catch (err) {
+      setMsg(msgId, err.message || 'Fehler beim Speichern.', true);
+    }
+  }
+
+  function saveGeneral() {
+    saveSection('msgGeneral', function () {
+      content.brand = { name: val('brandName'), tagline: val('brandTagline'), logoText: val('brandLogoText') };
+      content.hero = {
+        eyebrow: val('heroEyebrow'), title: val('heroTitle'),
+        subtitle: val('heroSubtitle'), primaryCta: val('heroPrimaryCta'),
+        secondaryCta: val('heroSecondaryCta'), backgroundImage: val('heroBackground'),
+      };
+      content.about = Object.assign({}, content.about, {
+        eyebrow: val('aboutEyebrow'), title: val('aboutTitle'), body: val('aboutBody'),
+      });
+      content.coverage = { title: val('coverageTitle'), body: val('coverageBody'), cities: cities.slice() };
+      content.cta = { title: val('ctaTitle'), subtitle: val('ctaSubtitle'), button: val('ctaButton') };
+    });
+  }
+
+  function saveServices() {
+    saveSection('msgServices', function () { content.services = readServices(); });
+  }
+  function saveFleet() {
+    saveSection('msgFleet', function () { content.fleet = readFleet(); });
+  }
+  function saveVoices() {
+    saveSection('msgVoices', function () { content.testimonials = readVoices(); });
+  }
+
+  function saveContact() {
+    saveSection('msgContact', function () {
+      content.contact = {
+        phone: val('contactPhone'), phoneHref: val('contactPhoneHref'),
+        email: val('contactEmail'), whatsapp: val('contactWhatsapp'),
+        whatsappHref: val('contactWhatsappHref'), address: val('contactAddress'),
+        hours: val('contactHours'),
+      };
+    });
+  }
+
+  function saveLegal() {
+    saveSection('msgLegal', function () {
+      content.legal = { impressum: val('legalImpressum'), datenschutz: val('legalDatenschutz'), agb: val('legalAgb') };
+    });
+  }
+
+  function saveSeo() {
+    saveSection('msgSeo', function () {
+      content.seo = { title: val('seoTitle'), description: val('seoDescription'), ogImage: val('seoOgImage') };
+    });
+  }
+
+  // ─── Inquiries ────────────────────────────────────────────────────────────
+
+  async function loadInquiries() {
+    var host = document.getElementById('inquiriesList');
+    host.innerHTML = '<p class="adm-empty">Lade …</p>';
+    try {
+      var list = await fetch('/api/inquiries', { headers: { 'x-csrf-token': csrfToken } }).then(function (r) { return r.json(); });
+      host.innerHTML = '';
+      if (!list.length) { host.innerHTML = '<p class="adm-empty">Keine Anfragen vorhanden.</p>'; return; }
+      list.forEach(function (entry) {
+        host.appendChild(buildInquiryCard(entry));
+      });
+    } catch (err) {
+      host.innerHTML = '<p class="adm-empty">Fehler beim Laden.</p>';
+    }
+  }
+
+  function buildInquiryCard(e) {
+    var div = document.createElement('div');
+    div.className = 'adm-inquiry';
+    div.id = 'inq-' + e.id;
+    var meta = [e.vehicle, e.datetime, e.pickup && ('Von: ' + e.pickup), e.dropoff && ('Nach: ' + e.dropoff)]
+      .filter(Boolean).join(' · ');
+    div.innerHTML =
+      '<div class="adm-inquiry-header">' +
+        '<div><div class="adm-inquiry-who">' + esc(e.name) + '</div>' +
+        '<div class="adm-inquiry-meta"><a href="mailto:' + esc(e.email) + '" style="color:#c9a86a">' + esc(e.email) + '</a>' + (e.phone ? ' · ' + esc(e.phone) : '') + '</div>' +
+        (meta ? '<div class="adm-inquiry-meta">' + esc(meta) + '</div>' : '') + '</div>' +
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">' +
+          '<span class="adm-inquiry-time">' + new Date(e.receivedAt).toLocaleString('de-AT') + '</span>' +
+          '<button class="adm-btn adm-btn--danger" data-inq-del="' + esc(e.id) + '">Löschen</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="adm-inquiry-msg">' + esc(e.message) + '</div>';
+    div.querySelector('[data-inq-del]').addEventListener('click', function () { deleteInquiry(e.id); });
+    return div;
+  }
+
+  async function deleteInquiry(id) {
+    if (!confirm('Anfrage löschen?')) return;
+    try {
+      await api('DELETE', '/api/inquiries/' + id);
+      var el = document.getElementById('inq-' + id);
+      if (el) el.remove();
+      toast('Anfrage gelöscht', true);
+    } catch (err) {
+      toast('Fehler: ' + err.message, false);
+    }
+  }
+
+  function setupInquiries() {}
+
+  // ─── Media ────────────────────────────────────────────────────────────────
+
+  async function loadMedia() {
+    var grid = document.getElementById('mediaGrid');
+    grid.innerHTML = '';
+    try {
+      var files = await fetch('/api/uploads', { headers: { 'x-csrf-token': csrfToken } }).then(function (r) { return r.json(); });
+      if (!files.length) { grid.innerHTML = '<p class="adm-empty" style="width:100%">Noch keine Bilder hochgeladen.</p>'; return; }
+      files.forEach(function (f) { grid.appendChild(buildMediaItem(f)); });
+    } catch (err) {
+      grid.innerHTML = '<p class="adm-empty">Fehler beim Laden.</p>';
+    }
+  }
+
+  function buildMediaItem(f) {
+    var div = document.createElement('div');
+    div.className = 'adm-media-item';
+    div.id = 'media-' + CSS.escape(f.name);
+    var img = document.createElement('img');
+    img.src = f.url; img.alt = f.name; img.loading = 'lazy';
+    var nameEl = document.createElement('div');
+    nameEl.className = 'adm-media-name'; nameEl.textContent = f.name;
+    var delBtn = document.createElement('button');
+    delBtn.className = 'adm-media-del'; delBtn.textContent = '×';
+    delBtn.setAttribute('aria-label', 'Löschen');
+    delBtn.addEventListener('click', function () { deleteMedia(f.name); });
+    div.appendChild(img); div.appendChild(nameEl); div.appendChild(delBtn);
+    return div;
+  }
+
+  async function deleteMedia(name) {
+    if (!confirm('Bild "' + name + '" löschen?')) return;
+    try {
+      await api('DELETE', '/api/uploads/' + encodeURIComponent(name));
+      var el = document.getElementById('media-' + CSS.escape(name));
+      if (el) el.remove();
+      toast('Bild gelöscht', true);
+    } catch (err) {
+      toast('Fehler: ' + err.message, false);
+    }
+  }
+
+  function setupMedia() {
+    var zone = document.getElementById('uploadZone');
+    var input = document.getElementById('uploadInput');
+    zone.addEventListener('click', function () { input.click(); });
+    zone.addEventListener('dragover', function (e) { e.preventDefault(); });
+    zone.addEventListener('drop', function (e) { e.preventDefault(); uploadFile(e.dataTransfer.files[0]); });
+    input.addEventListener('change', function () { if (input.files[0]) uploadFile(input.files[0]); input.value = ''; });
+  }
+
+  async function uploadFile(file) {
+    if (!file) return;
+    var msg = document.getElementById('msgMedia');
+    setMsg('msgMedia', 'Hochladen …');
+    var form = new FormData();
+    form.append('image', file);
+    try {
+      var r = await fetch('/api/upload', { method: 'POST', headers: { 'x-csrf-token': csrfToken }, body: form });
+      var data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Upload fehlgeschlagen');
+      setMsg('msgMedia', 'Hochgeladen: ' + data.url);
+      loadMedia();
+    } catch (err) {
+      setMsg('msgMedia', err.message, true);
+    }
+  }
+
+  // ─── Account ──────────────────────────────────────────────────────────────
+
+  function setupAccount() {
+    document.getElementById('changePw').addEventListener('click', async function () {
+      var current = document.getElementById('pwCurrent').value;
+      var next = document.getElementById('pwNew').value;
+      var confirm2 = document.getElementById('pwConfirm').value;
+      if (!current || !next) { setMsg('msgPw', 'Bitte alle Felder ausfüllen.', true); return; }
+      if (next !== confirm2) { setMsg('msgPw', 'Die neuen Passwörter stimmen nicht überein.', true); return; }
+      if (next.length < 10) { setMsg('msgPw', 'Mindestens 10 Zeichen erforderlich.', true); return; }
+      try {
+        await api('POST', '/api/password', { currentPassword: current, newPassword: next });
+        setMsg('msgPw', 'Passwort erfolgreich geändert.');
+        document.getElementById('pwCurrent').value = '';
+        document.getElementById('pwNew').value = '';
+        document.getElementById('pwConfirm').value = '';
+      } catch (err) {
+        setMsg('msgPw', err.message || 'Fehler.', true);
+      }
+    });
+  }
+
+  // ─── Logout ───────────────────────────────────────────────────────────────
+
+  function setupLogout() {
+    document.getElementById('admLogout').addEventListener('click', async function () {
+      try {
+        await api('POST', '/api/logout');
+        window.location.href = '/admin/login';
+      } catch {
+        window.location.href = '/admin/login';
+      }
+    });
+  }
+
+  // ─── Escape HTML ──────────────────────────────────────────────────────────
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ─── Boot ─────────────────────────────────────────────────────────────────
+
+  init();
+}());
+</script>
+</body>
+</html>
