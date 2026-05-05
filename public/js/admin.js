@@ -74,6 +74,90 @@
     setupMedia();
     setupAccount();
     setupLogout();
+    setupPicker();
+  }
+
+  // ─── Image picker (used by hero background, fleet images, SEO og) ─────────
+
+  var pickerCallback = null;
+
+  function openImagePicker(callback) {
+    pickerCallback = callback;
+    var picker = document.getElementById('admPicker');
+    var body = document.getElementById('admPickerBody');
+    var urlInput = document.getElementById('admPickerUrl');
+    body.innerHTML = '<p class="adm-picker-empty">Lade …</p>';
+    urlInput.value = '';
+    picker.removeAttribute('hidden');
+    fetch('/api/uploads', { headers: { 'x-csrf-token': csrfToken } })
+      .then(function (r) { return r.json(); })
+      .then(function (files) {
+        if (!Array.isArray(files) || !files.length) {
+          body.innerHTML = '<p class="adm-picker-empty">Keine Bilder vorhanden. Laden Sie zuerst Bilder im Tab „Medien" hoch.</p>';
+          return;
+        }
+        body.innerHTML = '';
+        files.forEach(function (f) {
+          var item = document.createElement('div');
+          item.className = 'adm-picker-item';
+          item.setAttribute('role', 'button');
+          item.setAttribute('tabindex', '0');
+          item.setAttribute('aria-label', f.name);
+          item.innerHTML =
+            '<img src="' + esc(f.url) + '" alt="" loading="lazy" />' +
+            '<div class="adm-picker-name">' + esc(f.name) + '</div>';
+          item.addEventListener('click', function () { selectImage(f.url); });
+          item.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectImage(f.url); }
+          });
+          body.appendChild(item);
+        });
+      })
+      .catch(function () {
+        body.innerHTML = '<p class="adm-picker-empty">Fehler beim Laden der Mediathek.</p>';
+      });
+  }
+
+  function closePicker() {
+    document.getElementById('admPicker').setAttribute('hidden', '');
+    pickerCallback = null;
+  }
+
+  function selectImage(url) {
+    var cb = pickerCallback;
+    closePicker();
+    if (cb) cb(url);
+  }
+
+  function setupPicker() {
+    document.getElementById('admPickerClose').addEventListener('click', closePicker);
+    document.getElementById('admPickerUseUrl').addEventListener('click', function () {
+      var url = document.getElementById('admPickerUrl').value.trim();
+      if (url) selectImage(url);
+    });
+    document.getElementById('admPickerUrl').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        var url = e.target.value.trim();
+        if (url) selectImage(url);
+      }
+    });
+    // Click outside the card closes the picker.
+    document.getElementById('admPicker').addEventListener('click', function (e) {
+      if (e.target.id === 'admPicker') closePicker();
+    });
+    // Escape closes the picker.
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !document.getElementById('admPicker').hasAttribute('hidden')) closePicker();
+    });
+    // Static picker buttons (hero background, SEO og image)
+    document.querySelectorAll('[data-pick-target]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var input = document.getElementById(btn.getAttribute('data-pick-target'));
+        if (!input) return;
+        openImagePicker(function (url) { input.value = url; });
+      });
+    });
   }
 
   // ─── Tab navigation ──────────────────────────────────────────────────────
@@ -317,12 +401,21 @@
           '<div class="adm-field"><label class="adm-field-label">Gepäck</label><input class="adm-input" data-fl-lug maxlength="20" value="' + esc(item.luggage) + '" /></div>' +
         '</div>' +
         '<div class="adm-field"><label class="adm-field-label">Features (kommagetrennt)</label><input class="adm-input" data-fl-feats maxlength="800" value="' + esc(feats) + '" /></div>' +
-        '<div class="adm-field"><label class="adm-field-label">Bild (URL)</label><input class="adm-input" data-fl-img value="' + esc(item.image) + '" /></div>' +
+        '<div class="adm-field"><label class="adm-field-label">Bild</label>' +
+          '<div class="adm-img-field">' +
+            '<input class="adm-input" data-fl-img value="' + esc(item.image) + '" placeholder="/uploads/… oder leer für Standard" />' +
+            '<button type="button" class="adm-btn adm-btn--ghost adm-btn--small" data-fl-pick>Auswählen</button>' +
+          '</div>' +
+        '</div>' +
       '</div>';
     div.querySelector('[data-remove]').addEventListener('click', function () {
       content.fleet = readFleet();
       content.fleet.splice(i, 1);
       renderFleet();
+    });
+    div.querySelector('[data-fl-pick]').addEventListener('click', function () {
+      var input = div.querySelector('[data-fl-img]');
+      openImagePicker(function (url) { input.value = url; });
     });
     return div;
   }

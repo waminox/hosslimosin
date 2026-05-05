@@ -233,6 +233,67 @@ textarea, input, select { font: inherit; }
   .adm-panel { padding: 20px 16px; }
   .adm-grid2 { grid-template-columns: 1fr; }
 }
+
+/* Image field with picker button */
+.adm-img-field { display: flex; gap: 8px; align-items: stretch; }
+.adm-img-field .adm-input { flex: 1; min-width: 0; }
+.adm-img-field .adm-btn { white-space: nowrap; }
+
+/* Image picker modal */
+.adm-picker {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.78); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.adm-picker[hidden] { display: none; }
+.adm-picker-card {
+  width: 100%; max-width: 760px; max-height: 86vh;
+  background: #0e0e0e; border: 1px solid rgba(255,255,255,0.1);
+  display: flex; flex-direction: column;
+}
+.adm-picker-head {
+  padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.adm-picker-title {
+  font-size: 0.7rem; letter-spacing: 0.32em; text-transform: uppercase;
+  color: #c9a86a; font-weight: 600;
+}
+.adm-picker-close {
+  font-size: 1.6rem; line-height: 1; color: #6f6759; cursor: pointer;
+  background: transparent; border: 0; padding: 0 4px;
+}
+.adm-picker-close:hover { color: #c9a86a; }
+.adm-picker-body {
+  flex: 1; overflow-y: auto; padding: 20px 24px;
+  display: flex; flex-wrap: wrap; gap: 12px; align-content: flex-start;
+}
+.adm-picker-item {
+  width: 130px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.adm-picker-item img {
+  width: 130px; height: 86px; object-fit: cover; display: block;
+  background: #111; border: 1px solid rgba(255,255,255,0.08);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.adm-picker-item:hover img { border-color: #c9a86a; transform: translateY(-2px); }
+.adm-picker-name {
+  font-size: 0.6rem; color: #6f6759;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;
+}
+.adm-picker-empty { color: #6f6759; font-size: 0.85rem; padding: 12px 0; }
+.adm-picker-foot {
+  padding: 14px 24px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; gap: 12px; align-items: center;
+}
+.adm-picker-url {
+  flex: 1; min-width: 0;
+  background: #111; border: 1px solid rgba(255,255,255,0.08);
+  color: #d8d0c4; padding: 9px 12px; font-size: 0.82rem; font: inherit;
+  outline: none; transition: border-color 0.2s;
+}
+.adm-picker-url:focus { border-color: rgba(201,168,106,0.5); }
 </style>
 </head>
 <body>
@@ -318,7 +379,12 @@ textarea, input, select { font: inherit; }
         <div class="adm-field"><label class="adm-field-label">Untertitel</label><textarea class="adm-textarea" id="heroSubtitle" maxlength="400" rows="3"></textarea></div>
         <div class="adm-grid2">
           <div class="adm-field"><label class="adm-field-label">Sekundärer Button</label><input class="adm-input" id="heroSecondaryCta" maxlength="60" /></div>
-          <div class="adm-field"><label class="adm-field-label">Hintergrundbild (URL)</label><input class="adm-input" id="heroBackground" placeholder="/img/hero.jpg" /></div>
+          <div class="adm-field"><label class="adm-field-label">Hintergrundbild</label>
+            <div class="adm-img-field">
+              <input class="adm-input" id="heroBackground" placeholder="/uploads/… oder leer für Standard" />
+              <button type="button" class="adm-btn adm-btn--ghost adm-btn--small" data-pick-target="heroBackground">Auswählen</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -449,7 +515,12 @@ textarea, input, select { font: inherit; }
       <p class="adm-panel-desc">Meta-Titel, Beschreibung und Open-Graph-Bild.</p>
       <div class="adm-field"><label class="adm-field-label">Seiten-Titel (max. 60 Zeichen)</label><input class="adm-input" id="seoTitle" maxlength="120" /></div>
       <div class="adm-field"><label class="adm-field-label">Meta-Beschreibung (max. 160 Zeichen)</label><textarea class="adm-textarea" id="seoDescription" maxlength="320" rows="3"></textarea></div>
-      <div class="adm-field"><label class="adm-field-label">OG-Bild (URL)</label><input class="adm-input" id="seoOgImage" placeholder="/img/og.jpg" /></div>
+      <div class="adm-field"><label class="adm-field-label">OG-Bild</label>
+        <div class="adm-img-field">
+          <input class="adm-input" id="seoOgImage" placeholder="/uploads/…" />
+          <button type="button" class="adm-btn adm-btn--ghost adm-btn--small" data-pick-target="seoOgImage">Auswählen</button>
+        </div>
+      </div>
       <div class="adm-save-bar">
         <button class="adm-btn adm-btn--gold" id="saveSeo">Speichern</button>
         <span class="adm-save-msg" id="msgSeo"></span>
@@ -496,6 +567,20 @@ textarea, input, select { font: inherit; }
 </div>
 
 <div class="adm-toast" id="admToast"></div>
+
+<div class="adm-picker" id="admPicker" hidden role="dialog" aria-modal="true" aria-labelledby="admPickerTitle">
+  <div class="adm-picker-card">
+    <div class="adm-picker-head">
+      <span class="adm-picker-title" id="admPickerTitle">Bild auswählen</span>
+      <button class="adm-picker-close" id="admPickerClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="adm-picker-body" id="admPickerBody"></div>
+    <div class="adm-picker-foot">
+      <input type="url" class="adm-picker-url" id="admPickerUrl" placeholder="Externe URL einfügen (https://…)" />
+      <button class="adm-btn adm-btn--ghost adm-btn--small" id="admPickerUseUrl">URL übernehmen</button>
+    </div>
+  </div>
+</div>
 
 <script src="/js/admin.js" defer></script>
 </body>
