@@ -212,6 +212,26 @@
         agb: c.legal.agb || LEGAL.agb,
       };
     }
+
+    // Hero title: only override when the admin's value actually differs from
+    // the markup default; preserves the design's <em> styling for unchanged copy.
+    const hero = c.hero || {};
+    const titleEl = document.querySelector('.hero__title');
+    if (titleEl && hero.title && hero.title.trim() !== titleEl.textContent.trim()) {
+      titleEl.textContent = hero.title;
+    }
+    const subtitleEl = document.querySelector('.hero__subtitle');
+    if (subtitleEl && hero.subtitle) {
+      subtitleEl.textContent = hero.subtitle;
+    }
+    const ctas = document.querySelectorAll('.hero__cta a');
+    if (ctas[0] && hero.primaryCta) ctas[0].textContent = hero.primaryCta;
+    if (ctas[1] && hero.secondaryCta) ctas[1].textContent = hero.secondaryCta;
+
+    const heroBg = document.getElementById('heroBg');
+    if (heroBg) {
+      heroBg.style.backgroundImage = hero.backgroundImage ? `url(${JSON.stringify(hero.backgroundImage)})` : '';
+    }
   }
 
   // ------- Boot -------
