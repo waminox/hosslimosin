@@ -1,6 +1,18 @@
 (() => {
   'use strict';
 
+  // Escape HTML and convert *segment* markers into <em>segment</em> for safe
+  // innerHTML rendering of admin-managed copy.
+  function escHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function emphasize(s) {
+    return String(s).split(/(\*[^*]+\*)/g).map((part) => {
+      const m = part.match(/^\*([^*]+)\*$/);
+      return m ? `<em>${escHtml(m[1])}</em>` : escHtml(part);
+    }).join('');
+  }
+
   // ------- Fleet data (image keys map to :root --img-* placeholders) -------
   const FLEET = [
     { name: "Mercedes-Benz EQS", category: "Vollelektrische Luxus-Limousine", bucket: "Mercedes", passengers: "3", luggage: "2",
@@ -213,12 +225,16 @@
       };
     }
 
-    // Hero title: only override when the admin's value actually differs from
-    // the markup default; preserves the design's <em> styling for unchanged copy.
+    // Hero title: admin can wrap any segment in *asterisks* to render it as
+    // <em> (gold italic). Skip when stripped value matches current text so the
+    // design's existing <em> markup stays for unchanged default copy.
     const hero = c.hero || {};
     const titleEl = document.querySelector('.hero__title');
-    if (titleEl && hero.title && hero.title.trim() !== titleEl.textContent.trim()) {
-      titleEl.textContent = hero.title;
+    if (titleEl && hero.title) {
+      const stripped = hero.title.replace(/\*/g, '').trim();
+      if (stripped !== titleEl.textContent.trim()) {
+        titleEl.innerHTML = emphasize(hero.title);
+      }
     }
     const subtitleEl = document.querySelector('.hero__subtitle');
     if (subtitleEl && hero.subtitle) {
