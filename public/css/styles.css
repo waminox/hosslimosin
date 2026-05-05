@@ -132,6 +132,7 @@ button { font: inherit; cursor: pointer; border: 0; background: transparent; col
   padding: 26px 28px 36px; background: rgba(5,5,5,0.97);
   border-top: 1px solid var(--line); backdrop-filter: blur(20px);
 }
+.nav__mobile[hidden] { display: none; }
 .nav__mobile a {
   font-family: var(--serif); font-size: 1.65rem; color: var(--ink); font-style: italic;
 }
