@@ -51,11 +51,14 @@ if (!fs.existsSync(CONTENT_FILE) && fs.existsSync(DEFAULT_CONTENT_FILE)) {
 // Seed admin user from env on first boot.
 if (!fs.existsSync(USERS_FILE)) {
   const username = process.env.ADMIN_USERNAME || 'admin';
-  const password = process.env.ADMIN_PASSWORD || 'ChangeMe!2026';
-  const hash = bcrypt.hashSync(password, 12);
-  fs.writeFileSync(USERS_FILE, JSON.stringify({ username, passwordHash: hash }, null, 2));
-  console.log(`[init] Wrote ${USERS_FILE}. Default login: ${username} / ${password}`);
-  console.log('[init] Change the password from /admin immediately.');
+  const envHash = process.env.ADMIN_PASSWORD_HASH || '';
+  const envPassword = process.env.ADMIN_PASSWORD || '';
+  const passwordHash = envHash || (envPassword ? bcrypt.hashSync(envPassword, 12) : '');
+  if (!passwordHash) {
+    throw new Error('Missing admin credentials: set ADMIN_PASSWORD_HASH (preferred) or ADMIN_PASSWORD.');
+  }
+  fs.writeFileSync(USERS_FILE, JSON.stringify({ username, passwordHash }, null, 2));
+  console.log(`[init] Wrote ${USERS_FILE}. Admin login ready for user: ${username}`);
 }
 
 const app = express();
@@ -166,7 +169,7 @@ async function verifyRecaptcha(token) {
         });
       }
     );
-    req.on('error', () => resolve(true)); // network error → allow through
+    req.on('error', () => resolve(false));
     req.write(body);
     req.end();
   });
@@ -293,6 +296,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   }
   if (String(message).length > 4000) return res.status(400).json({ error: 'Nachricht zu lang.' });
 
+  const siteContent = await readJson(CONTENT_FILE).catch(() => ({}));
   const entry = {
     id: crypto.randomBytes(8).toString('hex'),
     receivedAt: new Date().toISOString(),
@@ -315,11 +319,13 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 
   // Send email notification — fire-and-forget; a save error must not block the response.
   const mailer = createMailer();
-  if (mailer && CONTACT_RECEIVER_EMAIL) {
+  const resolvedReceiver =
+    asString(siteContent?.contactForm?.receiverEmail || '', 180).trim() || CONTACT_RECEIVER_EMAIL;
+  if (mailer && resolvedReceiver) {
     mailer
       .sendMail({
         from: `"Hosslimo Anfrage" <${SMTP_USER}>`,
-        to: CONTACT_RECEIVER_EMAIL,
+        to: resolvedReceiver,
         replyTo: entry.email,
         subject: `Neue Anfrage: ${entry.name}`,
         text: buildPlainText(entry),
@@ -601,6 +607,9 @@ function sanitizeContent(c) {
     title: asString(c?.cta?.title, 240),
     subtitle: asString(c?.cta?.subtitle, 400),
     button: asString(c?.cta?.button, 60),
+  };
+  out.contactForm = {
+    receiverEmail: asString(c?.contactForm?.receiverEmail, 180),
   };
   out.legal = {
     impressum: asString(c?.legal?.impressum, 8000),

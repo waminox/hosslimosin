@@ -412,6 +412,7 @@ textarea, input, select { font: inherit; }
         <div class="adm-field"><label class="adm-field-label">WhatsApp (wa.me Link)</label><input class="adm-input" id="contactWhatsappHref" maxlength="200" placeholder="https://wa.me/43…" /></div>
       </div>
       <div class="adm-field"><label class="adm-field-label">Verfügbarkeitszeiten</label><input class="adm-input" id="contactHours" maxlength="200" placeholder="24 / 7 für Sie erreichbar" /></div>
+      <div class="adm-field"><label class="adm-field-label">Empfänger-E-Mail für Kontaktformular</label><input class="adm-input" id="contactReceiverEmail" type="email" maxlength="180" placeholder="office@hosslimo.com" /></div>
       <div class="adm-save-bar">
         <button class="adm-btn adm-btn--gold" id="saveContact">Speichern</button>
         <span class="adm-save-msg" id="msgContact"></span>
@@ -631,6 +632,7 @@ textarea, input, select { font: inherit; }
     setVal('contactWhatsappHref', c.contact && c.contact.whatsappHref);
     setVal('contactAddress', c.contact && c.contact.address);
     setVal('contactHours', c.contact && c.contact.hours);
+    setVal('contactReceiverEmail', c.contactForm && c.contactForm.receiverEmail);
     // Legal
     setVal('legalImpressum', c.legal && c.legal.impressum);
     setVal('legalDatenschutz', c.legal && c.legal.datenschutz);
@@ -913,6 +915,7 @@ textarea, input, select { font: inherit; }
         whatsappHref: val('contactWhatsappHref'), address: val('contactAddress'),
         hours: val('contactHours'),
       };
+      content.contactForm = { receiverEmail: val('contactReceiverEmail') };
     });
   }
 

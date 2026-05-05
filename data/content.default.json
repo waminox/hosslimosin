@@ -210,6 +210,9 @@
     "subtitle": "Senden Sie uns eine Anfrage – wir antworten persönlich, meist innerhalb weniger Minuten.",
     "button": "Anfrage senden"
   },
+  "contactForm": {
+    "receiverEmail": "office@hosslimo.com"
+  },
   "legal": {
     "impressum": "Bitte ergänzen Sie Ihre Impressums-Angaben im Admin-Bereich.",
     "datenschutz": "Bitte ergänzen Sie Ihre Datenschutzerklärung im Admin-Bereich.",
