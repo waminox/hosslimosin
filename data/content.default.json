@@ -10,8 +10,8 @@
     "email": "office@hosslimo.com",
     "whatsapp": "WhatsApp",
     "whatsappHref": "https://wa.me/436600000000",
-    "address": "Wien, Österreich",
-    "hours": "24 / 7 für Sie erreichbar"
+    "address": "Wien, Österreich\nAuf Wunsch europaweit unterwegs.",
+    "hours": "24 / 7 für Sie da"
   },
   "hero": {
     "eyebrow": "Chauffeur · Limousine · Vans",
@@ -52,32 +52,32 @@
     {
       "icon": "plane",
       "title": "Flughafentransfer",
-      "text": "Zuverlässige Transfers zu und von allen Flughäfen – wir behalten die Flugzeiten im Blick, empfangen Sie am Ausgang und kümmern uns um Ihr Gepäck."
+      "text": "Komfortable Transfers von und zu allen Flughäfen — mit Flugüberwachung, Empfang am Gate und Gepäckservice."
     },
     {
       "icon": "briefcase",
       "title": "Business-Chauffeur",
-      "text": "Repräsentativer Chauffeurservice für Meetings, Konferenzen und Kundentermine – stunden- oder tagesweise buchbar, mit diskreter Begleitung."
+      "text": "Repräsentativer Auftritt für Geschäftstermine, Konferenzen und Roadshows — Stunden- oder Tagespauschale."
     },
     {
       "icon": "ring",
-      "title": "Hochzeiten & Anlässe",
-      "text": "Eine stilvolle Limousine für Ihren besonderen Tag – Hochzeiten, Jubiläen, Premieren. Auf Wunsch mit persönlich abgestimmtem Ablauf."
+      "title": "Hochzeiten & Events",
+      "text": "Eine elegante Limousine für den schönsten Tag. Auf Wunsch mit Blumenschmuck und individuellem Ablauf."
     },
     {
       "icon": "users",
-      "title": "Gruppen-Transfer",
-      "text": "Mercedes-Benz V-Klasse oder Sprinter für Gruppen ab 6 oder 12 Personen – ideal für Flughafenzubringer, Hotelshuttles und gemeinsame Ausflüge."
+      "title": "Gruppen- & VIP-Transfer",
+      "text": "Sprinter-Vans ab 12 Personen für Gruppen, Roadshows oder hochwertige Sammeltransfers."
     },
     {
       "icon": "route",
-      "title": "Langstrecke & Ausland",
-      "text": "Mehrtägiger Chauffeurservice in ganz Europa – verlässlich, diskret, mit erfahrenen Chauffeuren auch auf längeren Reiserouten."
+      "title": "Langstrecken",
+      "text": "Diskreter Chauffeur über mehrere Tage in ganz Europa — inklusive Hotelübernachtung des Chauffeurs."
     },
     {
       "icon": "star",
-      "title": "VIP & Roadshows",
-      "text": "Begleitung für Geschäftsgäste, Künstler und Persönlichkeiten – mit dem nötigen Feingefühl, klarer Planung und absoluter Diskretion."
+      "title": "Roadshows & Premieren",
+      "text": "Begleitservice für Künstler, Diplomaten und Unternehmer — höchste Diskretion garantiert."
     }
   ],
   "fleet": [
@@ -86,8 +86,8 @@
       "category": "Vollelektrische Luxus-Limousine",
       "passengers": "3",
       "luggage": "2",
-      "features": ["Massagesitze", "Burmester Sound", "Panoramadach", "Lautlos & emissionsfrei"],
-      "image": "/img/car-sedan.svg"
+      "features": ["Massagesitze", "Burmester Sound", "Panoramadach", "Lautlos"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz EQE",
@@ -95,47 +95,47 @@
       "passengers": "3",
       "luggage": "2",
       "features": ["Klimakomfortsitze", "WLAN", "Hyperscreen", "Emissionsfrei"],
-      "image": "/img/car-sedan.svg"
+      "image": ""
     },
     {
       "name": "Mercedes-Benz S-Klasse",
       "category": "Klassische Luxus-Limousine",
       "passengers": "3",
       "luggage": "3",
-      "features": ["Chauffeur-Paket", "Burmester 4D Sound", "Massagesitze", "Executive-Komfort"],
-      "image": "/img/car-sedan.svg"
+      "features": ["Chauffeur-Paket", "Burmester 4D", "Massagesitze", "Executive"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz E-Klasse",
       "category": "Business-Limousine",
       "passengers": "3",
       "luggage": "3",
-      "features": ["Lederausstattung", "Klimakomfort", "WLAN", "Ruhige Fahrkabine"],
-      "image": "/img/car-sedan.svg"
+      "features": ["Lederausstattung", "Klimakomfort", "WLAN", "Stille Kabine"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz V-Klasse",
       "category": "First-Class-Van",
       "passengers": "6",
       "luggage": "6",
-      "features": ["Konferenzbestuhlung", "Tisch & Steckdosen", "Sichtschutz", "Großer Kofferraum"],
-      "image": "/img/car-van.svg"
+      "features": ["Konferenzbestuhlung", "Tisch", "Verdunkelung", "Großer Kofferraum"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz EQV",
       "category": "Elektrischer First-Class-Van",
       "passengers": "6",
       "luggage": "6",
-      "features": ["Konferenzbestuhlung", "Lautlos", "Emissionsfrei", "Premium-Komfort"],
-      "image": "/img/car-van.svg"
+      "features": ["Konferenzbestuhlung", "Lautlos", "Emissionsfrei", "Premium"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz Sprinter",
-      "category": "Gruppen-Shuttle ab 12 Personen",
+      "category": "Gruppen-Van ab 12 Personen",
       "passengers": "12+",
       "luggage": "12+",
-      "features": ["Komfortbestuhlung", "Klimaanlage", "Großer Stauraum", "Ideal für Gruppen"],
-      "image": "/img/car-sprinter.svg"
+      "features": ["Komfortbestuhlung", "Klimaanlage", "Stauraum", "Für Gruppen"],
+      "image": ""
     },
     {
       "name": "Tesla Model S",
@@ -143,48 +143,48 @@
       "passengers": "3",
       "luggage": "2",
       "features": ["Autopilot", "Premium Audio", "Glasdach", "Emissionsfrei"],
-      "image": "/img/car-sedan.svg"
+      "image": ""
     },
     {
       "name": "Tesla Model X",
       "category": "Elektrischer Premium-SUV",
       "passengers": "5",
       "luggage": "4",
-      "features": ["Falcon-Wing-Türen", "Glasdach", "HEPA-Luftfilter", "Emissionsfrei"],
-      "image": "/img/car-suv.svg"
+      "features": ["Falcon-Wing-Türen", "Glasdach", "HEPA-Filter", "Emissionsfrei"],
+      "image": ""
     },
     {
       "name": "Tesla Model Y",
       "category": "Elektrischer Komfort-SUV",
       "passengers": "4",
       "luggage": "3",
-      "features": ["Panoramadach", "Premium Audio", "Großzügiger Innenraum", "Emissionsfrei"],
-      "image": "/img/car-suv.svg"
+      "features": ["Glasdach", "Premium Audio", "Innenraum", "Emissionsfrei"],
+      "image": ""
     },
     {
       "name": "Tesla Model 3",
       "category": "Elektrische Business-Limousine",
       "passengers": "3",
       "luggage": "2",
-      "features": ["Premium Audio", "Glasdach", "Schnellladung", "Emissionsfrei"],
-      "image": "/img/car-sedan.svg"
+      "features": ["Premium Audio", "Glasdach", "Schnellladen", "Emissionsfrei"],
+      "image": ""
     }
   ],
   "testimonials": [
     {
       "author": "Maria K.",
       "role": "Geschäftsführerin",
-      "quote": "Wir nutzen Hosslimo für all unsere Roadshows. Pünktlich, stil­voll und immer persönlich betreut – jedes Mal."
+      "quote": "Wir nutzen Hosslimo für all unsere Roadshows. Pünktlichkeit, Stil und ein sehr aufmerksamer Service — jedes Mal."
     },
     {
       "author": "Stefan L.",
       "role": "Hochzeitspaar",
-      "quote": "Die EQS war traumhaft. Der Chauffeur diskret, freundlich und absolut professionell. Eine klare Empfehlung."
+      "quote": "Die EQS war traumhaft. Der Chauffeur diskret, freundlich und absolut professionell. Klare Empfehlung."
     },
     {
       "author": "Andreas H.",
       "role": "Investor",
-      "quote": "Verlässlich, leise, perfekt vorbereitet – genau so muss ein Chauffeurservice sein."
+      "quote": "Verlässlich, leise, perfekt vorbereitet — genau so muss ein Chauffeurservice sein."
     }
   ],
   "coverage": {
