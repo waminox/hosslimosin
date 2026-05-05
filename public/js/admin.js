@@ -598,25 +598,88 @@
     }
   }
 
+  function fmtTime(iso) {
+    try { return new Date(iso).toLocaleString('de-AT'); } catch { return iso || ''; }
+  }
+
+  function bubbleHtml(text, ts, outgoing) {
+    return (
+      '<div class="adm-bubble ' + (outgoing ? 'adm-bubble--out' : 'adm-bubble--in') + '">' +
+      esc(text) +
+      '<span class="adm-bubble-time">' + esc(fmtTime(ts)) + '</span>' +
+      '</div>'
+    );
+  }
+
   function buildInquiryCard(e) {
     var div = document.createElement('div');
     div.className = 'adm-inquiry';
     div.id = 'inq-' + e.id;
     var meta = [e.vehicle, e.datetime, e.pickup && ('Von: ' + e.pickup), e.dropoff && ('Nach: ' + e.dropoff)]
       .filter(Boolean).join(' · ');
+    var replies = Array.isArray(e.replies) ? e.replies : [];
+
+    var thread = '<div class="adm-thread" data-thread>' +
+      bubbleHtml(e.message || '', e.receivedAt, false) +
+      replies.map(function (r) { return bubbleHtml(r.body, r.at, true); }).join('') +
+    '</div>';
+
+    var composer =
+      '<div class="adm-reply">' +
+        '<textarea data-reply-body maxlength="8000" rows="3" placeholder="Antwort schreiben …"></textarea>' +
+        '<div class="adm-reply-row">' +
+          '<span class="adm-reply-msg" data-reply-msg></span>' +
+          '<button type="button" class="adm-btn adm-btn--gold adm-btn--small" data-reply-send>Senden</button>' +
+        '</div>' +
+      '</div>';
+
     div.innerHTML =
       '<div class="adm-inquiry-header">' +
         '<div><div class="adm-inquiry-who">' + esc(e.name) + '</div>' +
-        '<div class="adm-inquiry-meta"><a href="mailto:' + esc(e.email) + '" style="color:#c9a86a">' + esc(e.email) + '</a>' + (e.phone ? ' · ' + esc(e.phone) : '') + '</div>' +
-        (meta ? '<div class="adm-inquiry-meta">' + esc(meta) + '</div>' : '') + '</div>' +
+        '<div class="adm-inquiry-meta">' +
+          '<a href="mailto:' + esc(e.email) + '">' + esc(e.email) + '</a>' +
+          (e.phone ? ' · <a href="tel:' + esc(e.phone) + '">' + esc(e.phone) + '</a>' : '') +
+        '</div>' +
+        (meta ? '<div class="adm-inquiry-meta">' + esc(meta) + '</div>' : '') +
+        '</div>' +
         '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">' +
-          '<span class="adm-inquiry-time">' + new Date(e.receivedAt).toLocaleString('de-AT') + '</span>' +
+          '<span class="adm-inquiry-time">' + esc(fmtTime(e.receivedAt)) + '</span>' +
           '<button class="adm-btn adm-btn--danger" data-inq-del="' + esc(e.id) + '">Löschen</button>' +
         '</div>' +
       '</div>' +
-      '<div class="adm-inquiry-msg">' + esc(e.message) + '</div>';
+      thread +
+      composer;
+
     div.querySelector('[data-inq-del]').addEventListener('click', function () { deleteInquiry(e.id); });
+    div.querySelector('[data-reply-send]').addEventListener('click', function () {
+      sendReply(e.id, div);
+    });
     return div;
+  }
+
+  async function sendReply(id, cardEl) {
+    var ta = cardEl.querySelector('[data-reply-body]');
+    var msg = cardEl.querySelector('[data-reply-msg]');
+    var btn = cardEl.querySelector('[data-reply-send]');
+    var body = (ta.value || '').trim();
+    if (!body) { msg.textContent = 'Bitte einen Text schreiben.'; msg.className = 'adm-reply-msg is-err'; return; }
+    btn.disabled = true; msg.textContent = 'Wird gesendet …'; msg.className = 'adm-reply-msg';
+    try {
+      var data = await api('POST', '/api/inquiries/' + id + '/reply', { body: body });
+      if (!data) return; // 401 redirected
+      var thread = cardEl.querySelector('[data-thread]');
+      thread.insertAdjacentHTML('beforeend', bubbleHtml(data.reply.body, data.reply.at, true));
+      ta.value = '';
+      msg.textContent = 'Gesendet.';
+      msg.className = 'adm-reply-msg';
+      toast('Antwort gesendet', true);
+    } catch (err) {
+      msg.textContent = err.message || 'Fehler beim Senden.';
+      msg.className = 'adm-reply-msg is-err';
+      toast('Fehler: ' + (err.message || 'unbekannt'), false);
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   async function deleteInquiry(id) {

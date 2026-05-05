@@ -248,6 +248,60 @@ function buildHtmlEmail(e) {
 </html>`;
 }
 
+function buildReplyPlainText(inquiry, body) {
+  const greeting = inquiry.name ? `Sehr geehrte/r ${inquiry.name},` : 'Sehr geehrte/r Interessent/in,';
+  return [
+    greeting,
+    '',
+    body,
+    '',
+    'Mit freundlichen Grüßen',
+    'Hoss Limousine Service e.U.',
+    '',
+    '— — — — — — — — — — — — — — — — — — — —',
+    'Ihre ursprüngliche Anfrage:',
+    inquiry.message || '',
+  ].join('\n');
+}
+
+function buildReplyHtml(inquiry, body) {
+  const esc = (s) =>
+    String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  const greeting = inquiry.name ? `Sehr geehrte/r ${esc(inquiry.name)},` : 'Sehr geehrte/r Interessent/in,';
+  return `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"></head>
+<body style="margin:0;padding:0;background:#f2f2f2;font-family:Arial,Helvetica,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f2f2f2;padding:32px 0">
+<tr><td align="center">
+<table width="580" cellpadding="0" cellspacing="0" style="background:#fff;max-width:580px;width:100%">
+  <tr><td style="background:#050505;padding:26px 36px 24px">
+    <span style="font-family:'Times New Roman',serif;font-style:italic;font-size:22px;color:#f1ece2;letter-spacing:1px">Hosslimo</span>
+    <span style="display:block;font-size:10px;color:#c9a86a;letter-spacing:3px;text-transform:uppercase;margin-top:5px">Antwort auf Ihre Anfrage</span>
+  </td></tr>
+  <tr><td style="padding:32px 36px;color:#1a1a1a;font-size:14px;line-height:1.7">
+    <p style="margin:0 0 18px">${greeting}</p>
+    <div style="white-space:pre-wrap">${esc(body)}</div>
+    <p style="margin:24px 0 0">Mit freundlichen Grüßen<br><strong>Hoss Limousine Service e.U.</strong></p>
+  </td></tr>
+  ${
+    inquiry.message
+      ? `<tr><td style="background:#f9f9f9;padding:20px 36px;border-top:1px solid #eee;color:#666;font-size:12px;line-height:1.65">
+           <p style="margin:0 0 8px;color:#999;text-transform:uppercase;letter-spacing:1.5px;font-size:10px">Ihre ursprüngliche Anfrage</p>
+           <div style="white-space:pre-wrap">${esc(inquiry.message)}</div>
+         </td></tr>`
+      : ''
+  }
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
 function requireAuth(req, res, next) {
   if (req.session && req.session.user) return next();
   if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'unauthorized' });
@@ -427,6 +481,52 @@ app.delete('/api/inquiries/:id', requireAuth, csrfProtection, async (req, res) =
   const next = list.filter((x) => x.id !== req.params.id);
   await writeJsonAtomic(file, next);
   res.json({ ok: true });
+});
+
+// Reply to an inquiry — sends SMTP email to the original sender and persists
+// the message on the inquiry so the admin sees the conversation history.
+const replyLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 30, standardHeaders: true });
+app.post('/api/inquiries/:id/reply', replyLimiter, requireAuth, csrfProtection, async (req, res) => {
+  const body = String((req.body && req.body.body) || '').trim();
+  if (!body) return res.status(400).json({ error: 'Antworttext fehlt.' });
+  if (body.length > 8000) return res.status(400).json({ error: 'Antwort zu lang.' });
+
+  const file = path.join(DATA_DIR, 'inquiries.json');
+  let list = [];
+  try { list = await readJson(file); } catch {}
+  const idx = list.findIndex((x) => x.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Anfrage nicht gefunden.' });
+  const inquiry = list[idx];
+  if (!inquiry.email) return res.status(400).json({ error: 'Keine Empfänger-E-Mail in der Anfrage.' });
+
+  const mailer = createMailer();
+  if (!mailer) return res.status(503).json({ error: 'SMTP ist nicht konfiguriert.' });
+
+  try {
+    await mailer.sendMail({
+      from: `"Hosslimo" <${SMTP_USER}>`,
+      to: inquiry.email,
+      replyTo: CONTACT_RECEIVER_EMAIL || SMTP_USER,
+      subject: `Antwort auf Ihre Anfrage – Hosslimo`,
+      text: buildReplyPlainText(inquiry, body),
+      html: buildReplyHtml(inquiry, body),
+    });
+  } catch (err) {
+    console.error('[mail] reply error:', err.message);
+    return res.status(502).json({ error: 'E-Mail konnte nicht gesendet werden.' });
+  }
+
+  const reply = {
+    id: crypto.randomBytes(6).toString('hex'),
+    at: new Date().toISOString(),
+    body,
+    by: (req.session.user && req.session.user.username) || 'admin',
+  };
+  inquiry.replies = Array.isArray(inquiry.replies) ? inquiry.replies : [];
+  inquiry.replies.push(reply);
+  list[idx] = inquiry;
+  await writeJsonAtomic(file, list);
+  res.json({ ok: true, reply, inquiry });
 });
 
 // ----- Image upload ---------------------------------------------------------
