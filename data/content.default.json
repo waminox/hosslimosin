@@ -16,7 +16,7 @@
   "hero": {
     "eyebrow": "Chauffeur · Limousine · Vans",
     "title": "Diskret. Pünktlich. Erstklassig.",
-    "subtitle": "Ihr persönlicher Chauffeurservice mit schwarzer Mercedes-Benz- und Tesla-Flotte – in Wien, österreichweit und auf Wunsch durch ganz Europa.",
+    "subtitle": "Ihr persönlicher Chauffeurservice mit schwarzer Mercedes-Benz- und Tesla-Flotte – in Wien, österreichweit und auf Anfrage in ganz Europa.",
     "primaryCta": "Jetzt anfragen",
     "secondaryCta": "Flotte ansehen",
     "backgroundImage": "/img/hero.jpg"
@@ -24,27 +24,27 @@
   "about": {
     "eyebrow": "Über Hosslimo",
     "title": "Mehr als eine Fahrt — ein Erlebnis.",
-    "body": "Hosslimo steht für einen Chauffeurservice, der Komfort, Verlässlichkeit und Stil verbindet. Ob Flughafentransfer, Geschäftstermin, Roadshow oder besonderer Anlass – unsere Chauffeure sorgen dafür, dass Sie entspannt, diskret und pünktlich ans Ziel kommen. Jede Buchung wird persönlich betreut – kein Call-Center, keine Massenabfertigung.",
+    "body": "Hosslimo steht für einen Chauffeurservice, der Komfort, Verlässlichkeit und Stil verbindet. Ob Flughafentransfer, Geschäftstermin oder besonderer Anlass – unsere Chauffeure bringen Sie entspannt, diskret und pünktlich ans Ziel. Jede Anfrage wird persönlich betreut – kein Call-Center, keine Massenabfertigung.",
     "highlights": [
       {
         "icon": "shield",
-        "title": "Sicherheit & Diskretion",
-        "text": "Professionelle Chauffeure mit langjähriger Erfahrung – verlässlich, diskret und stets vorbereitet."
+        "title": "Diskret & vertrauenswürdig",
+        "text": "Erfahrene Chauffeure, die wissen, wie man sich im Hintergrund hält und gleichzeitig immer einen Schritt voraus ist."
       },
       {
         "icon": "clock",
-        "title": "Garantierte Pünktlichkeit",
-        "text": "Wir sind vor der vereinbarten Zeit am Abholort – mit Echtzeit-Flugüberwachung bei Airporttransfers."
+        "title": "Pünktlich am Treffpunkt",
+        "text": "Wir planen mit Puffer und behalten Verkehr und Flugzeiten im Blick – damit Ihr Termin entspannt beginnt."
       },
       {
         "icon": "sparkle",
-        "title": "Premium-Flotte",
-        "text": "Vollständig schwarze Flotte aus Mercedes-Benz und Tesla, gepflegt bis ins letzte Detail."
+        "title": "Schwarze Premium-Flotte",
+        "text": "Mercedes-Benz und Tesla – gepflegt, geprüft und mit Liebe zum Detail vorbereitet."
       },
       {
         "icon": "globe",
-        "title": "Österreich & Europa",
-        "text": "Wien, Salzburg, München, Zürich – und auf Wunsch mehrere Tage quer durch Europa."
+        "title": "Wien & Europa",
+        "text": "Wien ist unser Zuhause. Auf Wunsch fahren wir österreichweit – und auf Anfrage in ganz Europa."
       }
     ]
   },
@@ -52,7 +52,7 @@
     {
       "icon": "plane",
       "title": "Flughafentransfer",
-      "text": "Zuverlässige Transfers zu und von allen Flughäfen – mit Echtzeit-Flugüberwachung, Schilderempfang am Ausgang und Gepäckunterstützung."
+      "text": "Zuverlässige Transfers zu und von allen Flughäfen – wir behalten die Flugzeiten im Blick, empfangen Sie am Ausgang und kümmern uns um Ihr Gepäck."
     },
     {
       "icon": "briefcase",
@@ -61,23 +61,23 @@
     },
     {
       "icon": "ring",
-      "title": "Hochzeiten & Events",
-      "text": "Eine elegante Limousine für besondere Anlässe – Hochzeiten, Jubiläen, Premieren. Auf Wunsch mit persönlichem Ablauf und Blumenschmuck."
+      "title": "Hochzeiten & Anlässe",
+      "text": "Eine stilvolle Limousine für Ihren besonderen Tag – Hochzeiten, Jubiläen, Premieren. Auf Wunsch mit persönlich abgestimmtem Ablauf."
     },
     {
       "icon": "users",
-      "title": "Gruppen- & VIP-Transfer",
-      "text": "Mercedes-Benz Sprinter oder V-Klasse für Gruppen – ideal für Flughafenzubringer, Roadshows und Ausflüge ab 6 Personen."
+      "title": "Gruppen-Transfer",
+      "text": "Mercedes-Benz V-Klasse oder Sprinter für Gruppen ab 6 oder 12 Personen – ideal für Flughafenzubringer, Hotelshuttles und gemeinsame Ausflüge."
     },
     {
       "icon": "route",
       "title": "Langstrecke & Ausland",
-      "text": "Chauffeurservice über mehrere Tage in ganz Europa – diskret, verlässlich, mit erfahrenen Chauffeuren auch auf komplexen Reiserouten."
+      "text": "Mehrtägiger Chauffeurservice in ganz Europa – verlässlich, diskret, mit erfahrenen Chauffeuren auch auf längeren Reiserouten."
     },
     {
       "icon": "star",
       "title": "VIP & Roadshows",
-      "text": "Begleitservice für Geschäftsgäste, Künstler und öffentliche Personen – absolute Diskretion, höchste Professionalität."
+      "text": "Begleitung für Geschäftsgäste, Künstler und Persönlichkeiten – mit dem nötigen Feingefühl, klarer Planung und absoluter Diskretion."
     }
   ],
   "fleet": [
@@ -207,7 +207,7 @@
   },
   "cta": {
     "title": "Ihre nächste Fahrt verdient mehr als ein Taxi.",
-    "subtitle": "Senden Sie uns eine Anfrage – wir antworten persönlich, meist innerhalb weniger Minuten.",
+    "subtitle": "Senden Sie uns eine Anfrage – wir melden uns persönlich bei Ihnen zurück, meist noch am selben Tag.",
     "button": "Anfrage senden"
   },
   "legal": {

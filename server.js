@@ -173,9 +173,9 @@ async function verifyRecaptcha(token) {
 }
 
 function buildPlainText(e) {
-  const line = (label, val) => (val ? `${label}: ${val}\n` : '');
-  return [
-    `Neue Anfrage – Hosslimo`,
+  const line = (label, val) => (val ? `${label}: ${val}` : null);
+  const parts = [
+    'Neue Anfrage – Hosslimo',
     '='.repeat(50),
     `Eingegangen: ${new Date(e.receivedAt).toLocaleString('de-AT')}`,
     '',
@@ -183,19 +183,16 @@ function buildPlainText(e) {
     line('Name', e.name),
     line('E-Mail', e.email),
     line('Telefon', e.phone),
-    '',
-    '--- Fahrtwunsch ---',
-    line('Fahrzeug', e.vehicle),
-    line('Datum / Uhrzeit', e.datetime),
-    line('Abholung', e.pickup),
-    line('Ziel', e.dropoff),
-    '',
-    '--- Nachricht ---',
-    e.message,
-    '',
-    '='.repeat(50),
-    `ID: ${e.id}`,
-  ].join('\n');
+  ];
+  if (e.vehicle || e.datetime || e.pickup || e.dropoff) {
+    parts.push('', '--- Fahrtwunsch ---');
+    parts.push(line('Fahrzeug', e.vehicle));
+    parts.push(line('Datum / Uhrzeit', e.datetime));
+    parts.push(line('Abholung', e.pickup));
+    parts.push(line('Ziel', e.dropoff));
+  }
+  parts.push('', '--- Nachricht ---', e.message, '', '='.repeat(50), `ID: ${e.id}`);
+  return parts.filter((x) => x !== null).join('\n');
 }
 
 function buildHtmlEmail(e) {
