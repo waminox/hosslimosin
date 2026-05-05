@@ -225,29 +225,79 @@
       };
     }
 
-    // Hero title: admin can wrap any segment in *asterisks* to render it as
-    // <em> (gold italic). Skip when stripped value matches current text so the
-    // design's existing <em> markup stays for unchanged default copy.
-    const hero = c.hero || {};
-    const titleEl = document.querySelector('.hero__title');
-    if (titleEl && hero.title) {
-      const stripped = hero.title.replace(/\*/g, '').trim();
-      if (stripped !== titleEl.textContent.trim()) {
-        titleEl.innerHTML = emphasize(hero.title);
-      }
-    }
-    const subtitleEl = document.querySelector('.hero__subtitle');
-    if (subtitleEl && hero.subtitle) {
-      subtitleEl.textContent = hero.subtitle;
-    }
-    const ctas = document.querySelectorAll('.hero__cta a');
-    if (ctas[0] && hero.primaryCta) ctas[0].textContent = hero.primaryCta;
-    if (ctas[1] && hero.secondaryCta) ctas[1].textContent = hero.secondaryCta;
+    // Helpers that respect the design: only override when the admin's value
+    // (with asterisks stripped, for emphasised fields) differs from the markup,
+    // so default copy keeps the design's existing <em> styling.
+    const setText = (el, val) => {
+      if (!el || !val) return;
+      if (val.trim() === el.textContent.trim()) return;
+      el.textContent = val;
+    };
+    const setEm = (el, val) => {
+      if (!el || !val) return;
+      if (val.replace(/\*/g, '').trim() === el.textContent.trim()) return;
+      el.innerHTML = emphasize(val);
+    };
 
+    // ------- Hero -------
+    const hero = c.hero || {};
+    setEm(document.querySelector('.hero__title'), hero.title);
+    setText(document.querySelector('.hero__subtitle'), hero.subtitle);
+    const ctas = document.querySelectorAll('.hero__cta a');
+    setText(ctas[0], hero.primaryCta);
+    setText(ctas[1], hero.secondaryCta);
     const heroBg = document.getElementById('heroBg');
     if (heroBg) {
-      heroBg.style.backgroundImage = hero.backgroundImage ? `url(${JSON.stringify(hero.backgroundImage)})` : '';
+      heroBg.style.backgroundImage = hero.backgroundImage
+        ? `url(${JSON.stringify(hero.backgroundImage)})`
+        : '';
     }
+
+    // ------- Brand (wordmark, tagline, footer copyright) -------
+    const brand = c.brand || {};
+    if (brand.logoText) {
+      document.querySelectorAll('.nav__wordmark, .foot__mark').forEach((el) => setText(el, brand.logoText));
+    }
+    setText(document.querySelector('.foot__brand p'), brand.tagline);
+    if (brand.name && brand.name !== 'Hosslimo') {
+      const yearEl = document.getElementById('year');
+      let n = yearEl?.nextSibling;
+      while (n) {
+        if (n.nodeType === 3 && /Hosslimo/.test(n.textContent)) {
+          n.textContent = n.textContent.replace('Hosslimo', brand.name);
+          break;
+        }
+        n = n.nextSibling;
+      }
+    }
+
+    // ------- About -------
+    const about = c.about || {};
+    setText(document.querySelector('#about .section__num'), about.eyebrow);
+    setEm(document.querySelector('#about .section__title'), about.title);
+    setText(document.querySelector('#about .about__body'), about.body);
+
+    // ------- Coverage -------
+    const cov = c.coverage || {};
+    setEm(document.querySelector('#coverage .section__title'), cov.title);
+    setText(document.querySelector('#coverage .section__lead'), cov.body);
+    const citiesHost = document.querySelector('#coverage .coverage__cities');
+    if (citiesHost && Array.isArray(cov.cities) && cov.cities.length) {
+      const next = cov.cities.map((x) => String(x).trim()).filter(Boolean);
+      const current = Array.from(citiesHost.querySelectorAll('.city')).map((s) => s.textContent.trim());
+      const same = current.length === next.length && current.every((v, i) => v === next[i]);
+      if (!same) {
+        citiesHost.innerHTML = next
+          .map((name, i) => `<span class="city${i === 0 ? ' city--main' : ''}">${escHtml(name)}</span>`)
+          .join('');
+      }
+    }
+
+    // ------- CTA -------
+    const cta = c.cta || {};
+    setEm(document.querySelector('#contact .section__title'), cta.title);
+    setText(document.querySelector('#contact .section__lead'), cta.subtitle);
+    setText(document.querySelector('#contactForm button[type="submit"]'), cta.button);
   }
 
   // ------- Boot -------

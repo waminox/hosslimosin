@@ -1,7 +1,7 @@
 {
   "brand": {
     "name": "Hosslimo",
-    "tagline": "Premium Chauffeurservice",
+    "tagline": "Premium Chauffeurservice — eine schwarze Flotte aus Mercedes-Benz und Tesla. Aus Wien.",
     "logoText": "Hosslimo"
   },
   "contact": {
@@ -22,9 +22,9 @@
     "backgroundImage": ""
   },
   "about": {
-    "eyebrow": "Über Hosslimo",
-    "title": "Mehr als eine Fahrt — ein Erlebnis.",
-    "body": "Hosslimo steht für einen Chauffeurservice, der Komfort, Verlässlichkeit und Stil verbindet. Ob Flughafentransfer, Geschäftstermin oder besonderer Anlass – unsere Chauffeure bringen Sie entspannt, diskret und pünktlich ans Ziel. Jede Anfrage wird persönlich betreut – kein Call-Center, keine Massenabfertigung.",
+    "eyebrow": "01 — Über Hosslimo",
+    "title": "Mehr als eine Fahrt — *ein Erlebnis.*",
+    "body": "Hosslimo steht für einen Chauffeurservice, der Komfort, Sicherheit und Stil verbindet. Ob Geschäftstermin, Flughafentransfer, Hochzeit oder besonderer Anlass — unsere geschulten Chauffeure bringen Sie diskret, sicher und entspannt an Ihr Ziel. Persönlicher Service. Kein Massengeschäft.",
     "highlights": [
       {
         "icon": "shield",
@@ -188,8 +188,8 @@
     }
   ],
   "coverage": {
-    "title": "Wir bringen Sie überall hin.",
-    "body": "Wien ist unser Zuhause – aber unser Service endet nicht an der Stadtgrenze. Wir fahren österreichweit und auf Wunsch in ganz Europa.",
+    "title": "Wir bringen Sie *überall* hin.",
+    "body": "Wien ist unser Zuhause — aber unser Service endet nicht an der Stadtgrenze. Österreichweit. Auf Wunsch in ganz Europa.",
     "cities": [
       "Wien",
       "Salzburg",
@@ -202,12 +202,15 @@
       "Budapest",
       "Zürich",
       "Prag",
-      "Mailand"
+      "Mailand",
+      "Venedig",
+      "Genf",
+      "Paris"
     ]
   },
   "cta": {
-    "title": "Ihre nächste Fahrt verdient mehr als ein Taxi.",
-    "subtitle": "Senden Sie uns eine Anfrage – wir melden uns persönlich bei Ihnen zurück, meist noch am selben Tag.",
+    "title": "Ihre nächste Fahrt verdient *mehr* als ein Taxi.",
+    "subtitle": "Senden Sie uns eine Anfrage — wir antworten persönlich, meist innerhalb weniger Minuten.",
     "button": "Anfrage senden"
   },
   "legal": {
