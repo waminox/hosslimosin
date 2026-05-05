@@ -55,6 +55,16 @@
       features: ["Premium Audio", "Glasdach", "Schnellladen", "Emissionsfrei"], img: "--img-tesla-3" },
   ];
 
+  // Lookup: design's CSS-variable image keyed by car name (used as a fallback
+  // when admin's image URL is empty so the default Unsplash image is preserved).
+  const FLEET_IMG_BY_NAME = Object.fromEntries(FLEET.map((c) => [c.name, c.img]));
+
+  function fleetBg(name, image) {
+    if (image) return `url(${JSON.stringify(image)})`;
+    const cssVar = FLEET_IMG_BY_NAME[name];
+    return cssVar ? `var(${cssVar})` : 'none';
+  }
+
   function renderFleet(items) {
     const grid = document.getElementById('fleetGrid');
     if (!grid) return;
@@ -74,7 +84,7 @@
           passengers: x.passengers || '',
           luggage: x.luggage || '',
           features: Array.isArray(x.features) ? x.features : [],
-          bgImage: x.image ? `url(${JSON.stringify(x.image)})` : 'none',
+          bgImage: fleetBg(name, x.image),
         };
       });
     } else {
@@ -326,6 +336,15 @@
     setEm(document.querySelector('#about .section__title'), about.title);
     setText(document.querySelector('#about .about__body'), about.body);
 
+    // About media image (left of the text). Empty value clears the inline
+    // override so the design's CSS-variable image (--img-about) stays.
+    const aboutMedia = document.querySelector('.about__media');
+    if (aboutMedia) {
+      aboutMedia.style.backgroundImage = about.image
+        ? `url(${JSON.stringify(about.image)})`
+        : '';
+    }
+
     // About highlights (Diskretion, Pünktlichkeit, …)
     const highlights = Array.isArray(about.highlights) ? about.highlights.filter((x) => x && (x.title || x.text)) : [];
     const hlList = document.querySelector('.about__highlights');
@@ -450,15 +469,32 @@
     const fleet = Array.isArray(c.fleet) ? c.fleet.filter((x) => x && x.name) : [];
     if (fleet.length) {
       const grid = document.getElementById('fleetGrid');
+      const normBg = (s) => String(s).replace(/['"]/g, '"').replace(/\s+/g, '');
       const current = grid
         ? Array.from(grid.querySelectorAll('.car')).map((card) => ({
             name: norm(card.querySelector('.car__name')?.textContent || ''),
             category: norm(card.querySelector('.car__class')?.textContent || ''),
+            passengers: norm(card.querySelector('.car__specs strong')?.textContent || ''),
+            features: Array.from(card.querySelectorAll('.car__feats li')).map((li) => norm(li.textContent)).join('|'),
+            bg: normBg(card.querySelector('.car__media')?.style.backgroundImage || ''),
           }))
         : [];
+      const next = fleet.map((item) => ({
+        name: norm(item.name || ''),
+        category: norm(item.category || ''),
+        passengers: norm(item.passengers || ''),
+        features: (Array.isArray(item.features) ? item.features : []).map(norm).join('|'),
+        bg: normBg(fleetBg(String(item.name || ''), item.image)),
+      }));
       const same =
-        current.length === fleet.length &&
-        current.every((cur, i) => cur.name === norm(fleet[i].name) && cur.category === norm(fleet[i].category || ''));
+        current.length === next.length &&
+        current.every((cur, i) =>
+          cur.name === next[i].name &&
+          cur.category === next[i].category &&
+          cur.passengers === next[i].passengers &&
+          cur.features === next[i].features &&
+          cur.bg === next[i].bg
+        );
       if (!same) {
         renderFleet(fleet);
         if (grid) setupReveal(grid);

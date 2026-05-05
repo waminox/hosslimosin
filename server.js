@@ -653,6 +653,7 @@ function sanitizeContent(c) {
     eyebrow: asString(c?.about?.eyebrow, 80),
     title: asString(c?.about?.title, 240),
     body: asString(c?.about?.body, 4000),
+    image: asUrl(c?.about?.image),
     highlights: Array.isArray(c?.about?.highlights)
       ? c.about.highlights.slice(0, 8).map((h) => ({
           icon: asString(h?.icon, 40),

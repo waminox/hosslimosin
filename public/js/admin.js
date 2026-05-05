@@ -201,6 +201,7 @@
     setVal('aboutEyebrow', c.about && c.about.eyebrow);
     setVal('aboutTitle', c.about && c.about.title);
     setVal('aboutBody', c.about && c.about.body);
+    setVal('aboutImage', c.about && c.about.image);
     // Coverage
     setVal('coverageTitle', c.coverage && c.coverage.title);
     setVal('coverageBody', c.coverage && c.coverage.body);
@@ -541,6 +542,7 @@
       };
       content.about = Object.assign({}, content.about, {
         eyebrow: val('aboutEyebrow'), title: val('aboutTitle'), body: val('aboutBody'),
+        image: val('aboutImage'),
         highlights: readHighlights(),
       });
       content.coverage = { title: val('coverageTitle'), body: val('coverageBody'), cities: cities.slice() };
@@ -583,23 +585,80 @@
 
   // ─── Inquiries ────────────────────────────────────────────────────────────
 
+  // ─── Inquiries: WhatsApp-style list + conversation modal ─────────────────
+
+  var inquiriesCache = [];
+  var currentConvId = null;
+
   async function loadInquiries() {
     var host = document.getElementById('inquiriesList');
     host.innerHTML = '<p class="adm-empty">Lade …</p>';
     try {
       var list = await fetch('/api/inquiries', { headers: { 'x-csrf-token': csrfToken } }).then(function (r) { return r.json(); });
-      host.innerHTML = '';
-      if (!list.length) { host.innerHTML = '<p class="adm-empty">Keine Anfragen vorhanden.</p>'; return; }
-      list.forEach(function (entry) {
-        host.appendChild(buildInquiryCard(entry));
-      });
+      inquiriesCache = Array.isArray(list) ? list : [];
+      renderConvList();
     } catch (err) {
       host.innerHTML = '<p class="adm-empty">Fehler beim Laden.</p>';
     }
   }
 
+  function renderConvList() {
+    var host = document.getElementById('inquiriesList');
+    if (!inquiriesCache.length) {
+      host.innerHTML = '<p class="adm-empty">Keine Anfragen vorhanden.</p>';
+      return;
+    }
+    host.innerHTML = '<div class="adm-conv-list" id="convList"></div>';
+    var listEl = document.getElementById('convList');
+    inquiriesCache.forEach(function (e) { listEl.appendChild(buildConvListItem(e)); });
+  }
+
+  function buildConvListItem(e) {
+    var div = document.createElement('div');
+    div.className = 'adm-conv-item';
+    div.setAttribute('role', 'button');
+    div.setAttribute('tabindex', '0');
+    var initials = (e.name || e.email || '?').trim().split(/\s+/).map(function (s) { return s.charAt(0); }).join('').slice(0, 2).toUpperCase() || '?';
+    var replies = Array.isArray(e.replies) ? e.replies : [];
+    var lastMsg = replies.length ? replies[replies.length - 1].body : (e.message || '');
+    var lastAt = replies.length ? replies[replies.length - 1].at : e.receivedAt;
+    var preview = lastMsg.replace(/\s+/g, ' ').slice(0, 110);
+    var who = e.name || e.email || 'Anfrage';
+    div.innerHTML =
+      '<div class="adm-conv-avatar">' + esc(initials) + '</div>' +
+      '<div class="adm-conv-body">' +
+        '<div class="adm-conv-name">' +
+          '<span>' + esc(who) + '</span>' +
+          '<span class="adm-conv-time">' + esc(fmtRelTime(lastAt)) + '</span>' +
+        '</div>' +
+        '<div class="adm-conv-preview">' +
+          '<span class="adm-conv-preview-text">' + esc(preview) + '</span>' +
+          (replies.length ? '<span class="adm-conv-badge" title="Antworten">' + replies.length + '</span>' : '') +
+        '</div>' +
+      '</div>';
+    div.addEventListener('click', function () { openConversation(e.id); });
+    div.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openConversation(e.id); }
+    });
+    return div;
+  }
+
   function fmtTime(iso) {
-    try { return new Date(iso).toLocaleString('de-AT'); } catch { return iso || ''; }
+    try { return new Date(iso).toLocaleString('de-AT'); } catch (e) { return iso || ''; }
+  }
+
+  function fmtRelTime(iso) {
+    if (!iso) return '';
+    try {
+      var d = new Date(iso);
+      var now = new Date();
+      var diff = now - d;
+      if (diff < 60 * 1000) return 'gerade';
+      if (diff < 60 * 60 * 1000) return Math.floor(diff / 60000) + ' Min';
+      if (diff < 24 * 60 * 60 * 1000) return Math.floor(diff / 3600000) + ' Std';
+      if (diff < 7 * 24 * 60 * 60 * 1000) return Math.floor(diff / 86400000) + ' Tg';
+      return d.toLocaleDateString('de-AT');
+    } catch (e) { return ''; }
   }
 
   function bubbleHtml(text, ts, outgoing) {
@@ -611,68 +670,62 @@
     );
   }
 
-  function buildInquiryCard(e) {
-    var div = document.createElement('div');
-    div.className = 'adm-inquiry';
-    div.id = 'inq-' + e.id;
-    var meta = [e.vehicle, e.datetime, e.pickup && ('Von: ' + e.pickup), e.dropoff && ('Nach: ' + e.dropoff)]
+  function openConversation(id) {
+    var inq = inquiriesCache.find(function (x) { return x.id === id; });
+    if (!inq) return;
+    currentConvId = id;
+    document.getElementById('admConvTitle').textContent = inq.name || inq.email || 'Anfrage';
+    var subParts = [];
+    if (inq.email) subParts.push('<a href="mailto:' + esc(inq.email) + '">' + esc(inq.email) + '</a>');
+    if (inq.phone) subParts.push('<a href="tel:' + esc(inq.phone) + '">' + esc(inq.phone) + '</a>');
+    document.getElementById('admConvSub').innerHTML = subParts.join(' · ');
+    var meta = [inq.vehicle, inq.datetime, inq.pickup && ('Von: ' + inq.pickup), inq.dropoff && ('Nach: ' + inq.dropoff)]
       .filter(Boolean).join(' · ');
-    var replies = Array.isArray(e.replies) ? e.replies : [];
+    document.getElementById('admConvMeta').textContent = meta || 'Eingegangen ' + fmtTime(inq.receivedAt);
 
-    var thread = '<div class="adm-thread" data-thread>' +
-      bubbleHtml(e.message || '', e.receivedAt, false) +
-      replies.map(function (r) { return bubbleHtml(r.body, r.at, true); }).join('') +
-    '</div>';
+    var thread = document.getElementById('admConvThread');
+    thread.innerHTML =
+      bubbleHtml(inq.message || '', inq.receivedAt, false) +
+      (Array.isArray(inq.replies) ? inq.replies : []).map(function (r) { return bubbleHtml(r.body, r.at, true); }).join('');
 
-    var composer =
-      '<div class="adm-reply">' +
-        '<textarea data-reply-body maxlength="8000" rows="3" placeholder="Antwort schreiben …"></textarea>' +
-        '<div class="adm-reply-row">' +
-          '<span class="adm-reply-msg" data-reply-msg></span>' +
-          '<button type="button" class="adm-btn adm-btn--gold adm-btn--small" data-reply-send>Senden</button>' +
-        '</div>' +
-      '</div>';
+    var ta = document.getElementById('admConvBody');
+    var msg = document.getElementById('admConvMsg');
+    ta.value = '';
+    msg.textContent = '';
+    msg.className = 'adm-reply-msg';
 
-    div.innerHTML =
-      '<div class="adm-inquiry-header">' +
-        '<div><div class="adm-inquiry-who">' + esc(e.name) + '</div>' +
-        '<div class="adm-inquiry-meta">' +
-          '<a href="mailto:' + esc(e.email) + '">' + esc(e.email) + '</a>' +
-          (e.phone ? ' · <a href="tel:' + esc(e.phone) + '">' + esc(e.phone) + '</a>' : '') +
-        '</div>' +
-        (meta ? '<div class="adm-inquiry-meta">' + esc(meta) + '</div>' : '') +
-        '</div>' +
-        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">' +
-          '<span class="adm-inquiry-time">' + esc(fmtTime(e.receivedAt)) + '</span>' +
-          '<button class="adm-btn adm-btn--danger" data-inq-del="' + esc(e.id) + '">Löschen</button>' +
-        '</div>' +
-      '</div>' +
-      thread +
-      composer;
-
-    div.querySelector('[data-inq-del]').addEventListener('click', function () { deleteInquiry(e.id); });
-    div.querySelector('[data-reply-send]').addEventListener('click', function () {
-      sendReply(e.id, div);
-    });
-    return div;
+    document.getElementById('admConv').removeAttribute('hidden');
+    setTimeout(function () { thread.scrollTop = thread.scrollHeight; ta.focus(); }, 30);
   }
 
-  async function sendReply(id, cardEl) {
-    var ta = cardEl.querySelector('[data-reply-body]');
-    var msg = cardEl.querySelector('[data-reply-msg]');
-    var btn = cardEl.querySelector('[data-reply-send]');
+  function closeConversation() {
+    document.getElementById('admConv').setAttribute('hidden', '');
+    currentConvId = null;
+  }
+
+  async function sendCurrentReply() {
+    if (!currentConvId) return;
+    var ta = document.getElementById('admConvBody');
+    var msg = document.getElementById('admConvMsg');
+    var btn = document.getElementById('admConvSend');
     var body = (ta.value || '').trim();
     if (!body) { msg.textContent = 'Bitte einen Text schreiben.'; msg.className = 'adm-reply-msg is-err'; return; }
     btn.disabled = true; msg.textContent = 'Wird gesendet …'; msg.className = 'adm-reply-msg';
     try {
-      var data = await api('POST', '/api/inquiries/' + id + '/reply', { body: body });
-      if (!data) return; // 401 redirected
-      var thread = cardEl.querySelector('[data-thread]');
+      var data = await api('POST', '/api/inquiries/' + currentConvId + '/reply', { body: body });
+      if (!data) return;
+      var inq = inquiriesCache.find(function (x) { return x.id === currentConvId; });
+      if (inq) {
+        inq.replies = Array.isArray(inq.replies) ? inq.replies : [];
+        inq.replies.push(data.reply);
+      }
+      var thread = document.getElementById('admConvThread');
       thread.insertAdjacentHTML('beforeend', bubbleHtml(data.reply.body, data.reply.at, true));
+      thread.scrollTop = thread.scrollHeight;
       ta.value = '';
-      msg.textContent = 'Gesendet.';
-      msg.className = 'adm-reply-msg';
+      msg.textContent = 'Gesendet.'; msg.className = 'adm-reply-msg';
       toast('Antwort gesendet', true);
+      renderConvList();
     } catch (err) {
       msg.textContent = err.message || 'Fehler beim Senden.';
       msg.className = 'adm-reply-msg is-err';
@@ -682,19 +735,34 @@
     }
   }
 
-  async function deleteInquiry(id) {
-    if (!confirm('Anfrage löschen?')) return;
+  async function deleteCurrentConv() {
+    if (!currentConvId) return;
+    if (!confirm('Diese Anfrage wirklich löschen?')) return;
     try {
-      await api('DELETE', '/api/inquiries/' + id);
-      var el = document.getElementById('inq-' + id);
-      if (el) el.remove();
+      await api('DELETE', '/api/inquiries/' + currentConvId);
+      inquiriesCache = inquiriesCache.filter(function (x) { return x.id !== currentConvId; });
+      closeConversation();
+      renderConvList();
       toast('Anfrage gelöscht', true);
     } catch (err) {
-      toast('Fehler: ' + err.message, false);
+      toast('Fehler: ' + (err.message || 'unbekannt'), false);
     }
   }
 
-  function setupInquiries() {}
+  function setupInquiries() {
+    document.getElementById('admConvClose').addEventListener('click', closeConversation);
+    document.getElementById('admConv').addEventListener('click', function (e) {
+      if (e.target.id === 'admConv') closeConversation();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !document.getElementById('admConv').hasAttribute('hidden')) closeConversation();
+    });
+    document.getElementById('admConvSend').addEventListener('click', sendCurrentReply);
+    document.getElementById('admConvBody').addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); sendCurrentReply(); }
+    });
+    document.getElementById('admConvDelete').addEventListener('click', deleteCurrentConv);
+  }
 
   // ─── Media ────────────────────────────────────────────────────────────────
 
