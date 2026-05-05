@@ -329,7 +329,10 @@ textarea, input, select { font: inherit; }
           <div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" id="aboutTitle" maxlength="240" /></div>
         </div>
         <div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" id="aboutBody" maxlength="4000" rows="5"></textarea></div>
-        <p style="font-size:0.72rem;color:#6f6759;margin:4px 0 16px">Highlights: im Tab "Services" verwalten oder hier als JSON (für Entwickler).</p>
+        <p class="adm-section-title" style="margin-top:24px">Highlights</p>
+        <p style="font-size:0.72rem;color:#6f6759;margin:0 0 12px">Boxen mit Icon, Titel und kurzer Beschreibung (z. B. Diskretion, Pünktlichkeit).</p>
+        <div class="adm-list" id="highlightsList"></div>
+        <button class="adm-btn adm-btn--ghost adm-btn--small" id="addHighlight">+ Highlight hinzufügen</button>
       </div>
 
       <div class="adm-section">

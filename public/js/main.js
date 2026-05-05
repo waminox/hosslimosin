@@ -326,6 +326,37 @@
     setEm(document.querySelector('#about .section__title'), about.title);
     setText(document.querySelector('#about .about__body'), about.body);
 
+    // About highlights (Diskretion, Pünktlichkeit, …)
+    const highlights = Array.isArray(about.highlights) ? about.highlights.filter((x) => x && (x.title || x.text)) : [];
+    const hlList = document.querySelector('.about__highlights');
+    if (hlList && highlights.length) {
+      const current = Array.from(hlList.querySelectorAll('.hl')).map((li) => ({
+        title: norm(li.querySelector('.hl__title')?.textContent || ''),
+        text: norm(li.querySelector('.hl__text')?.textContent || ''),
+      }));
+      const next = highlights.map((h) => ({
+        title: norm(h.title || ''),
+        text: norm(h.text || ''),
+        icon: String(h.icon || 'star').trim(),
+        rawTitle: String(h.title || ''),
+        rawText: String(h.text || ''),
+      }));
+      const same =
+        current.length === next.length &&
+        current.every((cur, i) => cur.title === next[i].title && cur.text === next[i].text);
+      if (!same) {
+        hlList.innerHTML = next
+          .map((h) => `
+            <li class="hl">
+              <span class="hl__icon">${SERVICE_ICONS[h.icon] || SERVICE_ICONS.star}</span>
+              <h3 class="hl__title">${escHtml(h.rawTitle)}</h3>
+              <p class="hl__text">${escHtml(h.rawText)}</p>
+            </li>
+          `)
+          .join('');
+      }
+    }
+
     // ------- Coverage -------
     const cov = c.coverage || {};
     setEm(document.querySelector('#coverage .section__title'), cov.title);

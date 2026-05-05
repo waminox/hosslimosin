@@ -144,6 +144,7 @@
     setVal('seoOgImage', c.seo && c.seo.ogImage);
     // Array editors
     renderServices();
+    renderHighlights();
     renderFleet();
     renderVoices();
   }
@@ -235,6 +236,61 @@
     content.services = readServices();
     content.services.push({ icon: 'star', title: '', text: '' });
     renderServices();
+  });
+
+  // ─── Highlights editor (about boxes) ─────────────────────────────────────
+
+  function renderHighlights() {
+    var hs = (content.about && Array.isArray(content.about.highlights)) ? content.about.highlights : [];
+    renderItemList('highlightsList', hs, buildHighlightItem);
+  }
+
+  function buildHighlightItem(item, i) {
+    var div = document.createElement('div');
+    div.className = 'adm-item';
+    div.innerHTML =
+      '<div class="adm-item-header"><span class="adm-item-num">Highlight ' + (i + 1) + '</span>' +
+      '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
+      '<div class="adm-item-fields">' +
+        '<div class="adm-grid2">' +
+          '<div class="adm-field"><label class="adm-field-label">Icon</label>' +
+          '<select class="adm-select adm-input" data-hl-icon>' +
+          ICON_OPTIONS.map(function (ic) {
+            return '<option value="' + ic + '"' + (item.icon === ic ? ' selected' : '') + '>' + ic + '</option>';
+          }).join('') +
+          '</select></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" data-hl-title maxlength="120" value="' + esc(item.title) + '" /></div>' +
+        '</div>' +
+        '<div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" data-hl-text maxlength="400" rows="2">' + esc(item.text) + '</textarea></div>' +
+      '</div>';
+    div.querySelector('[data-remove]').addEventListener('click', function () {
+      content.about = content.about || {};
+      content.about.highlights = readHighlights();
+      content.about.highlights.splice(i, 1);
+      renderHighlights();
+    });
+    return div;
+  }
+
+  function readHighlights() {
+    var host = document.getElementById('highlightsList');
+    var items = [];
+    host.querySelectorAll('.adm-item').forEach(function (item) {
+      items.push({
+        icon: item.querySelector('[data-hl-icon]').value,
+        title: item.querySelector('[data-hl-title]').value,
+        text: item.querySelector('[data-hl-text]').value,
+      });
+    });
+    return items;
+  }
+
+  document.getElementById('addHighlight').addEventListener('click', function () {
+    content.about = content.about || {};
+    content.about.highlights = readHighlights();
+    if (content.about.highlights.length >= 8) { toast('Maximal 8 Highlights erlaubt', false); return; }
+    content.about.highlights.push({ icon: 'star', title: '', text: '' });
+    renderHighlights();
   });
 
   // ─── Fleet editor ─────────────────────────────────────────────────────────
@@ -392,6 +448,7 @@
       };
       content.about = Object.assign({}, content.about, {
         eyebrow: val('aboutEyebrow'), title: val('aboutTitle'), body: val('aboutBody'),
+        highlights: readHighlights(),
       });
       content.coverage = { title: val('coverageTitle'), body: val('coverageBody'), cities: cities.slice() };
       content.cta = { title: val('ctaTitle'), subtitle: val('ctaSubtitle'), button: val('ctaButton') };
