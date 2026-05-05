@@ -1,191 +1,146 @@
 (() => {
   'use strict';
 
-  // ---------- Inline icon library --------------------------------------------
-  const ICONS = {
-    shield: '<svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.4 9.3 8 10 4.6-.7 8-5 8-10V6l-8-4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
-    clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-    sparkle: '<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-    globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
-    plane: '<svg viewBox="0 0 24 24"><path d="m2 13 7 1 4-9 2 1-2 8 6 1 1 2-7 1-3 5-2-1 1-5-7-1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
-    briefcase: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
-    ring: '<svg viewBox="0 0 24 24"><circle cx="12" cy="15" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m9 9 3-5 3 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
-    users: '<svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 20a7 7 0 0 1 14 0M16 11a3 3 0 1 0 0-6M22 20a6 6 0 0 0-5-5.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-    route: '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 6h6a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-    star: '<svg viewBox="0 0 24 24"><path d="M12 2.5 14.6 9 22 9.6l-5.6 4.6 1.8 7.3L12 17.6 5.8 21.5l1.8-7.3L2 9.6 9.4 9 12 2.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
-  };
+  // ------- Fleet data (image keys map to :root --img-* placeholders) -------
+  const FLEET = [
+    { name: "Mercedes-Benz EQS", category: "Vollelektrische Luxus-Limousine", bucket: "Mercedes", passengers: "3", luggage: "2",
+      features: ["Massagesitze", "Burmester Sound", "Panoramadach", "Lautlos"], img: "--img-eqs" },
+    { name: "Mercedes-Benz EQE", category: "Elektrische Business-Limousine", bucket: "Mercedes", passengers: "3", luggage: "2",
+      features: ["Klimakomfortsitze", "WLAN", "Hyperscreen", "Emissionsfrei"], img: "--img-eqe" },
+    { name: "Mercedes-Benz S-Klasse", category: "Klassische Luxus-Limousine", bucket: "Mercedes", passengers: "3", luggage: "3",
+      features: ["Chauffeur-Paket", "Burmester 4D", "Massagesitze", "Executive"], img: "--img-sclass" },
+    { name: "Mercedes-Benz E-Klasse", category: "Business-Limousine", bucket: "Mercedes", passengers: "3", luggage: "3",
+      features: ["Lederausstattung", "Klimakomfort", "WLAN", "Stille Kabine"], img: "--img-eclass" },
+    { name: "Mercedes-Benz V-Klasse", category: "First-Class-Van", bucket: "Van", passengers: "6", luggage: "6",
+      features: ["Konferenzbestuhlung", "Tisch", "Verdunkelung", "Großer Kofferraum"], img: "--img-vclass" },
+    { name: "Mercedes-Benz EQV", category: "Elektrischer First-Class-Van", bucket: "Van", passengers: "6", luggage: "6",
+      features: ["Konferenzbestuhlung", "Lautlos", "Emissionsfrei", "Premium"], img: "--img-eqv" },
+    { name: "Mercedes-Benz Sprinter", category: "Gruppen-Van ab 12 Personen", bucket: "Van", passengers: "12+", luggage: "12+",
+      features: ["Komfortbestuhlung", "Klimaanlage", "Stauraum", "Für Gruppen"], img: "--img-sprinter" },
+    { name: "Tesla Model S", category: "Elektrische Performance-Limousine", bucket: "Tesla", passengers: "3", luggage: "2",
+      features: ["Autopilot", "Premium Audio", "Glasdach", "Emissionsfrei"], img: "--img-tesla-s" },
+    { name: "Tesla Model X", category: "Elektrischer Premium-SUV", bucket: "Tesla", passengers: "5", luggage: "4",
+      features: ["Falcon-Wing-Türen", "Glasdach", "HEPA-Filter", "Emissionsfrei"], img: "--img-tesla-x" },
+    { name: "Tesla Model Y", category: "Elektrischer Komfort-SUV", bucket: "Tesla", passengers: "4", luggage: "3",
+      features: ["Glasdach", "Premium Audio", "Innenraum", "Emissionsfrei"], img: "--img-tesla-y" },
+    { name: "Tesla Model 3", category: "Elektrische Business-Limousine", bucket: "Tesla", passengers: "3", luggage: "2",
+      features: ["Premium Audio", "Glasdach", "Schnellladen", "Emissionsfrei"], img: "--img-tesla-3" },
+  ];
 
-  function setIcon(el, name) {
-    if (!el) return;
-    el.innerHTML = ICONS[name] || ICONS.star;
+  function renderFleet() {
+    const grid = document.getElementById('fleetGrid');
+    if (!grid) return;
+    grid.innerHTML = FLEET.map(c => `
+      <article class="car reveal" data-bucket="${c.bucket}">
+        <div class="car__media" style="background-image: var(${c.img});">
+          <span class="car__badge">${c.bucket === 'Van' ? 'Van' : c.bucket}</span>
+        </div>
+        <div class="car__body">
+          <h3 class="car__name">${c.name}</h3>
+          <span class="car__class">${c.category}</span>
+          <div class="car__specs">
+            <span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><strong>${c.passengers}</strong> Pers.</span>
+            <span><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><strong>${c.luggage}</strong> Gepäck</span>
+          </div>
+          <ul class="car__feats">${c.features.map(f => `<li>${f}</li>`).join('')}</ul>
+          <a class="car__cta" href="#contact">Diese Klasse anfragen →</a>
+        </div>
+      </article>
+    `).join('');
   }
 
-  // ---------- Tiny dot-path getter -------------------------------------------
-  function get(obj, path) {
-    if (path === '.' || !path) return obj;
-    return path.split('.').reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
-  }
-
-  function setText(el, value) {
-    if (el == null) return;
-    if (value == null || value === '') return;
-    el.textContent = value;
-  }
-
-  // ---------- Bind a node tree to data ---------------------------------------
-  function bindTree(root, ctx) {
-    root.querySelectorAll('[data-bind]').forEach((el) => {
-      const path = el.getAttribute('data-bind');
-      const v = get(ctx, path);
-      if (typeof v === 'string' && v) el.textContent = v;
-    });
-    root.querySelectorAll('[data-bind-src]').forEach((el) => {
-      const path = el.getAttribute('data-bind-src');
-      const v = get(ctx, path);
-      if (typeof v === 'string' && v) el.setAttribute('src', v);
-    });
-    root.querySelectorAll('[data-bind-href]').forEach((el) => {
-      const path = el.getAttribute('data-bind-href');
-      const prefix = el.getAttribute('data-href-prefix') || '';
-      const v = get(ctx, path);
-      if (typeof v === 'string' && v) el.setAttribute('href', prefix + v);
-    });
-    root.querySelectorAll('[data-icon]').forEach((el) => {
-      const name = ctx?.icon;
-      setIcon(el, name);
-    });
-  }
-
-  function fillList(host, items, tplId, contentRoot) {
-    const tpl = document.getElementById(tplId);
-    if (!tpl || !host) return;
-    host.innerHTML = '';
-    items.forEach((item) => {
-      const node = tpl.content.firstElementChild.cloneNode(true);
-      // Two-pass binding: first by item-relative paths, then absolute fallback for top-level.
-      const ctx = typeof item === 'object' && item !== null ? item : { '.': item };
-      // For string-only items, allow [data-bind="."] to render the value.
-      node.querySelectorAll('[data-bind]').forEach((el) => {
-        const path = el.getAttribute('data-bind');
-        const v = path === '.' ? item : get(item, path);
-        if (typeof v === 'string' && v) el.textContent = v;
-      });
-      node.querySelectorAll('[data-bind-src]').forEach((el) => {
-        const path = el.getAttribute('data-bind-src');
-        const v = get(item, path);
-        if (typeof v === 'string' && v) el.setAttribute('src', v);
-      });
-      node.querySelectorAll('[data-icon]').forEach((el) => {
-        if (item && item.icon) setIcon(el, item.icon);
-      });
-      // Per-template helpers
-      const featsHost = node.querySelector('[data-features]');
-      if (featsHost && Array.isArray(item?.features)) {
-        item.features.forEach((f) => {
-          const li = document.createElement('li');
-          li.textContent = f;
-          featsHost.appendChild(li);
-        });
-      }
-      // Tag fleet items with a category bucket for filters.
-      if (node.matches?.('[data-car]') && typeof item?.name === 'string') {
-        const bucket = /Tesla/i.test(item.name)
-          ? 'Tesla'
-          : /Sprinter|V-Klasse|EQV/i.test(item.name)
-          ? 'Van'
-          : 'Mercedes';
-        node.dataset.bucket = bucket;
-      }
-      host.appendChild(node);
-    });
-  }
-
-  // ---------- Apply content to the page --------------------------------------
-  function apply(content) {
-    document.title = content.seo?.title || 'Hosslimo';
-    const md = document.querySelector('meta[name="description"]');
-    if (md && content.seo?.description) md.setAttribute('content', content.seo.description);
-
-    // Top-level binds
-    bindTree(document.body, content);
-
-    // Hero background
-    const heroBg = document.getElementById('heroBg');
-    const img = content.hero?.backgroundImage;
-    if (heroBg && img) heroBg.style.backgroundImage = `url(${JSON.stringify(img)})`;
-
-    // Lists
-    document.querySelectorAll('[data-list]').forEach((host) => {
-      const path = host.getAttribute('data-list');
-      const tpl = host.getAttribute('data-template');
-      const items = get(content, path);
-      if (Array.isArray(items)) fillList(host, items, tpl);
-    });
-
-    // Re-bind any new top-level paths exposed in cloned templates (e.g. nav phone etc.)
-    bindTree(document.body, content);
-
-    setupReveal();
-    setupFleetFilters();
-    setupLegalDialog(content.legal || {});
-    setupContactForm();
-  }
-
-  // ---------- Reveal on scroll -----------------------------------------------
+  // ------- Reveal -------
   function setupReveal() {
     const els = document.querySelectorAll('.reveal');
     if (!('IntersectionObserver' in window)) {
-      els.forEach((el) => el.classList.add('is-in'));
+      els.forEach(el => el.classList.add('is-in'));
       return;
     }
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, i) => {
-          if (entry.isIntersecting) {
-            const el = entry.target;
-            setTimeout(() => el.classList.add('is-in'), Math.min(i, 6) * 70);
-            io.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-    );
-    els.forEach((el) => io.observe(el));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          setTimeout(() => el.classList.add('is-in'), Math.min(i, 5) * 90);
+          io.unobserve(el);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(el => io.observe(el));
   }
 
-  // ---------- Fleet filters ---------------------------------------------------
-  function setupFleetFilters() {
+  // ------- Filters -------
+  function setupFilters() {
     const filters = document.getElementById('fleetFilters');
-    const grid = document.querySelector('.fleet__grid');
+    const grid = document.getElementById('fleetGrid');
     if (!filters || !grid) return;
     filters.addEventListener('click', (e) => {
       const btn = e.target.closest('.chip');
       if (!btn) return;
-      filters.querySelectorAll('.chip').forEach((c) => c.classList.toggle('is-active', c === btn));
+      filters.querySelectorAll('.chip').forEach(c => c.classList.toggle('is-active', c === btn));
       const f = btn.dataset.filter;
-      grid.querySelectorAll('[data-car]').forEach((card) => {
+      grid.querySelectorAll('[data-bucket]').forEach(card => {
         const ok = f === 'all' || card.dataset.bucket === f;
         card.classList.toggle('is-hidden', !ok);
       });
     });
   }
 
-  // ---------- Legal dialog ---------------------------------------------------
-  function setupLegalDialog(legal) {
+  // ------- Nav -------
+  function setupNav() {
+    const nav = document.getElementById('nav');
+    const burger = nav?.querySelector('.nav__burger');
+    const mobile = document.getElementById('mobileMenu');
+    const onScroll = () => nav.classList.toggle('is-stuck', window.scrollY > 30);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    if (burger && mobile) {
+      const toggle = (open) => {
+        const willOpen = typeof open === 'boolean' ? open : !mobile.classList.contains('is-open');
+        mobile.classList.toggle('is-open', willOpen);
+        burger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      };
+      burger.addEventListener('click', () => toggle());
+      mobile.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggle(false)));
+    }
+  }
+
+  // ------- Parallax -------
+  function setupParallax() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const bg = document.getElementById('heroBg');
+    if (!bg) return;
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = Math.min(window.scrollY, 900);
+        bg.style.transform = `translate3d(0, ${y * 0.2}px, 0) scale(1.05)`;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  // ------- Legal (text loaded from /api/content) -------
+  let LEGAL = {
+    impressum: 'Bitte ergänzen Sie Ihre Impressums-Angaben im Admin-Bereich.',
+    datenschutz: 'Bitte ergänzen Sie Ihre Datenschutzerklärung im Admin-Bereich.',
+    agb: 'Bitte ergänzen Sie Ihre AGB im Admin-Bereich.',
+  };
+  function setupLegal() {
     const dialog = document.getElementById('legalDialog');
     const title = document.getElementById('legalTitle');
     const body = document.getElementById('legalBody');
     const close = dialog?.querySelector('.legal__close');
     if (!dialog || !title || !body || !close) return;
-    document.querySelectorAll('[data-legal]').forEach((a) => {
+    document.querySelectorAll('[data-legal]').forEach(a => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
         const key = a.dataset.legal;
         const labels = { impressum: 'Impressum', datenschutz: 'Datenschutz', agb: 'AGB' };
         title.textContent = labels[key] || '';
-        body.textContent = legal[key] || '';
+        body.textContent = LEGAL[key] || '';
         if (typeof dialog.showModal === 'function') dialog.showModal();
-        else dialog.setAttribute('open', '');
       });
     });
     close.addEventListener('click', () => dialog.close?.());
@@ -196,9 +151,8 @@
     });
   }
 
-  // ---------- reCAPTCHA v3 (optional) ----------------------------------------
+  // ------- reCAPTCHA v3 (optional) -------
   let _rcSiteKey = '';
-
   function loadRecaptcha(siteKey) {
     if (!siteKey || document.querySelector('script[data-rc]')) return;
     const s = document.createElement('script');
@@ -207,28 +161,24 @@
     s.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(siteKey);
     document.head.appendChild(s);
   }
-
-  async function getRecaptchaToken(action) {
-    if (!_rcSiteKey || !window.grecaptcha) return '';
+  function getRecaptchaToken(action) {
+    if (!_rcSiteKey || !window.grecaptcha) return Promise.resolve('');
     return new Promise((resolve) => {
       window.grecaptcha.ready(() => {
-        window.grecaptcha
-          .execute(_rcSiteKey, { action })
-          .then(resolve)
-          .catch(() => resolve(''));
+        window.grecaptcha.execute(_rcSiteKey, { action }).then(resolve).catch(() => resolve(''));
       });
     });
   }
 
-  // ---------- Contact form ---------------------------------------------------
-  function setupContactForm() {
+  // ------- Contact form (real POST to /api/contact) -------
+  function setupForm() {
     const form = document.getElementById('contactForm');
     const status = document.getElementById('formStatus');
     if (!form) return;
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       status.classList.remove('is-err', 'is-ok');
-      status.textContent = '';
+      status.textContent = 'Wird gesendet …';
       const data = Object.fromEntries(new FormData(form).entries());
       try {
         data.recaptchaToken = await getRecaptchaToken('contact');
@@ -249,61 +199,33 @@
     });
   }
 
-  // ---------- Nav scroll + mobile menu ---------------------------------------
-  function setupNav() {
-    const nav = document.getElementById('nav');
-    const burger = nav?.querySelector('.nav__burger');
-    const mobile = document.getElementById('mobileMenu');
-    let last = 0;
-    const onScroll = () => {
-      const y = window.scrollY;
-      nav.classList.toggle('is-stuck', y > 30);
-      last = y;
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    if (burger && mobile) {
-      const toggle = (open) => {
-        const willOpen = typeof open === 'boolean' ? open : mobile.hasAttribute('hidden');
-        if (willOpen) {
-          mobile.removeAttribute('hidden');
-          burger.setAttribute('aria-expanded', 'true');
-        } else {
-          mobile.setAttribute('hidden', '');
-          burger.setAttribute('aria-expanded', 'false');
-        }
+  // ------- Apply admin-managed content (overrides only when set) -------
+  function applyContent(c) {
+    if (!c) return;
+    if (c.seo?.title) document.title = c.seo.title;
+    const md = document.querySelector('meta[name="description"]');
+    if (md && c.seo?.description) md.setAttribute('content', c.seo.description);
+    if (c.legal) {
+      LEGAL = {
+        impressum: c.legal.impressum || LEGAL.impressum,
+        datenschutz: c.legal.datenschutz || LEGAL.datenschutz,
+        agb: c.legal.agb || LEGAL.agb,
       };
-      burger.addEventListener('click', () => toggle());
-      mobile.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => toggle(false)));
     }
   }
 
-  // ---------- Hero parallax (subtle) -----------------------------------------
-  function setupParallax() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const bg = document.getElementById('heroBg');
-    if (!bg) return;
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const y = Math.min(window.scrollY, 800);
-        bg.style.transform = `translate3d(0, ${y * 0.18}px, 0) scale(1.05)`;
-      });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-  }
-
-  // ---------- Year footer ----------------------------------------------------
-  document.getElementById('year') && (document.getElementById('year').textContent = new Date().getFullYear());
-
-  // ---------- Boot ------------------------------------------------------------
+  // ------- Boot -------
+  const yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+  renderFleet();
   setupNav();
   setupParallax();
+  setupReveal();
+  setupFilters();
+  setupLegal();
+  setupForm();
 
-  // Load public config (reCAPTCHA site key etc.) — non-blocking, best-effort.
+  // Public config (reCAPTCHA site key) — non-blocking.
   fetch('/api/config')
     .then((r) => (r.ok ? r.json() : {}))
     .then((cfg) => {
@@ -314,14 +236,9 @@
     })
     .catch(() => {});
 
+  // Admin-managed text (legal, SEO meta) — non-blocking.
   fetch('/api/content')
-    .then((r) => (r.ok ? r.json() : Promise.reject(r.statusText)))
-    .then(apply)
-    .catch((err) => {
-      console.error('Content load failed:', err);
-      // Reveal whatever default text the markup already contains.
-      setupReveal();
-      setupFleetFilters();
-      setupContactForm();
-    });
+    .then((r) => (r.ok ? r.json() : null))
+    .then(applyContent)
+    .catch(() => {});
 })();
