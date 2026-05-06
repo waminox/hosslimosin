@@ -1,50 +1,51 @@
 {
   "brand": {
     "name": "Hosslimo",
-    "tagline": "Premium Chauffeurservice",
+    "tagline": "Premium Chauffeurservice — eine schwarze Flotte aus Mercedes-Benz und Tesla. Aus Wien.",
     "logoText": "Hosslimo"
   },
   "contact": {
-    "phone": "+43 660 000 0000",
-    "phoneHref": "+436600000000",
+    "phone": "+43 676 4121075",
+    "phoneHref": "+436764121075",
     "email": "office@hosslimo.com",
     "whatsapp": "WhatsApp",
-    "whatsappHref": "https://wa.me/436600000000",
-    "address": "Wien, Österreich",
-    "hours": "24 / 7 für Sie erreichbar"
+    "whatsappHref": "https://wa.me/436764121075",
+    "address": "Hoss Limousine Service e.U.\nFeitsingergasse 12/1/5\n1220 Wien",
+    "hours": "24 / 7 für Sie da"
   },
   "hero": {
     "eyebrow": "Chauffeur · Limousine · Vans",
-    "title": "Diskret. Pünktlich. Erstklassig.",
-    "subtitle": "Ihr persönlicher Chauffeurservice mit schwarzer Mercedes-Benz- und Tesla-Flotte – in Wien, österreichweit und auf Wunsch durch ganz Europa.",
+    "title": "Diskret. Pünktlich. *Erstklassig.*",
+    "subtitle": "Ihre persönliche Limousine mit professionellem Chauffeur — eine schwarze Flotte aus Mercedes-Benz und Tesla, die jedem Anlass gerecht wird. In Wien zuhause. Auf Wunsch europaweit.",
     "primaryCta": "Jetzt anfragen",
     "secondaryCta": "Flotte ansehen",
-    "backgroundImage": "/img/hero.jpg"
+    "backgroundImage": ""
   },
   "about": {
-    "eyebrow": "Über Hosslimo",
-    "title": "Mehr als eine Fahrt — ein Erlebnis.",
-    "body": "Hosslimo steht für einen Chauffeurservice, der Komfort, Verlässlichkeit und Stil verbindet. Ob Flughafentransfer, Geschäftstermin, Roadshow oder besonderer Anlass – unsere Chauffeure sorgen dafür, dass Sie entspannt, diskret und pünktlich ans Ziel kommen. Jede Buchung wird persönlich betreut – kein Call-Center, keine Massenabfertigung.",
+    "eyebrow": "01 — Über Hosslimo",
+    "title": "Mehr als eine Fahrt — *ein Erlebnis.*",
+    "body": "Hosslimo steht für einen Chauffeurservice, der Komfort, Sicherheit und Stil verbindet. Ob Geschäftstermin, Flughafentransfer, Hochzeit oder besonderer Anlass — unsere geschulten Chauffeure bringen Sie diskret, sicher und entspannt an Ihr Ziel. Persönlicher Service. Kein Massengeschäft.",
+    "image": "",
     "highlights": [
       {
         "icon": "shield",
-        "title": "Sicherheit & Diskretion",
-        "text": "Professionelle Chauffeure mit langjähriger Erfahrung – verlässlich, diskret und stets vorbereitet."
+        "title": "Diskretion",
+        "text": "Geschulte Chauffeure mit langjähriger Erfahrung und absoluter Verschwiegenheit."
       },
       {
         "icon": "clock",
-        "title": "Garantierte Pünktlichkeit",
-        "text": "Wir sind vor der vereinbarten Zeit am Abholort – mit Echtzeit-Flugüberwachung bei Airporttransfers."
+        "title": "Pünktlichkeit",
+        "text": "Wir sind vor der vereinbarten Zeit am Ort — vorbereitet, verlässlich, ohne Ausnahme."
       },
       {
         "icon": "sparkle",
         "title": "Premium-Flotte",
-        "text": "Vollständig schwarze Flotte aus Mercedes-Benz und Tesla, gepflegt bis ins letzte Detail."
+        "text": "Vollständig schwarze Flotte aus Mercedes-Benz und Tesla, gepflegt bis ins kleinste Detail."
       },
       {
         "icon": "globe",
-        "title": "Österreich & Europa",
-        "text": "Wien, Salzburg, München, Zürich – und auf Wunsch mehrere Tage quer durch Europa."
+        "title": "International",
+        "text": "Wien, Salzburg, München, Zürich — auf Wunsch europaweit, auch über mehrere Tage."
       }
     ]
   },
@@ -52,32 +53,32 @@
     {
       "icon": "plane",
       "title": "Flughafentransfer",
-      "text": "Zuverlässige Transfers zu und von allen Flughäfen – mit Echtzeit-Flugüberwachung, Schilderempfang am Ausgang und Gepäckunterstützung."
+      "text": "Komfortable Transfers von und zu allen Flughäfen — mit Flugüberwachung, Empfang am Gate und Gepäckservice."
     },
     {
       "icon": "briefcase",
       "title": "Business-Chauffeur",
-      "text": "Repräsentativer Chauffeurservice für Meetings, Konferenzen und Kundentermine – stunden- oder tagesweise buchbar, mit diskreter Begleitung."
+      "text": "Repräsentativer Auftritt für Geschäftstermine, Konferenzen und Roadshows — Stunden- oder Tagespauschale."
     },
     {
       "icon": "ring",
       "title": "Hochzeiten & Events",
-      "text": "Eine elegante Limousine für besondere Anlässe – Hochzeiten, Jubiläen, Premieren. Auf Wunsch mit persönlichem Ablauf und Blumenschmuck."
+      "text": "Eine elegante Limousine für den schönsten Tag. Auf Wunsch mit Blumenschmuck und individuellem Ablauf."
     },
     {
       "icon": "users",
       "title": "Gruppen- & VIP-Transfer",
-      "text": "Mercedes-Benz Sprinter oder V-Klasse für Gruppen – ideal für Flughafenzubringer, Roadshows und Ausflüge ab 6 Personen."
+      "text": "Sprinter-Vans ab 12 Personen für Gruppen, Roadshows oder hochwertige Sammeltransfers."
     },
     {
       "icon": "route",
-      "title": "Langstrecke & Ausland",
-      "text": "Chauffeurservice über mehrere Tage in ganz Europa – diskret, verlässlich, mit erfahrenen Chauffeuren auch auf komplexen Reiserouten."
+      "title": "Langstrecken",
+      "text": "Diskreter Chauffeur über mehrere Tage in ganz Europa — inklusive Hotelübernachtung des Chauffeurs."
     },
     {
       "icon": "star",
-      "title": "VIP & Roadshows",
-      "text": "Begleitservice für Geschäftsgäste, Künstler und öffentliche Personen – absolute Diskretion, höchste Professionalität."
+      "title": "Roadshows & Premieren",
+      "text": "Begleitservice für Künstler, Diplomaten und Unternehmer — höchste Diskretion garantiert."
     }
   ],
   "fleet": [
@@ -86,8 +87,8 @@
       "category": "Vollelektrische Luxus-Limousine",
       "passengers": "3",
       "luggage": "2",
-      "features": ["Massagesitze", "Burmester Sound", "Panoramadach", "Lautlos & emissionsfrei"],
-      "image": "/img/car-sedan.svg"
+      "features": ["Massagesitze", "Burmester Sound", "Panoramadach", "Lautlos"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz EQE",
@@ -95,47 +96,47 @@
       "passengers": "3",
       "luggage": "2",
       "features": ["Klimakomfortsitze", "WLAN", "Hyperscreen", "Emissionsfrei"],
-      "image": "/img/car-sedan.svg"
+      "image": ""
     },
     {
       "name": "Mercedes-Benz S-Klasse",
       "category": "Klassische Luxus-Limousine",
       "passengers": "3",
       "luggage": "3",
-      "features": ["Chauffeur-Paket", "Burmester 4D Sound", "Massagesitze", "Executive-Komfort"],
-      "image": "/img/car-sedan.svg"
+      "features": ["Chauffeur-Paket", "Burmester 4D", "Massagesitze", "Executive"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz E-Klasse",
       "category": "Business-Limousine",
       "passengers": "3",
       "luggage": "3",
-      "features": ["Lederausstattung", "Klimakomfort", "WLAN", "Ruhige Fahrkabine"],
-      "image": "/img/car-sedan.svg"
+      "features": ["Lederausstattung", "Klimakomfort", "WLAN", "Stille Kabine"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz V-Klasse",
       "category": "First-Class-Van",
       "passengers": "6",
       "luggage": "6",
-      "features": ["Konferenzbestuhlung", "Tisch & Steckdosen", "Sichtschutz", "Großer Kofferraum"],
-      "image": "/img/car-van.svg"
+      "features": ["Konferenzbestuhlung", "Tisch", "Verdunkelung", "Großer Kofferraum"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz EQV",
       "category": "Elektrischer First-Class-Van",
       "passengers": "6",
       "luggage": "6",
-      "features": ["Konferenzbestuhlung", "Lautlos", "Emissionsfrei", "Premium-Komfort"],
-      "image": "/img/car-van.svg"
+      "features": ["Konferenzbestuhlung", "Lautlos", "Emissionsfrei", "Premium"],
+      "image": ""
     },
     {
       "name": "Mercedes-Benz Sprinter",
-      "category": "Gruppen-Shuttle ab 12 Personen",
+      "category": "Gruppen-Van ab 12 Personen",
       "passengers": "12+",
       "luggage": "12+",
-      "features": ["Komfortbestuhlung", "Klimaanlage", "Großer Stauraum", "Ideal für Gruppen"],
-      "image": "/img/car-sprinter.svg"
+      "features": ["Komfortbestuhlung", "Klimaanlage", "Stauraum", "Für Gruppen"],
+      "image": ""
     },
     {
       "name": "Tesla Model S",
@@ -143,53 +144,53 @@
       "passengers": "3",
       "luggage": "2",
       "features": ["Autopilot", "Premium Audio", "Glasdach", "Emissionsfrei"],
-      "image": "/img/car-sedan.svg"
+      "image": ""
     },
     {
       "name": "Tesla Model X",
       "category": "Elektrischer Premium-SUV",
       "passengers": "5",
       "luggage": "4",
-      "features": ["Falcon-Wing-Türen", "Glasdach", "HEPA-Luftfilter", "Emissionsfrei"],
-      "image": "/img/car-suv.svg"
+      "features": ["Falcon-Wing-Türen", "Glasdach", "HEPA-Filter", "Emissionsfrei"],
+      "image": ""
     },
     {
       "name": "Tesla Model Y",
       "category": "Elektrischer Komfort-SUV",
       "passengers": "4",
       "luggage": "3",
-      "features": ["Panoramadach", "Premium Audio", "Großzügiger Innenraum", "Emissionsfrei"],
-      "image": "/img/car-suv.svg"
+      "features": ["Glasdach", "Premium Audio", "Innenraum", "Emissionsfrei"],
+      "image": ""
     },
     {
       "name": "Tesla Model 3",
       "category": "Elektrische Business-Limousine",
       "passengers": "3",
       "luggage": "2",
-      "features": ["Premium Audio", "Glasdach", "Schnellladung", "Emissionsfrei"],
-      "image": "/img/car-sedan.svg"
+      "features": ["Premium Audio", "Glasdach", "Schnellladen", "Emissionsfrei"],
+      "image": ""
     }
   ],
   "testimonials": [
     {
       "author": "Maria K.",
       "role": "Geschäftsführerin",
-      "quote": "Wir nutzen Hosslimo für all unsere Roadshows. Pünktlich, stil­voll und immer persönlich betreut – jedes Mal."
+      "quote": "Wir nutzen Hosslimo für all unsere Roadshows. Pünktlichkeit, Stil und ein sehr aufmerksamer Service — jedes Mal."
     },
     {
       "author": "Stefan L.",
       "role": "Hochzeitspaar",
-      "quote": "Die EQS war traumhaft. Der Chauffeur diskret, freundlich und absolut professionell. Eine klare Empfehlung."
+      "quote": "Die EQS war traumhaft. Der Chauffeur diskret, freundlich und absolut professionell. Klare Empfehlung."
     },
     {
       "author": "Andreas H.",
       "role": "Investor",
-      "quote": "Verlässlich, leise, perfekt vorbereitet – genau so muss ein Chauffeurservice sein."
+      "quote": "Verlässlich, leise, perfekt vorbereitet — genau so muss ein Chauffeurservice sein."
     }
   ],
   "coverage": {
-    "title": "Wir bringen Sie überall hin.",
-    "body": "Wien ist unser Zuhause – aber unser Service endet nicht an der Stadtgrenze. Wir fahren österreichweit und auf Wunsch in ganz Europa.",
+    "title": "Wir bringen Sie *überall* hin.",
+    "body": "Wien ist unser Zuhause — aber unser Service endet nicht an der Stadtgrenze. Österreichweit. Auf Wunsch in ganz Europa.",
     "cities": [
       "Wien",
       "Salzburg",
@@ -202,18 +203,21 @@
       "Budapest",
       "Zürich",
       "Prag",
-      "Mailand"
+      "Mailand",
+      "Venedig",
+      "Genf",
+      "Paris"
     ]
   },
   "cta": {
-    "title": "Ihre nächste Fahrt verdient mehr als ein Taxi.",
-    "subtitle": "Senden Sie uns eine Anfrage – wir antworten persönlich, meist innerhalb weniger Minuten.",
+    "title": "Ihre nächste Fahrt verdient *mehr* als ein Taxi.",
+    "subtitle": "Senden Sie uns eine Anfrage — wir antworten persönlich, meist innerhalb weniger Minuten.",
     "button": "Anfrage senden"
   },
   "legal": {
-    "impressum": "Bitte ergänzen Sie Ihre Impressums-Angaben im Admin-Bereich.",
-    "datenschutz": "Bitte ergänzen Sie Ihre Datenschutzerklärung im Admin-Bereich.",
-    "agb": "Bitte ergänzen Sie Ihre AGB im Admin-Bereich."
+    "impressum": "Impressum\n\nAngaben gemäß § 5 ECG, § 14 UGB und § 25 MedienG\n\nHoss Limousine Service e.U.\nRechtsform: Einzelunternehmer\nFirmenbuchnummer: FN 488514d\nFirmenbuchgericht: Handelsgericht Wien\nUID-Nummer: ATU73262514\n\nAnschrift\nFeitsingergasse 12/1/5\n1220 Wien\nÖsterreich\n\nKontakt\nTelefon: +43 676 4121075\nE-Mail: office@hosslimo.com\n\nBankverbindung\nIBAN: AT86 2011 1295 6897 1403\nBIC: GIBAATWWXXX\n\nUnternehmensgegenstand\nLimousinen- und Chauffeurservice (Personenbeförderung mit Personenkraftwagen)\n\nAufsichtsbehörde / Gewerbebehörde\nMagistrat der Stadt Wien (MBA des jeweiligen Bezirks)\n\nAnwendbare Rechtsvorschriften\nGewerbeordnung (GewO), Gelegenheitsverkehrs-Gesetz (GelverkG)\n\nOnline-Streitbeilegung\nDie Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit, die Sie unter https://ec.europa.eu/consumers/odr finden. Wir sind weder verpflichtet noch grundsätzlich bereit, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.\n\nHaftungsausschluss\nFür die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir trotz sorgfältiger Prüfung keine Gewähr übernehmen. Für Inhalte externer Links sind ausschließlich deren Betreiber verantwortlich.\n\nUrheberrecht\nAlle Inhalte dieser Website (Texte, Bilder, Grafiken) unterliegen dem Urheberrecht. Eine Verwendung außerhalb des Rahmens des Urheberrechtsgesetzes ist ohne schriftliche Zustimmung untersagt.",
+    "datenschutz": "Datenschutzerklärung\n\n1. Verantwortlicher\n\nHoss Limousine Service e.U.\nFeitsingergasse 12/1/5\n1220 Wien, Österreich\nTelefon: +43 676 4121075\nE-Mail: office@hosslimo.com\n\n2. Allgemeines\n\nDer Schutz Ihrer personenbezogenen Daten ist uns ein zentrales Anliegen. Diese Erklärung beschreibt, welche Daten wir wann und zu welchem Zweck verarbeiten. Rechtsgrundlage ist die Datenschutz-Grundverordnung (DSGVO) sowie das österreichische Datenschutzgesetz (DSG).\n\n3. Erhebung und Verarbeitung personenbezogener Daten\n\nWir verarbeiten personenbezogene Daten ausschließlich in dem Umfang, der für die Erbringung unserer Dienstleistungen, die Bearbeitung Ihrer Anfragen sowie die Erfüllung gesetzlicher Pflichten erforderlich ist. Rechtsgrundlagen sind insbesondere Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung), Art. 6 Abs. 1 lit. c DSGVO (rechtliche Verpflichtung) und Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse).\n\n4. Kontaktformular\n\nWenn Sie uns über das Kontaktformular kontaktieren, werden die von Ihnen übermittelten Angaben (Name, E-Mail-Adresse, Telefonnummer, Datum/Uhrzeit, Abhol- und Zielort, Fahrzeugwunsch, Nachricht) ausschließlich zur Bearbeitung Ihrer Anfrage und für etwaige Anschlusskommunikation verarbeitet. Die Daten werden vertraulich behandelt und nicht an Dritte weitergegeben, sofern dies nicht zur Erbringung der Dienstleistung notwendig ist.\n\n5. Server-Logfiles\n\nBeim Aufruf unserer Website werden technisch erforderliche Daten (IP-Adresse, Datum, Uhrzeit, abgerufene Seite, Referrer, Browsertyp) automatisiert in Logfiles gespeichert. Diese Daten dienen ausschließlich der Sicherstellung des technischen Betriebs sowie der Abwehr missbräuchlicher Zugriffe und werden nach 30 Tagen gelöscht.\n\n6. Cookies\n\nWir verwenden ausschließlich technisch notwendige Cookies, etwa zur Verwaltung der Sitzung im geschützten Admin-Bereich. Es kommen keine Tracking-, Analyse- oder Werbe-Cookies zum Einsatz. Eine Einwilligung ist daher nicht erforderlich.\n\n7. Google reCAPTCHA\n\nZum Schutz unseres Kontaktformulars vor automatisierten Anfragen verwenden wir Google reCAPTCHA (Anbieter: Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland). Bei der Nutzung des Formulars werden technische Daten (insbesondere IP-Adresse, Browser- und Geräteinformationen) an Google übertragen und ausgewertet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am Schutz vor Spam und Missbrauch). Weitere Informationen: https://policies.google.com/privacy\n\n8. Speicherdauer\n\nPersonenbezogene Daten werden nur so lange gespeichert, wie es für die jeweiligen Zwecke erforderlich oder gesetzlich vorgeschrieben ist. Anfragen aus dem Kontaktformular werden nach Erledigung gelöscht, sofern keine handels- oder steuerrechtlichen Aufbewahrungsfristen entgegenstehen.\n\n9. Ihre Rechte\n\nSie haben jederzeit das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Erteilte Einwilligungen können Sie jederzeit mit Wirkung für die Zukunft widerrufen. Anfragen richten Sie bitte an office@hosslimo.com.\n\n10. Beschwerderecht\n\nSie haben das Recht, sich bei einer Aufsichtsbehörde zu beschweren. Die zuständige Behörde in Österreich ist die Datenschutzbehörde (Barichgasse 40-42, 1030 Wien, www.dsb.gv.at).\n\nStand: 2026",
+    "agb": "Allgemeine Geschäftsbedingungen (AGB)\n\n§ 1 Geltungsbereich\n\nDiese Allgemeinen Geschäftsbedingungen gelten für sämtliche Verträge zwischen der Hoss Limousine Service e.U. (im Folgenden „Anbieter\") und ihren Kunden über die Erbringung von Chauffeur- und Limousinendiensten. Abweichende Bedingungen des Kunden werden nicht anerkannt, sofern der Anbieter ihrer Geltung nicht ausdrücklich zugestimmt hat.\n\n§ 2 Vertragsabschluss\n\nBuchungen können telefonisch, per E-Mail oder über das Online-Kontaktformular auf hosslimo.com erfolgen. Der Vertrag kommt mit der schriftlichen oder elektronischen Auftragsbestätigung des Anbieters zustande. Vor der Bestätigung handelt es sich um eine unverbindliche Anfrage.\n\n§ 3 Leistungsumfang\n\nDer Anbieter stellt einen professionellen Chauffeurservice mit Fahrzeugen der Premium-Klasse (Mercedes-Benz und Tesla) zur Verfügung. Die konkret zu erbringenden Leistungen, das Fahrzeug, der Abhol- und Zielort sowie der Zeitpunkt ergeben sich aus der jeweiligen Auftragsbestätigung.\n\n§ 4 Preise und Zahlung\n\nDie Preise werden pro Auftrag individuell vereinbart und in der Auftragsbestätigung ausgewiesen. Sofern nicht anders vereinbart, ist die Zahlung unverzüglich nach Erbringung der Leistung fällig. Akzeptierte Zahlungsmittel werden bei Buchung mitgeteilt.\n\n§ 5 Stornierung und Änderungen\n\nStornierungen und Änderungen sind bis 24 Stunden vor dem vereinbarten Abholzeitpunkt kostenfrei möglich. Bei späteren Stornierungen ist der Anbieter berechtigt, eine angemessene Bearbeitungspauschale zu verrechnen, höchstens jedoch den vollen vereinbarten Preis. Bei kurzfristigen Buchungen (weniger als 24 Stunden vor Abholung) entfällt das Stornorecht, sofern keine andere Vereinbarung getroffen wurde.\n\n§ 6 Pflichten des Kunden\n\nDer Kunde ist verpflichtet, korrekte und vollständige Angaben zu Abhol- und Zielort, Datum, Uhrzeit, Personen- und Gepäckanzahl sowie zu besonderen Wünschen zu machen. Wartezeiten und Mehraufwände, die durch unvollständige oder fehlerhafte Angaben entstehen, können dem Kunden gesondert in Rechnung gestellt werden. Der Kunde sorgt dafür, dass er und seine Begleitpersonen rechtzeitig am vereinbarten Abholort eintreffen.\n\n§ 7 Haftung\n\nDer Anbieter haftet im Rahmen der gesetzlichen Bestimmungen. Eine Haftung für leichte Fahrlässigkeit ist – soweit gesetzlich zulässig – ausgeschlossen, ausgenommen für Personenschäden. Für Schäden, die auf höherer Gewalt, außergewöhnlichen Verkehrsverhältnissen, behördlichen Maßnahmen oder Streiks beruhen, übernimmt der Anbieter keine Haftung.\n\n§ 8 Verhalten an Bord\n\nDer Kunde verpflichtet sich, das Fahrzeug pfleglich zu behandeln. Bei mutwilligen oder grob fahrlässigen Verschmutzungen oder Beschädigungen kann der Anbieter Reinigungs- oder Reparaturkosten in Rechnung stellen. Aus Sicherheitsgründen sind die Anweisungen des Chauffeurs zu befolgen.\n\n§ 9 Datenschutz\n\nDie Verarbeitung personenbezogener Daten erfolgt ausschließlich gemäß der Datenschutzerklärung des Anbieters.\n\n§ 10 Anwendbares Recht und Gerichtsstand\n\nEs gilt österreichisches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist – soweit gesetzlich zulässig – Wien. Bei Verbrauchern bleiben die zwingenden Bestimmungen des Konsumentenschutzgesetzes (KSchG) unberührt.\n\n§ 11 Salvatorische Klausel\n\nSollten einzelne Bestimmungen dieser AGB unwirksam oder undurchführbar sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt. An die Stelle der unwirksamen Bestimmung tritt eine Regelung, die dem wirtschaftlichen Zweck am nächsten kommt.\n\nStand: 2026"
   },
   "seo": {
     "title": "Hosslimo – Premium Chauffeurservice in Wien & Österreich",

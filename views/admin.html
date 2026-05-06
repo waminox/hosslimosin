@@ -151,7 +151,7 @@ textarea, input, select { font: inherit; }
 /* Inquiries */
 .adm-inquiry {
   background: #111; border: 1px solid rgba(255,255,255,0.07);
-  padding: 20px; margin-bottom: 12px;
+  padding: 20px; margin-bottom: 14px;
 }
 .adm-inquiry-header {
   display: flex; justify-content: space-between; align-items: flex-start;
@@ -159,14 +159,144 @@ textarea, input, select { font: inherit; }
 }
 .adm-inquiry-who { font-size: 0.9rem; color: #f1ece2; font-weight: 500; }
 .adm-inquiry-meta { font-size: 0.72rem; color: #6f6759; margin-top: 2px; }
+.adm-inquiry-meta a { color: #c9a86a; }
 .adm-inquiry-time { font-size: 0.7rem; color: #6f6759; }
-.adm-inquiry-detail { font-size: 0.8rem; color: #a89f8f; line-height: 1.6; margin-top: 8px; }
-.adm-inquiry-msg {
-  margin-top: 12px; padding: 12px 14px;
-  background: rgba(255,255,255,0.03); border-left: 2px solid rgba(201,168,106,0.3);
-  font-size: 0.82rem; color: #d8d0c4; white-space: pre-wrap; line-height: 1.65;
+
+/* Chat thread */
+.adm-thread {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px 0 4px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 12px;
 }
+.adm-bubble {
+  max-width: 78%; padding: 11px 14px;
+  font-size: 0.84rem; color: #d8d0c4; line-height: 1.6;
+  white-space: pre-wrap; word-wrap: break-word;
+}
+.adm-bubble--in {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+  border-bottom-left-radius: 0;
+}
+.adm-bubble--out {
+  align-self: flex-end;
+  background: rgba(201,168,106,0.10); border: 1px solid rgba(201,168,106,0.28);
+  color: #f1ece2; border-bottom-right-radius: 0;
+}
+.adm-bubble-time {
+  display: block; margin-top: 6px;
+  font-size: 0.62rem; color: #6f6759; letter-spacing: 0.04em;
+}
+.adm-bubble--out .adm-bubble-time { color: rgba(201,168,106,0.8); text-align: right; }
+
+/* Reply composer */
+.adm-reply {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-top: 14px; padding-top: 14px; border-top: 1px dashed rgba(255,255,255,0.07);
+}
+.adm-reply textarea {
+  background: #0d0d0d; border: 1px solid rgba(255,255,255,0.08);
+  color: #d8d0c4; padding: 11px 13px; font: inherit; font-size: 0.85rem;
+  line-height: 1.6; resize: vertical; min-height: 80px;
+  transition: border-color 0.2s; outline: none;
+}
+.adm-reply textarea:focus { border-color: rgba(201,168,106,0.5); }
+.adm-reply-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px; flex-wrap: wrap;
+}
+.adm-reply-msg { font-size: 0.74rem; color: #c9a86a; }
+.adm-reply-msg.is-err { color: #d97a7a; }
+
 .adm-empty { color: #6f6759; font-size: 0.82rem; padding: 20px 0; }
+
+/* Conversation list (WhatsApp-style) */
+.adm-conv-list { display: flex; flex-direction: column; gap: 6px; }
+.adm-conv-item {
+  display: flex; gap: 14px; align-items: center;
+  padding: 14px 16px;
+  background: #111; border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer; transition: background 0.2s, border-color 0.2s;
+}
+.adm-conv-item:hover { background: #161616; border-color: rgba(201,168,106,0.25); }
+.adm-conv-item:focus-visible { outline: 1px solid #c9a86a; outline-offset: 2px; }
+.adm-conv-avatar {
+  width: 42px; height: 42px; flex-shrink: 0;
+  background: rgba(201,168,106,0.12); color: #c9a86a;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Cormorant Garamond","Times New Roman",serif;
+  font-style: italic; font-size: 1.05rem; font-weight: 500;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,106,0.2);
+}
+.adm-conv-body { flex: 1; min-width: 0; }
+.adm-conv-name {
+  display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
+  font-size: 0.88rem; color: #f1ece2; font-weight: 500;
+}
+.adm-conv-time { font-size: 0.66rem; color: #6f6759; flex-shrink: 0; }
+.adm-conv-preview {
+  display: flex; justify-content: space-between; gap: 10px; align-items: center;
+  font-size: 0.78rem; color: #6f6759; margin-top: 3px;
+}
+.adm-conv-preview-text {
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.adm-conv-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 6px;
+  background: rgba(201,168,106,0.2); color: #c9a86a;
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.04em;
+  border-radius: 9px; flex-shrink: 0;
+}
+
+/* Conversation modal */
+.adm-conv {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.78); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.adm-conv[hidden] { display: none; }
+.adm-conv-card {
+  width: 100%; max-width: 720px; max-height: 86vh;
+  background: #0e0e0e; border: 1px solid rgba(255,255,255,0.1);
+  display: flex; flex-direction: column;
+}
+.adm-conv-head {
+  padding: 16px 22px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+}
+.adm-conv-head-info { flex: 1; min-width: 0; }
+.adm-conv-title {
+  display: block;
+  font-size: 0.95rem; color: #f1ece2; font-weight: 500;
+}
+.adm-conv-sub {
+  display: block; margin-top: 4px;
+  font-size: 0.72rem; color: #6f6759;
+  overflow-wrap: break-word;
+}
+.adm-conv-sub a { color: #c9a86a; }
+.adm-conv-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.adm-conv-close {
+  font-size: 1.6rem; line-height: 1; color: #6f6759; cursor: pointer;
+  background: transparent; border: 0; padding: 0 4px;
+}
+.adm-conv-close:hover { color: #c9a86a; }
+.adm-conv-meta {
+  padding: 10px 22px; font-size: 0.74rem; color: #a89f8f;
+  background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.adm-conv-thread {
+  flex: 1; overflow-y: auto; padding: 18px 22px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.adm-conv-thread .adm-bubble { max-width: 84%; }
+.adm-conv .adm-reply {
+  margin: 0; padding: 14px 22px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.adm-conv .adm-reply textarea { min-height: 70px; }
 
 /* Media grid */
 .adm-media-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
@@ -233,6 +363,67 @@ textarea, input, select { font: inherit; }
   .adm-panel { padding: 20px 16px; }
   .adm-grid2 { grid-template-columns: 1fr; }
 }
+
+/* Image field with picker button */
+.adm-img-field { display: flex; gap: 8px; align-items: stretch; }
+.adm-img-field .adm-input { flex: 1; min-width: 0; }
+.adm-img-field .adm-btn { white-space: nowrap; }
+
+/* Image picker modal */
+.adm-picker {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.78); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.adm-picker[hidden] { display: none; }
+.adm-picker-card {
+  width: 100%; max-width: 760px; max-height: 86vh;
+  background: #0e0e0e; border: 1px solid rgba(255,255,255,0.1);
+  display: flex; flex-direction: column;
+}
+.adm-picker-head {
+  padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.adm-picker-title {
+  font-size: 0.7rem; letter-spacing: 0.32em; text-transform: uppercase;
+  color: #c9a86a; font-weight: 600;
+}
+.adm-picker-close {
+  font-size: 1.6rem; line-height: 1; color: #6f6759; cursor: pointer;
+  background: transparent; border: 0; padding: 0 4px;
+}
+.adm-picker-close:hover { color: #c9a86a; }
+.adm-picker-body {
+  flex: 1; overflow-y: auto; padding: 20px 24px;
+  display: flex; flex-wrap: wrap; gap: 12px; align-content: flex-start;
+}
+.adm-picker-item {
+  width: 130px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.adm-picker-item img {
+  width: 130px; height: 86px; object-fit: cover; display: block;
+  background: #111; border: 1px solid rgba(255,255,255,0.08);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.adm-picker-item:hover img { border-color: #c9a86a; transform: translateY(-2px); }
+.adm-picker-name {
+  font-size: 0.6rem; color: #6f6759;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;
+}
+.adm-picker-empty { color: #6f6759; font-size: 0.85rem; padding: 12px 0; }
+.adm-picker-foot {
+  padding: 14px 24px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; gap: 12px; align-items: center;
+}
+.adm-picker-url {
+  flex: 1; min-width: 0;
+  background: #111; border: 1px solid rgba(255,255,255,0.08);
+  color: #d8d0c4; padding: 9px 12px; font-size: 0.82rem; font: inherit;
+  outline: none; transition: border-color 0.2s;
+}
+.adm-picker-url:focus { border-color: rgba(201,168,106,0.5); }
 </style>
 </head>
 <body>
@@ -318,7 +509,12 @@ textarea, input, select { font: inherit; }
         <div class="adm-field"><label class="adm-field-label">Untertitel</label><textarea class="adm-textarea" id="heroSubtitle" maxlength="400" rows="3"></textarea></div>
         <div class="adm-grid2">
           <div class="adm-field"><label class="adm-field-label">Sekundärer Button</label><input class="adm-input" id="heroSecondaryCta" maxlength="60" /></div>
-          <div class="adm-field"><label class="adm-field-label">Hintergrundbild (URL)</label><input class="adm-input" id="heroBackground" placeholder="/img/hero.jpg" /></div>
+          <div class="adm-field"><label class="adm-field-label">Hintergrundbild</label>
+            <div class="adm-img-field">
+              <input class="adm-input" id="heroBackground" placeholder="/uploads/… oder leer für Standard" />
+              <button type="button" class="adm-btn adm-btn--ghost adm-btn--small" data-pick-target="heroBackground">Auswählen</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -329,7 +525,16 @@ textarea, input, select { font: inherit; }
           <div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" id="aboutTitle" maxlength="240" /></div>
         </div>
         <div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" id="aboutBody" maxlength="4000" rows="5"></textarea></div>
-        <p style="font-size:0.72rem;color:#6f6759;margin:4px 0 16px">Highlights: im Tab "Services" verwalten oder hier als JSON (für Entwickler).</p>
+        <div class="adm-field"><label class="adm-field-label">Bild (links neben dem Text)</label>
+          <div class="adm-img-field">
+            <input class="adm-input" id="aboutImage" placeholder="/uploads/… oder leer für Standard" />
+            <button type="button" class="adm-btn adm-btn--ghost adm-btn--small" data-pick-target="aboutImage">Auswählen</button>
+          </div>
+        </div>
+        <p class="adm-section-title" style="margin-top:24px">Highlights</p>
+        <p style="font-size:0.72rem;color:#6f6759;margin:0 0 12px">Boxen mit Icon, Titel und kurzer Beschreibung (z. B. Diskretion, Pünktlichkeit).</p>
+        <div class="adm-list" id="highlightsList"></div>
+        <button class="adm-btn adm-btn--ghost adm-btn--small" id="addHighlight">+ Highlight hinzufügen</button>
       </div>
 
       <div class="adm-section">
@@ -446,7 +651,12 @@ textarea, input, select { font: inherit; }
       <p class="adm-panel-desc">Meta-Titel, Beschreibung und Open-Graph-Bild.</p>
       <div class="adm-field"><label class="adm-field-label">Seiten-Titel (max. 60 Zeichen)</label><input class="adm-input" id="seoTitle" maxlength="120" /></div>
       <div class="adm-field"><label class="adm-field-label">Meta-Beschreibung (max. 160 Zeichen)</label><textarea class="adm-textarea" id="seoDescription" maxlength="320" rows="3"></textarea></div>
-      <div class="adm-field"><label class="adm-field-label">OG-Bild (URL)</label><input class="adm-input" id="seoOgImage" placeholder="/img/og.jpg" /></div>
+      <div class="adm-field"><label class="adm-field-label">OG-Bild</label>
+        <div class="adm-img-field">
+          <input class="adm-input" id="seoOgImage" placeholder="/uploads/…" />
+          <button type="button" class="adm-btn adm-btn--ghost adm-btn--small" data-pick-target="seoOgImage">Auswählen</button>
+        </div>
+      </div>
       <div class="adm-save-bar">
         <button class="adm-btn adm-btn--gold" id="saveSeo">Speichern</button>
         <span class="adm-save-msg" id="msgSeo"></span>
@@ -494,609 +704,44 @@ textarea, input, select { font: inherit; }
 
 <div class="adm-toast" id="admToast"></div>
 
-<script>
-(function () {
-  'use strict';
-
-  var csrfToken = '';
-  var content = {};
-  var cities = [];
-
-  // ─── Helpers ──────────────────────────────────────────────────────────────
-
-  function toast(msg, ok) {
-    var el = document.getElementById('admToast');
-    el.textContent = msg;
-    el.className = 'adm-toast is-visible ' + (ok === false ? 'is-err' : 'is-ok');
-    clearTimeout(el._t);
-    el._t = setTimeout(function () { el.className = 'adm-toast'; }, 3200);
-  }
-
-  function setMsg(id, msg, err) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = msg;
-    el.className = 'adm-save-msg' + (err ? ' is-err' : '');
-    if (msg) {
-      clearTimeout(el._t);
-      el._t = setTimeout(function () { el.textContent = ''; el.className = 'adm-save-msg'; }, 4000);
-    }
-  }
-
-  async function api(method, path, body) {
-    var opts = {
-      method: method,
-      headers: { 'x-csrf-token': csrfToken },
-    };
-    if (body !== undefined) {
-      opts.headers['Content-Type'] = 'application/json';
-      opts.body = JSON.stringify(body);
-    }
-    var r = await fetch(path, opts);
-    if (r.status === 401) { window.location.href = '/admin/login'; return null; }
-    var data = await r.json().catch(function () { return {}; });
-    if (!r.ok) throw new Error(data.error || r.statusText);
-    if (data.csrfToken) csrfToken = data.csrfToken; // refresh if server rotates
-    return data;
-  }
-
-  function val(id) { var el = document.getElementById(id); return el ? el.value : ''; }
-  function setVal(id, v) { var el = document.getElementById(id); if (el) el.value = v || ''; }
-
-  // ─── Init ─────────────────────────────────────────────────────────────────
-
-  async function init() {
-    try {
-      var csrfData = await fetch('/api/csrf').then(function (r) { return r.json(); });
-      csrfToken = csrfData.csrfToken || '';
-
-      var me = await fetch('/api/me').then(function (r) {
-        if (!r.ok) { window.location.href = '/admin/login'; return null; }
-        return r.json();
-      });
-      if (!me) return;
-      document.getElementById('admUserName').textContent = me.user.username;
-
-      content = await fetch('/api/content').then(function (r) { return r.json(); });
-      populateForms();
-    } catch (err) {
-      console.error('Init error:', err);
-    }
-
-    setupNav();
-    setupSaveHandlers();
-    setupCityEditor();
-    setupArrayEditors();
-    setupInquiries();
-    setupMedia();
-    setupAccount();
-    setupLogout();
-  }
-
-  // ─── Tab navigation ──────────────────────────────────────────────────────
-
-  function setupNav() {
-    var nav = document.getElementById('admNav');
-    nav.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-panel]');
-      if (!btn) return;
-      var panelId = btn.dataset.panel;
-      // Update active button
-      nav.querySelectorAll('.adm-nav-item').forEach(function (b) {
-        b.classList.toggle('is-active', b === btn);
-      });
-      // Show panel
-      document.querySelectorAll('.adm-panel').forEach(function (p) {
-        p.classList.toggle('is-active', p.id === 'panel-' + panelId);
-      });
-      // Lazy-load inquiries and media when their tab is opened
-      if (panelId === 'inquiries') loadInquiries();
-      if (panelId === 'media') loadMedia();
-    });
-  }
-
-  // ─── Populate forms ──────────────────────────────────────────────────────
-
-  function populateForms() {
-    var c = content;
-    // Brand
-    setVal('brandName', c.brand && c.brand.name);
-    setVal('brandTagline', c.brand && c.brand.tagline);
-    setVal('brandLogoText', c.brand && c.brand.logoText);
-    // Hero
-    setVal('heroEyebrow', c.hero && c.hero.eyebrow);
-    setVal('heroTitle', c.hero && c.hero.title);
-    setVal('heroSubtitle', c.hero && c.hero.subtitle);
-    setVal('heroPrimaryCta', c.hero && c.hero.primaryCta);
-    setVal('heroSecondaryCta', c.hero && c.hero.secondaryCta);
-    setVal('heroBackground', c.hero && c.hero.backgroundImage);
-    // About
-    setVal('aboutEyebrow', c.about && c.about.eyebrow);
-    setVal('aboutTitle', c.about && c.about.title);
-    setVal('aboutBody', c.about && c.about.body);
-    // Coverage
-    setVal('coverageTitle', c.coverage && c.coverage.title);
-    setVal('coverageBody', c.coverage && c.coverage.body);
-    cities = (c.coverage && Array.isArray(c.coverage.cities)) ? c.coverage.cities.slice() : [];
-    renderCityTags();
-    // CTA
-    setVal('ctaTitle', c.cta && c.cta.title);
-    setVal('ctaSubtitle', c.cta && c.cta.subtitle);
-    setVal('ctaButton', c.cta && c.cta.button);
-    // Contact
-    setVal('contactPhone', c.contact && c.contact.phone);
-    setVal('contactPhoneHref', c.contact && c.contact.phoneHref);
-    setVal('contactEmail', c.contact && c.contact.email);
-    setVal('contactWhatsapp', c.contact && c.contact.whatsapp);
-    setVal('contactWhatsappHref', c.contact && c.contact.whatsappHref);
-    setVal('contactAddress', c.contact && c.contact.address);
-    setVal('contactHours', c.contact && c.contact.hours);
-    // Legal
-    setVal('legalImpressum', c.legal && c.legal.impressum);
-    setVal('legalDatenschutz', c.legal && c.legal.datenschutz);
-    setVal('legalAgb', c.legal && c.legal.agb);
-    // SEO
-    setVal('seoTitle', c.seo && c.seo.title);
-    setVal('seoDescription', c.seo && c.seo.description);
-    setVal('seoOgImage', c.seo && c.seo.ogImage);
-    // Array editors
-    renderServices();
-    renderFleet();
-    renderVoices();
-  }
-
-  // ─── City editor ─────────────────────────────────────────────────────────
-
-  function renderCityTags() {
-    var host = document.getElementById('cityTags');
-    host.innerHTML = '';
-    cities.forEach(function (city, i) {
-      var span = document.createElement('span');
-      span.className = 'adm-city-tag';
-      span.textContent = city;
-      var btn = document.createElement('button');
-      btn.className = 'adm-city-remove';
-      btn.textContent = '×';
-      btn.setAttribute('aria-label', city + ' entfernen');
-      btn.addEventListener('click', function () {
-        cities.splice(i, 1);
-        renderCityTags();
-      });
-      span.appendChild(btn);
-      host.appendChild(span);
-    });
-  }
-
-  function setupCityEditor() {
-    var input = document.getElementById('cityInput');
-    var btn = document.getElementById('cityAddBtn');
-    function addCity() {
-      var v = input.value.trim();
-      if (v && !cities.includes(v)) { cities.push(v); renderCityTags(); }
-      input.value = '';
-      input.focus();
-    }
-    btn.addEventListener('click', addCity);
-    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addCity(); } });
-  }
-
-  // ─── Services editor ──────────────────────────────────────────────────────
-
-  var ICON_OPTIONS = ['plane','briefcase','ring','users','route','star','shield','clock','sparkle','globe'];
-
-  function renderServices() {
-    var services = (content.services && Array.isArray(content.services)) ? content.services : [];
-    renderItemList('servicesList', services, buildServiceItem);
-  }
-
-  function buildServiceItem(item, i) {
-    var div = document.createElement('div');
-    div.className = 'adm-item';
-    div.innerHTML =
-      '<div class="adm-item-header"><span class="adm-item-num">Service ' + (i + 1) + '</span>' +
-      '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
-      '<div class="adm-item-fields">' +
-        '<div class="adm-grid2">' +
-          '<div class="adm-field"><label class="adm-field-label">Icon</label>' +
-          '<select class="adm-select adm-input" data-svc-icon>' +
-          ICON_OPTIONS.map(function (ic) {
-            return '<option value="' + ic + '"' + (item.icon === ic ? ' selected' : '') + '>' + ic + '</option>';
-          }).join('') +
-          '</select></div>' +
-          '<div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" data-svc-title maxlength="120" value="' + esc(item.title) + '" /></div>' +
-        '</div>' +
-        '<div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" data-svc-text maxlength="600" rows="3">' + esc(item.text) + '</textarea></div>' +
-      '</div>';
-    div.querySelector('[data-remove]').addEventListener('click', function () {
-      content.services = readServices();
-      content.services.splice(i, 1);
-      renderServices();
-    });
-    return div;
-  }
-
-  function readServices() {
-    var host = document.getElementById('servicesList');
-    var items = [];
-    host.querySelectorAll('.adm-item').forEach(function (item) {
-      items.push({
-        icon: item.querySelector('[data-svc-icon]').value,
-        title: item.querySelector('[data-svc-title]').value,
-        text: item.querySelector('[data-svc-text]').value,
-      });
-    });
-    return items;
-  }
-
-  document.getElementById('addService').addEventListener('click', function () {
-    content.services = readServices();
-    content.services.push({ icon: 'star', title: '', text: '' });
-    renderServices();
-  });
-
-  // ─── Fleet editor ─────────────────────────────────────────────────────────
-
-  function renderFleet() {
-    var fleet = (content.fleet && Array.isArray(content.fleet)) ? content.fleet : [];
-    renderItemList('fleetList', fleet, buildFleetItem);
-  }
-
-  function buildFleetItem(item, i) {
-    var feats = Array.isArray(item.features) ? item.features.join(', ') : '';
-    var div = document.createElement('div');
-    div.className = 'adm-item';
-    div.innerHTML =
-      '<div class="adm-item-header"><span class="adm-item-num">Fahrzeug ' + (i + 1) + '</span>' +
-      '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
-      '<div class="adm-item-fields">' +
-        '<div class="adm-grid2">' +
-          '<div class="adm-field"><label class="adm-field-label">Name</label><input class="adm-input" data-fl-name maxlength="80" value="' + esc(item.name) + '" /></div>' +
-          '<div class="adm-field"><label class="adm-field-label">Kategorie</label><input class="adm-input" data-fl-cat maxlength="60" value="' + esc(item.category) + '" /></div>' +
-        '</div>' +
-        '<div class="adm-grid2">' +
-          '<div class="adm-field"><label class="adm-field-label">Passagiere</label><input class="adm-input" data-fl-pax maxlength="20" value="' + esc(item.passengers) + '" /></div>' +
-          '<div class="adm-field"><label class="adm-field-label">Gepäck</label><input class="adm-input" data-fl-lug maxlength="20" value="' + esc(item.luggage) + '" /></div>' +
-        '</div>' +
-        '<div class="adm-field"><label class="adm-field-label">Features (kommagetrennt)</label><input class="adm-input" data-fl-feats maxlength="800" value="' + esc(feats) + '" /></div>' +
-        '<div class="adm-field"><label class="adm-field-label">Bild (URL)</label><input class="adm-input" data-fl-img value="' + esc(item.image) + '" /></div>' +
-      '</div>';
-    div.querySelector('[data-remove]').addEventListener('click', function () {
-      content.fleet = readFleet();
-      content.fleet.splice(i, 1);
-      renderFleet();
-    });
-    return div;
-  }
-
-  function readFleet() {
-    var host = document.getElementById('fleetList');
-    var items = [];
-    host.querySelectorAll('.adm-item').forEach(function (item) {
-      var featsRaw = item.querySelector('[data-fl-feats]').value;
-      items.push({
-        name: item.querySelector('[data-fl-name]').value,
-        category: item.querySelector('[data-fl-cat]').value,
-        passengers: item.querySelector('[data-fl-pax]').value,
-        luggage: item.querySelector('[data-fl-lug]').value,
-        features: featsRaw.split(',').map(function (f) { return f.trim(); }).filter(Boolean),
-        image: item.querySelector('[data-fl-img]').value,
-      });
-    });
-    return items;
-  }
-
-  document.getElementById('addFleet').addEventListener('click', function () {
-    content.fleet = readFleet();
-    content.fleet.push({ name: '', category: '', passengers: '', luggage: '', features: [], image: '' });
-    renderFleet();
-  });
-
-  // ─── Voices editor ────────────────────────────────────────────────────────
-
-  function renderVoices() {
-    var voices = (content.testimonials && Array.isArray(content.testimonials)) ? content.testimonials : [];
-    renderItemList('voicesList', voices, buildVoiceItem);
-  }
-
-  function buildVoiceItem(item, i) {
-    var div = document.createElement('div');
-    div.className = 'adm-item';
-    div.innerHTML =
-      '<div class="adm-item-header"><span class="adm-item-num">Stimme ' + (i + 1) + '</span>' +
-      '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
-      '<div class="adm-item-fields">' +
-        '<div class="adm-grid2">' +
-          '<div class="adm-field"><label class="adm-field-label">Name</label><input class="adm-input" data-vc-author maxlength="120" value="' + esc(item.author) + '" /></div>' +
-          '<div class="adm-field"><label class="adm-field-label">Rolle</label><input class="adm-input" data-vc-role maxlength="120" value="' + esc(item.role) + '" /></div>' +
-        '</div>' +
-        '<div class="adm-field"><label class="adm-field-label">Zitat</label><textarea class="adm-textarea" data-vc-quote maxlength="800" rows="3">' + esc(item.quote) + '</textarea></div>' +
-      '</div>';
-    div.querySelector('[data-remove]').addEventListener('click', function () {
-      content.testimonials = readVoices();
-      content.testimonials.splice(i, 1);
-      renderVoices();
-    });
-    return div;
-  }
-
-  function readVoices() {
-    var host = document.getElementById('voicesList');
-    var items = [];
-    host.querySelectorAll('.adm-item').forEach(function (item) {
-      items.push({
-        author: item.querySelector('[data-vc-author]').value,
-        role: item.querySelector('[data-vc-role]').value,
-        quote: item.querySelector('[data-vc-quote]').value,
-      });
-    });
-    return items;
-  }
-
-  document.getElementById('addVoice').addEventListener('click', function () {
-    content.testimonials = readVoices();
-    content.testimonials.push({ author: '', role: '', quote: '' });
-    renderVoices();
-  });
-
-  // ─── Generic item list renderer ───────────────────────────────────────────
-
-  function renderItemList(hostId, items, buildFn) {
-    var host = document.getElementById(hostId);
-    host.innerHTML = '';
-    items.forEach(function (item, i) {
-      host.appendChild(buildFn(item, i));
-    });
-  }
-
-  // ─── Save handlers ────────────────────────────────────────────────────────
-
-  function setupSaveHandlers() {
-    document.getElementById('saveGeneral').addEventListener('click', saveGeneral);
-    document.getElementById('saveServices').addEventListener('click', saveServices);
-    document.getElementById('saveFleet').addEventListener('click', saveFleet);
-    document.getElementById('saveVoices').addEventListener('click', saveVoices);
-    document.getElementById('saveContact').addEventListener('click', saveContact);
-    document.getElementById('saveLegal').addEventListener('click', saveLegal);
-    document.getElementById('saveSeo').addEventListener('click', saveSeo);
-  }
-
-  function setupArrayEditors() {}
-
-  async function saveSection(msgId, patchFn) {
-    var btn = document.querySelector('[id="save' + msgId.replace('msg','') + '"]');
-    try {
-      setMsg(msgId, '');
-      patchFn();
-      var result = await api('PUT', '/api/content', content);
-      if (result) {
-        content = result.content || content;
-        populateForms();
-        setMsg(msgId, 'Gespeichert.');
-        toast('Gespeichert', true);
-      }
-    } catch (err) {
-      setMsg(msgId, err.message || 'Fehler beim Speichern.', true);
-    }
-  }
-
-  function saveGeneral() {
-    saveSection('msgGeneral', function () {
-      content.brand = { name: val('brandName'), tagline: val('brandTagline'), logoText: val('brandLogoText') };
-      content.hero = {
-        eyebrow: val('heroEyebrow'), title: val('heroTitle'),
-        subtitle: val('heroSubtitle'), primaryCta: val('heroPrimaryCta'),
-        secondaryCta: val('heroSecondaryCta'), backgroundImage: val('heroBackground'),
-      };
-      content.about = Object.assign({}, content.about, {
-        eyebrow: val('aboutEyebrow'), title: val('aboutTitle'), body: val('aboutBody'),
-      });
-      content.coverage = { title: val('coverageTitle'), body: val('coverageBody'), cities: cities.slice() };
-      content.cta = { title: val('ctaTitle'), subtitle: val('ctaSubtitle'), button: val('ctaButton') };
-    });
-  }
-
-  function saveServices() {
-    saveSection('msgServices', function () { content.services = readServices(); });
-  }
-  function saveFleet() {
-    saveSection('msgFleet', function () { content.fleet = readFleet(); });
-  }
-  function saveVoices() {
-    saveSection('msgVoices', function () { content.testimonials = readVoices(); });
-  }
-
-  function saveContact() {
-    saveSection('msgContact', function () {
-      content.contact = {
-        phone: val('contactPhone'), phoneHref: val('contactPhoneHref'),
-        email: val('contactEmail'), whatsapp: val('contactWhatsapp'),
-        whatsappHref: val('contactWhatsappHref'), address: val('contactAddress'),
-        hours: val('contactHours'),
-      };
-    });
-  }
-
-  function saveLegal() {
-    saveSection('msgLegal', function () {
-      content.legal = { impressum: val('legalImpressum'), datenschutz: val('legalDatenschutz'), agb: val('legalAgb') };
-    });
-  }
-
-  function saveSeo() {
-    saveSection('msgSeo', function () {
-      content.seo = { title: val('seoTitle'), description: val('seoDescription'), ogImage: val('seoOgImage') };
-    });
-  }
-
-  // ─── Inquiries ────────────────────────────────────────────────────────────
-
-  async function loadInquiries() {
-    var host = document.getElementById('inquiriesList');
-    host.innerHTML = '<p class="adm-empty">Lade …</p>';
-    try {
-      var list = await fetch('/api/inquiries', { headers: { 'x-csrf-token': csrfToken } }).then(function (r) { return r.json(); });
-      host.innerHTML = '';
-      if (!list.length) { host.innerHTML = '<p class="adm-empty">Keine Anfragen vorhanden.</p>'; return; }
-      list.forEach(function (entry) {
-        host.appendChild(buildInquiryCard(entry));
-      });
-    } catch (err) {
-      host.innerHTML = '<p class="adm-empty">Fehler beim Laden.</p>';
-    }
-  }
-
-  function buildInquiryCard(e) {
-    var div = document.createElement('div');
-    div.className = 'adm-inquiry';
-    div.id = 'inq-' + e.id;
-    var meta = [e.vehicle, e.datetime, e.pickup && ('Von: ' + e.pickup), e.dropoff && ('Nach: ' + e.dropoff)]
-      .filter(Boolean).join(' · ');
-    div.innerHTML =
-      '<div class="adm-inquiry-header">' +
-        '<div><div class="adm-inquiry-who">' + esc(e.name) + '</div>' +
-        '<div class="adm-inquiry-meta"><a href="mailto:' + esc(e.email) + '" style="color:#c9a86a">' + esc(e.email) + '</a>' + (e.phone ? ' · ' + esc(e.phone) : '') + '</div>' +
-        (meta ? '<div class="adm-inquiry-meta">' + esc(meta) + '</div>' : '') + '</div>' +
-        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">' +
-          '<span class="adm-inquiry-time">' + new Date(e.receivedAt).toLocaleString('de-AT') + '</span>' +
-          '<button class="adm-btn adm-btn--danger" data-inq-del="' + esc(e.id) + '">Löschen</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="adm-inquiry-msg">' + esc(e.message) + '</div>';
-    div.querySelector('[data-inq-del]').addEventListener('click', function () { deleteInquiry(e.id); });
-    return div;
-  }
-
-  async function deleteInquiry(id) {
-    if (!confirm('Anfrage löschen?')) return;
-    try {
-      await api('DELETE', '/api/inquiries/' + id);
-      var el = document.getElementById('inq-' + id);
-      if (el) el.remove();
-      toast('Anfrage gelöscht', true);
-    } catch (err) {
-      toast('Fehler: ' + err.message, false);
-    }
-  }
-
-  function setupInquiries() {}
-
-  // ─── Media ────────────────────────────────────────────────────────────────
-
-  async function loadMedia() {
-    var grid = document.getElementById('mediaGrid');
-    grid.innerHTML = '';
-    try {
-      var files = await fetch('/api/uploads', { headers: { 'x-csrf-token': csrfToken } }).then(function (r) { return r.json(); });
-      if (!files.length) { grid.innerHTML = '<p class="adm-empty" style="width:100%">Noch keine Bilder hochgeladen.</p>'; return; }
-      files.forEach(function (f) { grid.appendChild(buildMediaItem(f)); });
-    } catch (err) {
-      grid.innerHTML = '<p class="adm-empty">Fehler beim Laden.</p>';
-    }
-  }
-
-  function buildMediaItem(f) {
-    var div = document.createElement('div');
-    div.className = 'adm-media-item';
-    div.id = 'media-' + CSS.escape(f.name);
-    var img = document.createElement('img');
-    img.src = f.url; img.alt = f.name; img.loading = 'lazy';
-    var nameEl = document.createElement('div');
-    nameEl.className = 'adm-media-name'; nameEl.textContent = f.name;
-    var delBtn = document.createElement('button');
-    delBtn.className = 'adm-media-del'; delBtn.textContent = '×';
-    delBtn.setAttribute('aria-label', 'Löschen');
-    delBtn.addEventListener('click', function () { deleteMedia(f.name); });
-    div.appendChild(img); div.appendChild(nameEl); div.appendChild(delBtn);
-    return div;
-  }
-
-  async function deleteMedia(name) {
-    if (!confirm('Bild "' + name + '" löschen?')) return;
-    try {
-      await api('DELETE', '/api/uploads/' + encodeURIComponent(name));
-      var el = document.getElementById('media-' + CSS.escape(name));
-      if (el) el.remove();
-      toast('Bild gelöscht', true);
-    } catch (err) {
-      toast('Fehler: ' + err.message, false);
-    }
-  }
-
-  function setupMedia() {
-    var zone = document.getElementById('uploadZone');
-    var input = document.getElementById('uploadInput');
-    zone.addEventListener('click', function () { input.click(); });
-    zone.addEventListener('dragover', function (e) { e.preventDefault(); });
-    zone.addEventListener('drop', function (e) { e.preventDefault(); uploadFile(e.dataTransfer.files[0]); });
-    input.addEventListener('change', function () { if (input.files[0]) uploadFile(input.files[0]); input.value = ''; });
-  }
-
-  async function uploadFile(file) {
-    if (!file) return;
-    var msg = document.getElementById('msgMedia');
-    setMsg('msgMedia', 'Hochladen …');
-    var form = new FormData();
-    form.append('image', file);
-    try {
-      var r = await fetch('/api/upload', { method: 'POST', headers: { 'x-csrf-token': csrfToken }, body: form });
-      var data = await r.json();
-      if (!r.ok) throw new Error(data.error || 'Upload fehlgeschlagen');
-      setMsg('msgMedia', 'Hochgeladen: ' + data.url);
-      loadMedia();
-    } catch (err) {
-      setMsg('msgMedia', err.message, true);
-    }
-  }
-
-  // ─── Account ──────────────────────────────────────────────────────────────
-
-  function setupAccount() {
-    document.getElementById('changePw').addEventListener('click', async function () {
-      var current = document.getElementById('pwCurrent').value;
-      var next = document.getElementById('pwNew').value;
-      var confirm2 = document.getElementById('pwConfirm').value;
-      if (!current || !next) { setMsg('msgPw', 'Bitte alle Felder ausfüllen.', true); return; }
-      if (next !== confirm2) { setMsg('msgPw', 'Die neuen Passwörter stimmen nicht überein.', true); return; }
-      if (next.length < 10) { setMsg('msgPw', 'Mindestens 10 Zeichen erforderlich.', true); return; }
-      try {
-        await api('POST', '/api/password', { currentPassword: current, newPassword: next });
-        setMsg('msgPw', 'Passwort erfolgreich geändert.');
-        document.getElementById('pwCurrent').value = '';
-        document.getElementById('pwNew').value = '';
-        document.getElementById('pwConfirm').value = '';
-      } catch (err) {
-        setMsg('msgPw', err.message || 'Fehler.', true);
-      }
-    });
-  }
-
-  // ─── Logout ───────────────────────────────────────────────────────────────
-
-  function setupLogout() {
-    document.getElementById('admLogout').addEventListener('click', async function () {
-      try {
-        await api('POST', '/api/logout');
-        window.location.href = '/admin/login';
-      } catch {
-        window.location.href = '/admin/login';
-      }
-    });
-  }
-
-  // ─── Escape HTML ──────────────────────────────────────────────────────────
-
-  function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  // ─── Boot ─────────────────────────────────────────────────────────────────
-
-  init();
-}());
-</script>
+<div class="adm-conv" id="admConv" hidden role="dialog" aria-modal="true" aria-labelledby="admConvTitle">
+  <div class="adm-conv-card">
+    <div class="adm-conv-head">
+      <div class="adm-conv-head-info">
+        <span class="adm-conv-title" id="admConvTitle"></span>
+        <span class="adm-conv-sub" id="admConvSub"></span>
+      </div>
+      <div class="adm-conv-actions">
+        <button class="adm-btn adm-btn--danger adm-btn--small" id="admConvDelete">Löschen</button>
+        <button class="adm-conv-close" id="admConvClose" aria-label="Schließen">×</button>
+      </div>
+    </div>
+    <div class="adm-conv-meta" id="admConvMeta"></div>
+    <div class="adm-conv-thread" id="admConvThread"></div>
+    <div class="adm-reply">
+      <textarea id="admConvBody" maxlength="8000" rows="3" placeholder="Antwort schreiben …"></textarea>
+      <div class="adm-reply-row">
+        <span class="adm-reply-msg" id="admConvMsg"></span>
+        <button type="button" class="adm-btn adm-btn--gold adm-btn--small" id="admConvSend">Senden</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="adm-picker" id="admPicker" hidden role="dialog" aria-modal="true" aria-labelledby="admPickerTitle">
+  <div class="adm-picker-card">
+    <div class="adm-picker-head">
+      <span class="adm-picker-title" id="admPickerTitle">Bild auswählen</span>
+      <button class="adm-picker-close" id="admPickerClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="adm-picker-body" id="admPickerBody"></div>
+    <div class="adm-picker-foot">
+      <input type="url" class="adm-picker-url" id="admPickerUrl" placeholder="Externe URL einfügen (https://…)" />
+      <button class="adm-btn adm-btn--ghost adm-btn--small" id="admPickerUseUrl">URL übernehmen</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/admin.js" defer></script>
 </body>
 </html>
