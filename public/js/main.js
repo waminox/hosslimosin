@@ -36,29 +36,29 @@
   const ROMAN = ['i.', 'ii.', 'iii.', 'iv.', 'v.', 'vi.', 'vii.', 'viii.', 'ix.', 'x.', 'xi.', 'xii.', 'xiii.', 'xiv.', 'xv.', 'xvi.', 'xvii.', 'xviii.', 'xix.', 'xx.'];
 
   // ------- Fleet data (image keys map to :root --img-* placeholders) -------
+  // Order: Mercedes-Benz first (paired ICE/EQ where available), then vans,
+  // then Tesla — per the customer's pricelist.
   const FLEET = [
-    { name: "Mercedes-Benz EQS", category: "Vollelektrische Luxus-Limousine", bucket: "Mercedes", passengers: "3", luggage: "2",
-      features: ["Massagesitze", "Burmester Sound", "Panoramadach", "Lautlos"], img: "--img-eqs" },
+    { name: "Mercedes-Benz E-Klasse", category: "Business-Limousine", bucket: "Mercedes", passengers: "3", luggage: "2",
+      features: ["Lederausstattung", "Klimakomfort", "WLAN", "Stille Kabine"], img: "--img-eclass" },
     { name: "Mercedes-Benz EQE", category: "Elektrische Business-Limousine", bucket: "Mercedes", passengers: "3", luggage: "2",
       features: ["Klimakomfortsitze", "WLAN", "Hyperscreen", "Emissionsfrei"], img: "--img-eqe" },
-    { name: "Mercedes-Benz S-Klasse", category: "Klassische Luxus-Limousine", bucket: "Mercedes", passengers: "3", luggage: "3",
+    { name: "Mercedes-Benz S-Klasse", category: "Luxus-Limousine · LongVersion", bucket: "Mercedes", passengers: "3", luggage: "2",
       features: ["Chauffeur-Paket", "Burmester 4D", "Massagesitze", "Executive"], img: "--img-sclass" },
-    { name: "Mercedes-Benz E-Klasse", category: "Business-Limousine", bucket: "Mercedes", passengers: "3", luggage: "3",
-      features: ["Lederausstattung", "Klimakomfort", "WLAN", "Stille Kabine"], img: "--img-eclass" },
-    { name: "Mercedes-Benz V-Klasse", category: "First-Class-Van", bucket: "Van", passengers: "6", luggage: "6",
+    { name: "Mercedes-Benz EQS", category: "Elektrische Luxus-Limousine", bucket: "Mercedes", passengers: "3", luggage: "2",
+      features: ["Massagesitze", "Burmester Sound", "Panoramadach", "Lautlos"], img: "--img-eqs" },
+    { name: "Mercedes-Benz V-Klasse", category: "First-Class MiniVan", bucket: "Van", passengers: "6", luggage: "6",
       features: ["Konferenzbestuhlung", "Tisch", "Verdunkelung", "Großer Kofferraum"], img: "--img-vclass" },
-    { name: "Mercedes-Benz EQV", category: "Elektrischer First-Class-Van", bucket: "Van", passengers: "6", luggage: "6",
+    { name: "Mercedes-Benz EQV", category: "Elektrischer First-Class MiniVan", bucket: "Van", passengers: "6", luggage: "6",
       features: ["Konferenzbestuhlung", "Lautlos", "Emissionsfrei", "Premium"], img: "--img-eqv" },
-    { name: "Mercedes-Benz Sprinter", category: "Gruppen-Van ab 12 Personen", bucket: "Van", passengers: "12+", luggage: "12+",
-      features: ["Komfortbestuhlung", "Klimaanlage", "Stauraum", "Für Gruppen"], img: "--img-sprinter" },
+    { name: "Mercedes-Benz Vito", category: "MiniVan", bucket: "Van", passengers: "8", luggage: "10",
+      features: ["Komfortable Bestuhlung", "Klimaanlage", "Großer Stauraum", "Bis 8 Personen"], img: "--img-vito" },
+    { name: "Mercedes-Benz Sprinter", category: "Gruppen-Bus", bucket: "Van", passengers: "20", luggage: "16",
+      features: ["Komfortbestuhlung", "Klimaanlage", "Stauraum", "Bis 20 Personen"], img: "--img-sprinter" },
     { name: "Tesla Model S", category: "Elektrische Performance-Limousine", bucket: "Tesla", passengers: "3", luggage: "2",
       features: ["Autopilot", "Premium Audio", "Glasdach", "Emissionsfrei"], img: "--img-tesla-s" },
-    { name: "Tesla Model X", category: "Elektrischer Premium-SUV", bucket: "Tesla", passengers: "5", luggage: "4",
-      features: ["Falcon-Wing-Türen", "Glasdach", "HEPA-Filter", "Emissionsfrei"], img: "--img-tesla-x" },
     { name: "Tesla Model Y", category: "Elektrischer Komfort-SUV", bucket: "Tesla", passengers: "4", luggage: "3",
       features: ["Glasdach", "Premium Audio", "Innenraum", "Emissionsfrei"], img: "--img-tesla-y" },
-    { name: "Tesla Model 3", category: "Elektrische Business-Limousine", bucket: "Tesla", passengers: "3", luggage: "2",
-      features: ["Premium Audio", "Glasdach", "Schnellladen", "Emissionsfrei"], img: "--img-tesla-3" },
   ];
 
   // Lookup: design's CSS-variable image keyed by car name (used as a fallback
@@ -80,7 +80,7 @@
         const name = String(x.name);
         const bucket = /Tesla/i.test(name)
           ? 'Tesla'
-          : /Sprinter|V-Klasse|EQV/i.test(name)
+          : /Sprinter|V-Klasse|EQV|Vito/i.test(name)
           ? 'Van'
           : 'Mercedes';
         return {
