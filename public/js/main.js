@@ -2,9 +2,15 @@
   'use strict';
 
   // Escape HTML and convert *segment* markers into <em>segment</em> for safe
-  // innerHTML rendering of admin-managed copy.
+  // innerHTML rendering of admin-managed copy. Also escapes both quote types
+  // so the same helper is safe inside HTML attributes (e.g. data-bg="…").
   function escHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
   function emphasize(s) {
     return String(s).split(/(\*[^*]+\*)/g).map((part) => {
@@ -100,7 +106,7 @@
     }
     grid.innerHTML = cars.map((c) => `
       <article class="car reveal" data-bucket="${escHtml(c.bucket)}">
-        <div class="car__media" style="background-image: ${c.bgImage};">
+        <div class="car__media" data-bg="${escHtml(c.bgImage)}">
           <span class="car__badge">${escHtml(c.bucket === 'Van' ? 'Van' : c.bucket)}</span>
         </div>
         <div class="car__body">
@@ -111,10 +117,17 @@
             <span><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><strong>${escHtml(c.luggage)}</strong> Gepäck</span>
           </div>
           <ul class="car__feats">${c.features.map((f) => `<li>${escHtml(f)}</li>`).join('')}</ul>
-          <a class="car__cta" href="#contact">Diese Klasse anfragen →</a>
+          <a class="car__cta" href="#contact" data-car-name="${escHtml(c.name)}">Diese Klasse anfragen →</a>
         </div>
       </article>
     `).join('');
+    // Apply background-image via the DOM API so admin-uploaded URLs (which
+    // would otherwise contain double quotes that break out of style="…")
+    // render reliably. Doing it post-innerHTML also keeps the markup clean.
+    grid.querySelectorAll('[data-bg]').forEach((el) => {
+      el.style.backgroundImage = el.getAttribute('data-bg') || '';
+      el.removeAttribute('data-bg');
+    });
   }
 
   // ------- Reveal -------
@@ -135,6 +148,67 @@
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     els.forEach((el) => io.observe(el));
+  }
+
+  // ------- Car-CTA → contact form vehicle pre-select -------
+  // "Mercedes-Benz EQS" / "Mercedes EQS" / "Mercedes Sprinter (12+ Pers.)" all
+  // normalise to the same key so the design's existing form options match the
+  // admin's fleet names without an exact string match.
+  function carKey(s) {
+    return String(s || '')
+      .toLowerCase()
+      .replace(/^mercedes(-benz)?\s+/i, '')
+      .replace(/\s*\(.*\)\s*$/, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function syncVehicleOptions(fleet) {
+    const select = document.querySelector('#contactForm select[name="vehicle"]');
+    if (!select || !Array.isArray(fleet)) return;
+    const existing = new Set(
+      Array.from(select.options).map((o) => carKey(o.value || o.textContent))
+    );
+    fleet.forEach((item) => {
+      const name = item && item.name;
+      if (!name) return;
+      const key = carKey(name);
+      if (key && !existing.has(key)) {
+        const opt = document.createElement('option');
+        opt.textContent = name;
+        select.appendChild(opt);
+        existing.add(key);
+      }
+    });
+  }
+
+  function selectVehicle(name) {
+    const select = document.querySelector('#contactForm select[name="vehicle"]');
+    if (!select || !name) return;
+    const target = carKey(name);
+    for (const opt of select.options) {
+      if (carKey(opt.value || opt.textContent) === target) {
+        select.value = opt.value || opt.textContent;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        return;
+      }
+    }
+    // No matching option — add the admin-defined name as a new entry.
+    const opt = document.createElement('option');
+    opt.textContent = name;
+    select.appendChild(opt);
+    select.value = name;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function setupCarCta() {
+    document.addEventListener('click', (e) => {
+      const cta = e.target.closest('.car__cta[data-car-name]');
+      if (!cta) return;
+      const name = cta.getAttribute('data-car-name');
+      if (name) selectVehicle(name);
+      // Default href="#contact" handles the smooth scroll.
+    });
   }
 
   // ------- Filters -------
@@ -499,6 +573,7 @@
         renderFleet(fleet);
         if (grid) setupReveal(grid);
       }
+      syncVehicleOptions(fleet);
     }
 
     // ------- Stimmen -------
@@ -548,6 +623,7 @@
   setupFilters();
   setupLegal();
   setupForm();
+  setupCarCta();
 
   // Public config (reCAPTCHA site key) — non-blocking.
   fetch('/api/config')
