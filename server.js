@@ -76,6 +76,11 @@ app.use(
         'connect-src': ["'self'", "https://www.google.com"],
         'frame-src': ["https://www.google.com"],
         'frame-ancestors': ["'none'"],
+        // Disabled so internal-IP HTTP dev (e.g. http://192.168.x.x:3000 from
+        // a phone) works. Without this, helmet's default would force every
+        // subresource (/js/*, /uploads/*) to be requested over HTTPS, which
+        // silently fails because no HTTPS server is running locally.
+        'upgrade-insecure-requests': null,
       },
     },
     crossOriginEmbedderPolicy: false,
