@@ -536,6 +536,15 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 .cta__status { font-size: 0.85rem; margin: 8px 0 0; min-height: 1.4em; text-align: center; }
 .cta__status.is-ok { color: var(--gold); }
 .cta__status.is-err { color: #d97a7a; }
+
+/* Required-field marker + per-field invalid state */
+.cta__form .req { color: var(--gold); margin-left: 2px; font-style: normal; }
+.cta__form label.is-invalid > span { color: #d97a7a; }
+.cta__form label.is-invalid > span .req { color: #d97a7a; }
+.cta__form label.is-invalid input,
+.cta__form label.is-invalid textarea,
+.cta__form label.is-invalid select { border-bottom-color: #d97a7a; }
+
 @media (max-width: 920px) {
   .cta__layout { grid-template-columns: 1fr; gap: 60px; }
   .cta__form .grid2 { grid-template-columns: 1fr; }
@@ -879,9 +888,10 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 
       <form class="cta__form" id="contactForm" novalidate>
         <input type="text" name="hp" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true" />
+        <p class="cta__hint" style="text-align:left;margin:0 0 4px">Mit <em class="req">*</em> markierte Felder sind Pflichtfelder.</p>
         <div class="grid2">
-          <label><span>Name</span><input name="name" required minlength="2" maxlength="200" placeholder="Ihr Name" /></label>
-          <label><span>E-Mail</span><input name="email" type="email" required maxlength="200" placeholder="ihre@email.com" /></label>
+          <label><span>Name <em class="req">*</em></span><input name="name" required minlength="2" maxlength="200" placeholder="Ihr Name" /></label>
+          <label><span>E-Mail <em class="req">*</em></span><input name="email" type="email" required maxlength="200" placeholder="ihre@email.com" /></label>
         </div>
         <div class="grid2">
           <label><span>Telefon</span><input name="phone" type="tel" maxlength="80" placeholder="+43 …" /></label>
@@ -891,7 +901,20 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
           <label><span>Abholung</span><input name="pickup" maxlength="300" placeholder="Adresse, Hotel, Flughafen…" /></label>
           <label><span>Ziel</span><input name="dropoff" maxlength="300" placeholder="Adresse, Hotel, Flughafen…" /></label>
         </div>
-        <label class="full"><span>Fahrzeug</span>
+        <div class="grid2">
+          <label><span>Anlass</span>
+            <select name="service">
+              <option value="">Allgemeine Anfrage</option>
+              <option>Flughafentransfer</option>
+              <option>Business-Chauffeur</option>
+              <option>Hochzeiten &amp; Events</option>
+              <option>Gruppen- &amp; VIP-Transfer</option>
+              <option>Langstrecken</option>
+              <option>Roadshows &amp; Premieren</option>
+              <option>Andere — auf Anfrage</option>
+            </select>
+          </label>
+          <label><span>Fahrzeug</span>
           <select name="vehicle">
             <option value="">Beliebig</option>
             <option>Mercedes-Benz E-Klasse</option>
@@ -906,8 +929,9 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
             <option>Tesla Model Y</option>
             <option>Andere Klasse — auf Anfrage</option>
           </select>
-        </label>
-        <label class="full"><span>Nachricht</span><textarea name="message" rows="4" required minlength="5" maxlength="4000" placeholder="Anlass, Anzahl Personen, Sonderwünsche …"></textarea></label>
+          </label>
+        </div>
+        <label class="full"><span>Nachricht <em class="req">*</em></span><textarea name="message" rows="4" required minlength="5" maxlength="4000" placeholder="Anzahl Personen, Sonderwünsche …"></textarea></label>
         <button class="btn btn--gold btn--full" type="submit">Anfrage senden</button>
         <p class="cta__hint">Wir antworten persönlich — keine Auto-Mails, kein Spam.</p>
         <p class="cta__status" id="formStatus" role="status" aria-live="polite"></p>

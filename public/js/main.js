@@ -211,6 +211,53 @@
     });
   }
 
+  // ------- Service-CTA → contact form Anlass pre-select -------
+  function syncServiceOptions(services) {
+    const select = document.querySelector('#contactForm select[name="service"]');
+    if (!select || !Array.isArray(services)) return;
+    const norm = (s) => String(s || '').toLowerCase().trim();
+    const existing = new Set(Array.from(select.options).map((o) => norm(o.value || o.textContent)));
+    services.forEach((item) => {
+      const title = item && item.title;
+      if (!title) return;
+      const key = norm(title);
+      if (key && !existing.has(key)) {
+        const opt = document.createElement('option');
+        opt.textContent = title;
+        select.appendChild(opt);
+        existing.add(key);
+      }
+    });
+  }
+
+  function selectService(title) {
+    const select = document.querySelector('#contactForm select[name="service"]');
+    if (!select || !title) return;
+    const norm = (s) => String(s || '').toLowerCase().trim();
+    const target = norm(title);
+    for (const opt of select.options) {
+      if (norm(opt.value || opt.textContent) === target) {
+        select.value = opt.value || opt.textContent;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        return;
+      }
+    }
+    const opt = document.createElement('option');
+    opt.textContent = title;
+    select.appendChild(opt);
+    select.value = title;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function setupServiceCta() {
+    document.addEventListener('click', (e) => {
+      const cta = e.target.closest('.svc__more');
+      if (!cta) return;
+      const title = cta.closest('.svc')?.querySelector('.svc__title')?.textContent.trim();
+      if (title) selectService(title);
+    });
+  }
+
   // ------- Filters -------
   function setupFilters() {
     const filters = document.getElementById('fleetFilters');
@@ -318,9 +365,45 @@
     const form = document.getElementById('contactForm');
     const status = document.getElementById('formStatus');
     if (!form) return;
+
+    const REQUIRED = [
+      { name: 'name', test: (v) => v.length >= 2, msg: 'Bitte geben Sie Ihren Namen an.' },
+      { name: 'email', test: (v) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v), msg: 'Bitte geben Sie eine gültige E-Mail-Adresse an.' },
+      { name: 'message', test: (v) => v.length >= 5, msg: 'Bitte beschreiben Sie kurz Ihre Anfrage.' },
+    ];
+
+    // Clear the per-field error highlight as soon as the user types in a field.
+    form.addEventListener('input', (e) => {
+      const label = e.target.closest('label');
+      if (label) label.classList.remove('is-invalid');
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       status.classList.remove('is-err', 'is-ok');
+      form.querySelectorAll('label.is-invalid').forEach((l) => l.classList.remove('is-invalid'));
+
+      // Client-side required-field validation.
+      let firstInvalid = null;
+      let firstError = '';
+      for (const r of REQUIRED) {
+        const field = form.elements[r.name];
+        const value = (field?.value || '').trim();
+        if (!r.test(value)) {
+          field?.closest('label')?.classList.add('is-invalid');
+          if (!firstInvalid) { firstInvalid = field; firstError = r.msg; }
+        }
+      }
+      if (firstInvalid) {
+        status.textContent = firstError;
+        status.classList.add('is-err');
+        firstInvalid.focus();
+        if (typeof firstInvalid.scrollIntoView === 'function') {
+          firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
       status.textContent = 'Wird gesendet …';
       const data = Object.fromEntries(new FormData(form).entries());
       try {
@@ -531,12 +614,13 @@
               <span class="svc__icon">${SERVICE_ICONS[s.icon] || SERVICE_ICONS.star}</span>
               <h3 class="svc__title">${escHtml(s.rawTitle)}</h3>
               <p class="svc__text">${escHtml(s.rawText)}</p>
-              <a class="svc__more" href="#contact">Anfragen →</a>
+              <a class="svc__more" href="#contact" data-service-name="${escHtml(s.rawTitle)}">Anfragen →</a>
             </article>
           `)
           .join('');
         setupReveal(svcGrid);
       }
+      syncServiceOptions(services);
     }
 
     // ------- Fleet -------
@@ -624,6 +708,7 @@
   setupLegal();
   setupForm();
   setupCarCta();
+  setupServiceCta();
 
   // Public config (reCAPTCHA site key) — non-blocking.
   fetch('/api/config')

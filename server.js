@@ -189,8 +189,9 @@ function buildPlainText(e) {
     line('E-Mail', e.email),
     line('Telefon', e.phone),
   ];
-  if (e.vehicle || e.datetime || e.pickup || e.dropoff) {
+  if (e.service || e.vehicle || e.datetime || e.pickup || e.dropoff) {
     parts.push('', '--- Fahrtwunsch ---');
+    parts.push(line('Anlass', e.service));
     parts.push(line('Fahrzeug', e.vehicle));
     parts.push(line('Datum / Uhrzeit', e.datetime));
     parts.push(line('Abholung', e.pickup));
@@ -211,9 +212,10 @@ function buildHtmlEmail(e) {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   const tripSection =
-    e.vehicle || e.datetime || e.pickup || e.dropoff
+    e.service || e.vehicle || e.datetime || e.pickup || e.dropoff
       ? `<h3 style="margin:24px 0 12px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Fahrtwunsch</h3>
          <table cellpadding="0" cellspacing="0" style="width:100%">
+           ${row('Anlass', esc(e.service))}
            ${row('Fahrzeug', esc(e.vehicle))}
            ${row('Datum / Uhrzeit', esc(e.datetime))}
            ${row('Abholung', esc(e.pickup))}
@@ -333,7 +335,7 @@ app.get('/api/config', (req, res) => {
 // Contact submission — stored as a flat JSON log file. Owner views from dashboard.
 const contactLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 8, standardHeaders: true });
 app.post('/api/contact', contactLimiter, async (req, res) => {
-  const { name, email, phone, message, pickup, dropoff, datetime, vehicle, hp, recaptchaToken } = req.body || {};
+  const { name, email, phone, message, pickup, dropoff, datetime, vehicle, service, hp, recaptchaToken } = req.body || {};
 
   // Honeypot — silent drop.
   if (hp) return res.json({ ok: true });
@@ -355,6 +357,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
     name: String(name).slice(0, 200),
     email: String(email).slice(0, 200),
     phone: phone ? String(phone).slice(0, 80) : '',
+    service: service ? String(service).slice(0, 120) : '',
     pickup: pickup ? String(pickup).slice(0, 300) : '',
     dropoff: dropoff ? String(dropoff).slice(0, 300) : '',
     datetime: datetime ? String(datetime).slice(0, 80) : '',

@@ -679,7 +679,7 @@
     if (inq.email) subParts.push('<a href="mailto:' + esc(inq.email) + '">' + esc(inq.email) + '</a>');
     if (inq.phone) subParts.push('<a href="tel:' + esc(inq.phone) + '">' + esc(inq.phone) + '</a>');
     document.getElementById('admConvSub').innerHTML = subParts.join(' · ');
-    var meta = [inq.vehicle, inq.datetime, inq.pickup && ('Von: ' + inq.pickup), inq.dropoff && ('Nach: ' + inq.dropoff)]
+    var meta = [inq.service, inq.vehicle, inq.datetime, inq.pickup && ('Von: ' + inq.pickup), inq.dropoff && ('Nach: ' + inq.dropoff)]
       .filter(Boolean).join(' · ');
     document.getElementById('admConvMeta').textContent = meta || 'Eingegangen ' + fmtTime(inq.receivedAt);
 
