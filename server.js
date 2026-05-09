@@ -143,7 +143,10 @@ function createMailer() {
 
 async function verifyRecaptcha(token) {
   if (!RECAPTCHA_SECRET_KEY) return true;  // not configured → skip check
-  if (!token) return false;
+  if (!token) {
+    console.warn('[recaptcha] no token in request body — frontend may not be loading the reCAPTCHA script');
+    return false;
+  }
   return new Promise((resolve) => {
     const body =
       'secret=' + encodeURIComponent(RECAPTCHA_SECRET_KEY) +
@@ -164,14 +167,22 @@ async function verifyRecaptcha(token) {
         res.on('end', () => {
           try {
             const r = JSON.parse(data);
-            resolve(r.success === true && (r.score === undefined || r.score >= 0.5));
-          } catch {
+            const ok = r.success === true && (r.score === undefined || r.score >= 0.5);
+            if (!ok) {
+              console.warn('[recaptcha] verification failed:', JSON.stringify(r));
+            }
+            resolve(ok);
+          } catch (err) {
+            console.warn('[recaptcha] could not parse Google response:', err.message, '| body:', data.slice(0, 200));
             resolve(false);
           }
         });
       }
     );
-    req.on('error', () => resolve(true)); // network error → allow through
+    req.on('error', (err) => {
+      console.warn('[recaptcha] network error reaching Google:', err.message);
+      resolve(true); // network error → allow through
+    });
     req.write(body);
     req.end();
   });
