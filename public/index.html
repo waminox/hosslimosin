@@ -548,6 +548,52 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 .cta__form label.is-invalid textarea,
 .cta__form label.is-invalid select { border-bottom-color: #d97a7a; }
 
+/* Centred toast for contact-form success / error feedback */
+.toast {
+  position: fixed; top: 22px; left: 50%;
+  transform: translate(-50%, -16px);
+  z-index: 200;
+  width: calc(100% - 32px); max-width: 460px; min-width: 280px;
+  background: rgba(10, 10, 10, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--gold);
+  padding: 18px 22px;
+  display: flex; gap: 14px; align-items: flex-start;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+}
+.toast.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast[hidden] { display: none; }
+.toast.is-err { border-color: #d97a7a; }
+.toast__icon {
+  width: 24px; height: 24px; flex-shrink: 0; color: var(--gold);
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-top: 3px;
+}
+.toast.is-err .toast__icon { color: #d97a7a; }
+.toast__icon svg { width: 100%; height: 100%; }
+.toast__content { flex: 1; min-width: 0; }
+.toast__title {
+  display: block;
+  font-family: var(--serif); font-style: italic; font-weight: 500;
+  font-size: 1.2rem; color: var(--ink);
+  margin-bottom: 4px; letter-spacing: 0.01em; line-height: 1.2;
+}
+.toast__msg {
+  display: block;
+  font-size: 0.86rem; color: var(--ink-dim); line-height: 1.55;
+  font-weight: 300;
+}
+.toast__close {
+  font-size: 1.5rem; line-height: 1; color: var(--ink-mute);
+  background: none; border: 0; cursor: pointer;
+  padding: 0 2px; flex-shrink: 0;
+  transition: color 0.2s;
+}
+.toast__close:hover { color: var(--gold); }
+
 @media (max-width: 920px) {
   .cta__layout { grid-template-columns: 1fr; gap: 60px; }
   .cta__form .grid2 { grid-template-columns: 1fr; }
@@ -985,6 +1031,15 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
   <h2 id="legalTitle"></h2>
   <div class="legal__body" id="legalBody"></div>
 </dialog>
+
+<div class="toast" id="contactToast" role="status" aria-live="polite" hidden>
+  <span class="toast__icon" aria-hidden="true"></span>
+  <div class="toast__content">
+    <strong class="toast__title"></strong>
+    <span class="toast__msg"></span>
+  </div>
+  <button type="button" class="toast__close" aria-label="Schließen">×</button>
+</div>
 
 <script src="/js/main.js" defer></script>
 </body>

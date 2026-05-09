@@ -360,6 +360,39 @@
     });
   }
 
+  // ------- Toast for contact-form feedback -------
+  const TOAST_ICONS = {
+    ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5 12-13"/></svg>',
+    err: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  };
+  let _toastTimer = 0;
+  function showToast(title, msg, kind, autoHideMs) {
+    const toast = document.getElementById('contactToast');
+    if (!toast) return;
+    toast.querySelector('.toast__title').textContent = title;
+    toast.querySelector('.toast__msg').textContent = msg;
+    toast.querySelector('.toast__icon').innerHTML = TOAST_ICONS[kind] || TOAST_ICONS.ok;
+    toast.classList.toggle('is-err', kind === 'err');
+    toast.removeAttribute('hidden');
+    // force reflow so the transition runs even on fast successive shows
+    void toast.offsetWidth;
+    toast.classList.add('is-visible');
+    clearTimeout(_toastTimer);
+    if (autoHideMs && autoHideMs > 0) _toastTimer = setTimeout(hideToast, autoHideMs);
+  }
+  function hideToast() {
+    const toast = document.getElementById('contactToast');
+    if (!toast) return;
+    toast.classList.remove('is-visible');
+    setTimeout(() => toast.setAttribute('hidden', ''), 400);
+  }
+  function setupToast() {
+    const toast = document.getElementById('contactToast');
+    if (!toast) return;
+    const closeBtn = toast.querySelector('.toast__close');
+    if (closeBtn) closeBtn.addEventListener('click', hideToast);
+  }
+
   // ------- Contact form (real POST to /api/contact) -------
   function setupForm() {
     const form = document.getElementById('contactForm');
@@ -415,12 +448,22 @@
         });
         const json = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(json.error || 'Senden fehlgeschlagen.');
-        status.textContent = 'Vielen Dank! Wir melden uns in Kürze bei Ihnen.';
-        status.classList.add('is-ok');
+        status.textContent = '';
+        showToast(
+          'Vielen Dank für Ihre Anfrage',
+          'Wir haben Ihre Nachricht erhalten und melden uns persönlich bei Ihnen — meist noch am selben Tag.',
+          'ok',
+          8000
+        );
         form.reset();
       } catch (err) {
-        status.textContent = err.message || 'Es ist ein Fehler aufgetreten. Bitte rufen Sie uns an oder versuchen Sie es erneut.';
-        status.classList.add('is-err');
+        status.textContent = '';
+        showToast(
+          'Senden nicht möglich',
+          err.message || 'Bitte versuchen Sie es erneut oder rufen Sie uns direkt an.',
+          'err',
+          0
+        );
       }
     });
   }
@@ -707,6 +750,7 @@
   setupFilters();
   setupLegal();
   setupForm();
+  setupToast();
   setupCarCta();
   setupServiceCta();
 
