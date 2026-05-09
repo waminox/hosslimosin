@@ -46,6 +46,64 @@
   function val(id) { var el = document.getElementById(id); return el ? el.value : ''; }
   function setVal(id, v) { var el = document.getElementById(id); if (el) el.value = v || ''; }
 
+  // ─── Drag & drop reorder for admin item lists ─────────────────────────────
+  // Attaches HTML5 drag-and-drop to a list of .adm-item children inside the
+  // host element. The .adm-item must have draggable=true (set in the build
+  // function) and the .adm-item-header is the visible grab affordance.
+  // After a drop we re-read the array from the DOM (so any unsaved input
+  // edits are preserved), splice the moved item to its new position, and
+  // call the caller's render() to repaint with fresh closures.
+  function makeListDraggable(hostId, itemSel, getArray, setArray, render) {
+    var host = document.getElementById(hostId);
+    if (!host) return;
+    var draggedIdx = null;
+
+    host.addEventListener('dragstart', function (e) {
+      var item = e.target.closest && e.target.closest(itemSel);
+      if (!item) return;
+      var items = Array.prototype.slice.call(host.querySelectorAll(itemSel));
+      draggedIdx = items.indexOf(item);
+      item.classList.add('is-dragging');
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', String(draggedIdx)); } catch (err) {}
+      }
+    });
+
+    host.addEventListener('dragend', function () {
+      host.querySelectorAll(itemSel).forEach(function (el) {
+        el.classList.remove('is-dragging', 'is-drop-target');
+      });
+      draggedIdx = null;
+    });
+
+    host.addEventListener('dragover', function (e) {
+      if (draggedIdx === null) return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      var over = e.target.closest && e.target.closest(itemSel);
+      host.querySelectorAll(itemSel).forEach(function (el) {
+        el.classList.remove('is-drop-target');
+      });
+      if (over && !over.classList.contains('is-dragging')) over.classList.add('is-drop-target');
+    });
+
+    host.addEventListener('drop', function (e) {
+      if (draggedIdx === null) return;
+      e.preventDefault();
+      var target = e.target.closest && e.target.closest(itemSel);
+      if (!target) return;
+      var items = Array.prototype.slice.call(host.querySelectorAll(itemSel));
+      var newIdx = items.indexOf(target);
+      if (newIdx === -1 || newIdx === draggedIdx) return;
+      var arr = getArray();
+      var moved = arr.splice(draggedIdx, 1)[0];
+      arr.splice(newIdx, 0, moved);
+      setArray(arr);
+      render();
+    });
+  }
+
   // ─── Init ─────────────────────────────────────────────────────────────────
 
   async function init() {
@@ -75,6 +133,34 @@
     setupAccount();
     setupLogout();
     setupPicker();
+    setupReorder();
+  }
+
+  function setupReorder() {
+    makeListDraggable('servicesList', '.adm-item',
+      function () { return readServices(); },
+      function (arr) { content.services = arr; },
+      function () { renderServices(); });
+    makeListDraggable('highlightsList', '.adm-item',
+      function () { return readHighlights(); },
+      function (arr) { content.about = content.about || {}; content.about.highlights = arr; },
+      function () { renderHighlights(); });
+    makeListDraggable('fleetList', '.adm-item',
+      function () { return readFleet(); },
+      function (arr) { content.fleet = arr; },
+      function () { renderFleet(); });
+    makeListDraggable('voicesList', '.adm-item',
+      function () { return readVoices(); },
+      function (arr) { content.testimonials = arr; },
+      function () { renderVoices(); });
+    makeListDraggable('cityTags', '.adm-city-tag',
+      function () { return cities.slice(); },
+      function (arr) { cities = arr; },
+      function () { renderCityTags(); });
+    makeListDraggable('certificationsList', '.adm-item',
+      function () { return readCertifications(); },
+      function (arr) { content.certifications = arr; },
+      function () { renderCertifications(); });
   }
 
   // ─── Image picker (used by hero background, fleet images, SEO og) ─────────
@@ -232,6 +318,7 @@
     renderHighlights();
     renderFleet();
     renderVoices();
+    renderCertifications();
   }
 
   // ─── City editor ─────────────────────────────────────────────────────────
@@ -242,6 +329,7 @@
     cities.forEach(function (city, i) {
       var span = document.createElement('span');
       span.className = 'adm-city-tag';
+      span.draggable = true;
       span.textContent = city;
       var btn = document.createElement('button');
       btn.className = 'adm-city-remove';
@@ -281,8 +369,9 @@
   function buildServiceItem(item, i) {
     var div = document.createElement('div');
     div.className = 'adm-item';
+    div.draggable = true;
     div.innerHTML =
-      '<div class="adm-item-header"><span class="adm-item-num">Service ' + (i + 1) + '</span>' +
+      '<div class="adm-item-header"><span class="adm-item-num"><span class="adm-grip" aria-hidden="true">⋮⋮</span>Service ' + (i + 1) + '</span>' +
       '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
       '<div class="adm-item-fields">' +
         '<div class="adm-grid2">' +
@@ -333,8 +422,9 @@
   function buildHighlightItem(item, i) {
     var div = document.createElement('div');
     div.className = 'adm-item';
+    div.draggable = true;
     div.innerHTML =
-      '<div class="adm-item-header"><span class="adm-item-num">Highlight ' + (i + 1) + '</span>' +
+      '<div class="adm-item-header"><span class="adm-item-num"><span class="adm-grip" aria-hidden="true">⋮⋮</span>Highlight ' + (i + 1) + '</span>' +
       '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
       '<div class="adm-item-fields">' +
         '<div class="adm-grid2">' +
@@ -378,6 +468,60 @@
     renderHighlights();
   });
 
+  // ─── Certifications editor (TÜV / ISO etc.) ──────────────────────────────
+
+  function renderCertifications() {
+    var certs = (content.certifications && Array.isArray(content.certifications)) ? content.certifications : [];
+    renderItemList('certificationsList', certs, buildCertificationItem);
+  }
+
+  function buildCertificationItem(item, i) {
+    var div = document.createElement('div');
+    div.className = 'adm-item';
+    div.draggable = true;
+    div.innerHTML =
+      '<div class="adm-item-header"><span class="adm-item-num"><span class="adm-grip" aria-hidden="true">⋮⋮</span>Zertifikat ' + (i + 1) + '</span>' +
+      '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
+      '<div class="adm-item-fields">' +
+        '<div class="adm-field"><label class="adm-field-label">Bezeichnung</label><input class="adm-input" data-cert-label maxlength="80" value="' + esc(item.label) + '" /></div>' +
+        '<div class="adm-field"><label class="adm-field-label">Logo (optional)</label>' +
+          '<div class="adm-img-field">' +
+            '<input class="adm-input" data-cert-img value="' + esc(item.image) + '" placeholder="/uploads/… oder leer für Text-Badge" />' +
+            '<button type="button" class="adm-btn adm-btn--ghost adm-btn--small" data-cert-pick>Auswählen</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    div.querySelector('[data-remove]').addEventListener('click', function () {
+      content.certifications = readCertifications();
+      content.certifications.splice(i, 1);
+      renderCertifications();
+    });
+    div.querySelector('[data-cert-pick]').addEventListener('click', function () {
+      var input = div.querySelector('[data-cert-img]');
+      openImagePicker(function (url) { input.value = url; });
+    });
+    return div;
+  }
+
+  function readCertifications() {
+    var host = document.getElementById('certificationsList');
+    var items = [];
+    host.querySelectorAll('.adm-item').forEach(function (item) {
+      items.push({
+        label: item.querySelector('[data-cert-label]').value,
+        image: item.querySelector('[data-cert-img]').value,
+      });
+    });
+    return items;
+  }
+
+  document.getElementById('addCertification').addEventListener('click', function () {
+    content.certifications = readCertifications();
+    if (content.certifications.length >= 8) { toast('Maximal 8 Zertifikate erlaubt', false); return; }
+    content.certifications.push({ label: '', image: '' });
+    renderCertifications();
+  });
+
   // ─── Fleet editor ─────────────────────────────────────────────────────────
 
   function renderFleet() {
@@ -389,8 +533,9 @@
     var feats = Array.isArray(item.features) ? item.features.join(', ') : '';
     var div = document.createElement('div');
     div.className = 'adm-item';
+    div.draggable = true;
     div.innerHTML =
-      '<div class="adm-item-header"><span class="adm-item-num">Fahrzeug ' + (i + 1) + '</span>' +
+      '<div class="adm-item-header"><span class="adm-item-num"><span class="adm-grip" aria-hidden="true">⋮⋮</span>Fahrzeug ' + (i + 1) + '</span>' +
       '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
       '<div class="adm-item-fields">' +
         '<div class="adm-grid2">' +
@@ -454,8 +599,9 @@
   function buildVoiceItem(item, i) {
     var div = document.createElement('div');
     div.className = 'adm-item';
+    div.draggable = true;
     div.innerHTML =
-      '<div class="adm-item-header"><span class="adm-item-num">Stimme ' + (i + 1) + '</span>' +
+      '<div class="adm-item-header"><span class="adm-item-num"><span class="adm-grip" aria-hidden="true">⋮⋮</span>Stimme ' + (i + 1) + '</span>' +
       '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
       '<div class="adm-item-fields">' +
         '<div class="adm-grid2">' +
@@ -547,6 +693,7 @@
       });
       content.coverage = { title: val('coverageTitle'), body: val('coverageBody'), cities: cities.slice() };
       content.cta = { title: val('ctaTitle'), subtitle: val('ctaSubtitle'), button: val('ctaButton') };
+      content.certifications = readCertifications();
     });
   }
 

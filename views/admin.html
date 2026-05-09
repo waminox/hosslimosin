@@ -140,13 +140,26 @@ textarea, input, select { font: inherit; }
 .adm-item {
   background: #111; border: 1px solid rgba(255,255,255,0.07);
   padding: 16px 16px 12px;
+  transition: border-color 0.15s, opacity 0.15s, transform 0.15s;
 }
 .adm-item-header {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 12px;
+  cursor: grab; user-select: none;
 }
-.adm-item-num { font-size: 0.65rem; color: #c9a86a; letter-spacing: 0.2em; text-transform: uppercase; }
+.adm-item-header:active { cursor: grabbing; }
+.adm-item-num { font-size: 0.65rem; color: #c9a86a; letter-spacing: 0.2em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 8px; }
 .adm-item-fields { display: flex; flex-direction: column; gap: 10px; }
+.adm-grip {
+  display: inline-block; color: #6f6759; font-size: 0.95rem;
+  letter-spacing: -2px; line-height: 1; cursor: grab;
+}
+.adm-item:hover .adm-grip { color: #c9a86a; }
+.adm-item.is-dragging { opacity: 0.4; transform: scale(0.985); }
+.adm-item.is-drop-target {
+  border-color: rgba(201,168,106,0.6);
+  box-shadow: 0 0 0 1px rgba(201,168,106,0.6);
+}
 
 /* Inquiries */
 .adm-inquiry {
@@ -353,7 +366,12 @@ textarea, input, select { font: inherit; }
   display: inline-flex; align-items: center; gap: 6px;
   padding: 4px 10px; border: 1px solid rgba(255,255,255,0.1);
   background: #111; font-size: 0.75rem; color: #d8d0c4;
+  cursor: grab; user-select: none;
+  transition: border-color 0.15s, opacity 0.15s;
 }
+.adm-city-tag:active { cursor: grabbing; }
+.adm-city-tag.is-dragging { opacity: 0.4; }
+.adm-city-tag.is-drop-target { border-color: rgba(201,168,106,0.6); box-shadow: 0 0 0 1px rgba(201,168,106,0.6); }
 .adm-city-remove {
   color: #6f6759; font-size: 0.9rem; line-height: 1; cursor: pointer;
   background: transparent; border: 0; padding: 0;
@@ -563,6 +581,16 @@ textarea, input, select { font: inherit; }
         <div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" id="ctaTitle" maxlength="240" /></div>
         <div class="adm-field"><label class="adm-field-label">Untertitel</label><textarea class="adm-textarea" id="ctaSubtitle" maxlength="400" rows="3"></textarea></div>
         <div class="adm-field"><label class="adm-field-label">Button-Text</label><input class="adm-input" id="ctaButton" maxlength="60" /></div>
+      </div>
+
+      <div class="adm-section">
+        <p class="adm-section-title">Zertifizierungen</p>
+        <p style="font-size:0.72rem;color:#6f6759;margin:0 0 12px">
+          Erscheint im Band oben (zwischen Hero und „Über uns") und im Footer.
+          Lassen Sie das Logo-Feld leer für einen Text-Badge, oder laden Sie das offizielle Zertifikatslogo via Medien hoch.
+        </p>
+        <div class="adm-list" id="certificationsList"></div>
+        <button class="adm-btn adm-btn--ghost adm-btn--small" id="addCertification">+ Zertifikat hinzufügen</button>
       </div>
 
       <div class="adm-save-bar">

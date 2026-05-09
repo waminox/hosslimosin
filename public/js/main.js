@@ -738,6 +738,37 @@
         setupReveal(voicesGrid);
       }
     }
+
+    // ------- Certifications (top band + footer) -------
+    const certs = Array.isArray(c.certifications) ? c.certifications.filter((x) => x && (x.label || x.image)) : [];
+    if (certs.length) {
+      const certList = document.querySelector('.cert__list');
+      if (certList) {
+        certList.innerHTML = certs
+          .map((x) => {
+            const label = String(x.label || '');
+            const img = String(x.image || '');
+            const inner = img
+              ? `<img src="${escHtml(img)}" alt="${escHtml(label)}" loading="lazy"><span>${escHtml(label)}</span>`
+              : `<span>${escHtml(label)}</span>`;
+            return `<li class="cert__item${img ? ' cert__item--has-img' : ''}">${inner}</li>`;
+          })
+          .join('');
+      }
+      const footCerts = document.querySelector('.foot__certs');
+      if (footCerts) {
+        footCerts.innerHTML = certs
+          .map((x) => {
+            const label = String(x.label || '');
+            const img = String(x.image || '');
+            const inner = img
+              ? `<img src="${escHtml(img)}" alt="${escHtml(label)}" loading="lazy">`
+              : escHtml(label);
+            return `<li class="foot__cert">${inner}</li>`;
+          })
+          .join('');
+      }
+    }
   }
 
   // ------- Boot -------

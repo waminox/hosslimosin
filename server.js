@@ -707,6 +707,12 @@ function sanitizeContent(c) {
         quote: asString(t?.quote, 800),
       }))
     : [];
+  out.certifications = Array.isArray(c?.certifications)
+    ? c.certifications.slice(0, 8).map((x) => ({
+        label: asString(x?.label, 80),
+        image: asUrl(x?.image),
+      }))
+    : [];
   out.coverage = {
     title: asString(c?.coverage?.title, 240),
     body: asString(c?.coverage?.body, 1200),
