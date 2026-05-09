@@ -169,7 +169,16 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 /* ---------- Hero ---------- */
 .hero {
   position: relative; min-height: 100svh;
-  display: flex; align-items: flex-end; padding: 0 0 100px;
+  display: flex;
+  /* Two-step align-items so older engines that don't understand "safe"
+     still get the artistic flex-end alignment, while modern engines fall
+     back to flex-start when the viewport is too short for the content
+     to fit — preventing the eyebrow / title from being pushed up
+     behind the fixed nav. The padding-top gives that fallback ~60px
+     of clearance below the ~80px-tall nav. */
+  align-items: flex-end;
+  align-items: safe flex-end;
+  padding: 140px 0 100px;
   overflow: hidden; isolation: isolate;
 }
 .hero__bg {
