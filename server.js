@@ -150,7 +150,7 @@ async function verifyRecaptcha(token) {
   return new Promise((resolve) => {
     const body =
       'secret=' + encodeURIComponent(RECAPTCHA_SECRET_KEY) +
-      '&response=' + encodeURIComponent(String(token).slice(0, 2048));
+      '&response=' + encodeURIComponent(String(token).slice(0, 8192));
     const req = https.request(
       {
         hostname: 'www.google.com',
@@ -352,14 +352,6 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   if (hp) return res.json({ ok: true });
 
   // reCAPTCHA verification (skipped when RECAPTCHA_SECRET_KEY is not configured).
-  if (RECAPTCHA_SECRET_KEY) {
-    const t = String(recaptchaToken || '');
-    console.log(
-      '[recaptcha] received token len=' + t.length +
-      ' preview=' + JSON.stringify(t.slice(0, 30)) +
-      ' | configured site key tail=…' + RECAPTCHA_SITE_KEY.slice(-8)
-    );
-  }
   const captchaOk = await verifyRecaptcha(recaptchaToken);
   if (!captchaOk) {
     return res.status(400).json({ error: 'Sicherheitsüberprüfung fehlgeschlagen. Bitte versuchen Sie es erneut.' });
