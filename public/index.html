@@ -654,16 +654,19 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 .foot__mark::first-letter { color: var(--gold); }
 .foot__brand p { color: var(--ink-dim); font-size: 0.95rem; line-height: 1.7; margin: 0; font-weight: 300; }
 .foot__certs {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  list-style: none; margin: 6px 0 0; padding: 0;
+  display: flex; gap: 12px; flex-wrap: wrap;
+  list-style: none; margin: 8px 0 0; padding: 0;
 }
 .foot__cert {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 0.62rem; color: var(--gold);
-  letter-spacing: 0.22em; text-transform: uppercase;
-  padding: 6px 11px; border: 1px solid rgba(201,168,106,0.28);
+  /* Mirrors the top-band .cert__item so logo + text appear together
+     consistently above and below. */
+  display: inline-flex; align-items: center; gap: 12px;
+  font-size: 0.7rem; color: var(--ink-dim);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 10px 18px; border: 1px solid var(--line-2);
 }
-.foot__cert img { height: 18px; width: auto; max-width: 56px; object-fit: contain; }
+.foot__cert img { height: 30px; width: auto; max-width: 100px; object-fit: contain; }
+.foot__cert--has-img { padding: 8px 16px; border-color: rgba(201,168,106,0.32); }
 .foot__cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
 .foot__cols h4 {
   font-family: var(--sans); font-weight: 500; font-size: 0.7rem;
