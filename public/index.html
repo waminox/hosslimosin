@@ -93,7 +93,13 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 /* ---------- Nav ---------- */
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  transition: background 0.5s ease, padding 0.4s, border-color 0.5s;
+  /* Always opaque + blurred so the eyebrow / hero copy never bleeds through
+     behind the menu links. The is-stuck state below adds the gold-line
+     bottom border and tightens the padding once the user has scrolled. */
+  background: rgba(5,5,5,0.85);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  transition: padding 0.4s, border-color 0.5s;
   border-bottom: 1px solid transparent;
 }
 .nav__inner {
@@ -101,9 +107,6 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
   display: flex; align-items: center; justify-content: space-between; gap: 28px;
 }
 .nav.is-stuck {
-  background: rgba(5,5,5,0.85);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom-color: var(--line);
 }
 .nav.is-stuck .nav__inner { padding: 16px 28px; }
@@ -161,15 +164,6 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 @media (max-width: 920px) {
   .nav__menu, .nav__phone, .nav__cta { display: none; }
   .nav__burger { display: inline-flex; }
-  /* On phones the hero text starts close to the top, so keep the bar opaque
-     instead of waiting for is-stuck — otherwise the wordmark and section
-     headings overlap visually. */
-  .nav {
-    background: rgba(5,5,5,0.92);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom-color: var(--line);
-  }
 }
 
 /* ---------- Hero ---------- */
