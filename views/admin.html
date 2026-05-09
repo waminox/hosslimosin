@@ -292,6 +292,13 @@ textarea, input, select { font: inherit; }
   display: flex; flex-direction: column; gap: 10px;
 }
 .adm-conv-thread .adm-bubble { max-width: 84%; }
+.adm-conv-note {
+  margin: 0; padding: 10px 22px;
+  font-size: 0.7rem; color: #6f6759; line-height: 1.55;
+  background: rgba(201,168,106,0.05);
+  border-top: 1px solid rgba(201,168,106,0.12);
+}
+.adm-conv-note strong { color: #c9a86a; font-weight: 500; }
 .adm-conv .adm-reply {
   margin: 0; padding: 14px 22px;
   border-top: 1px solid rgba(255,255,255,0.06);
@@ -718,6 +725,9 @@ textarea, input, select { font: inherit; }
     </div>
     <div class="adm-conv-meta" id="admConvMeta"></div>
     <div class="adm-conv-thread" id="admConvThread"></div>
+    <p class="adm-conv-note">
+      Hinweis: Antworten des Kunden auf diese Nachricht landen direkt in <strong>office@hosslimo.com</strong> — sie erscheinen nicht in dieser Ansicht.
+    </p>
     <div class="adm-reply">
       <textarea id="admConvBody" maxlength="8000" rows="3" placeholder="Antwort schreiben …"></textarea>
       <div class="adm-reply-row">
