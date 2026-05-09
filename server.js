@@ -190,6 +190,8 @@ async function verifyRecaptcha(token) {
 
 function buildPlainText(e) {
   const line = (label, val) => (val ? `${label}: ${val}` : null);
+  const tripLine = (label, val) => `${label}: ${val || '—'}`;
+  const dt = formatPickupDateTime(e.datetime);
   const parts = [
     'Neue Anfrage – Hosslimo',
     '='.repeat(50),
@@ -199,17 +201,23 @@ function buildPlainText(e) {
     line('Name', e.name),
     line('E-Mail', e.email),
     line('Telefon', e.phone),
+    '',
+    '--- Fahrtwunsch ---',
+    tripLine('Anlass', e.service),
+    tripLine('Fahrzeug', e.vehicle),
+    tripLine('Datum / Uhrzeit', dt),
+    tripLine('Abholung', e.pickup),
+    tripLine('Ziel', e.dropoff),
   ];
-  if (e.service || e.vehicle || e.datetime || e.pickup || e.dropoff) {
-    parts.push('', '--- Fahrtwunsch ---');
-    parts.push(line('Anlass', e.service));
-    parts.push(line('Fahrzeug', e.vehicle));
-    parts.push(line('Datum / Uhrzeit', e.datetime));
-    parts.push(line('Abholung', e.pickup));
-    parts.push(line('Ziel', e.dropoff));
-  }
   parts.push('', '--- Nachricht ---', e.message, '', '='.repeat(50), `ID: ${e.id}`);
   return parts.filter((x) => x !== null).join('\n');
+}
+
+function formatPickupDateTime(s) {
+  if (!s) return '';
+  const d = new Date(s);
+  if (isNaN(d.getTime())) return String(s);
+  return d.toLocaleString('de-AT', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
 function buildHtmlEmail(e) {
@@ -217,22 +225,22 @@ function buildHtmlEmail(e) {
     val
       ? `<tr><td style="padding:6px 16px 6px 0;color:#888;white-space:nowrap;font-size:13px;vertical-align:top">${label}</td><td style="padding:6px 0;color:#1a1a1a;font-size:13px">${val}</td></tr>`
       : '';
+  const tripRow = (label, val) =>
+    `<tr><td style="padding:6px 16px 6px 0;color:#888;white-space:nowrap;font-size:13px;vertical-align:top">${label}</td><td style="padding:6px 0;color:${val ? '#1a1a1a' : '#bbb'};font-size:13px">${val || '—'}</td></tr>`;
   const esc = (s) =>
     String(s == null ? '' : s)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
-  const tripSection =
-    e.service || e.vehicle || e.datetime || e.pickup || e.dropoff
-      ? `<h3 style="margin:24px 0 12px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Fahrtwunsch</h3>
+  const dt = formatPickupDateTime(e.datetime);
+  const tripSection = `<h3 style="margin:24px 0 12px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:1.5px;font-weight:600">Fahrtwunsch</h3>
          <table cellpadding="0" cellspacing="0" style="width:100%">
-           ${row('Anlass', esc(e.service))}
-           ${row('Fahrzeug', esc(e.vehicle))}
-           ${row('Datum / Uhrzeit', esc(e.datetime))}
-           ${row('Abholung', esc(e.pickup))}
-           ${row('Ziel', esc(e.dropoff))}
-         </table>`
-      : '';
+           ${tripRow('Anlass', esc(e.service))}
+           ${tripRow('Fahrzeug', esc(e.vehicle))}
+           ${tripRow('Datum / Uhrzeit', esc(dt))}
+           ${tripRow('Abholung', esc(e.pickup))}
+           ${tripRow('Ziel', esc(e.dropoff))}
+         </table>`;
   return `<!DOCTYPE html>
 <html lang="de">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"></head>
