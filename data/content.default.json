@@ -180,6 +180,10 @@
       "quote": "Verlässlich, leise, perfekt vorbereitet — genau so muss ein Chauffeurservice sein."
     }
   ],
+  "certifications": [
+    { "label": "TÜV-geprüfte Chauffeur-Ausbildung", "image": "" },
+    { "label": "ISO 9001 zertifiziert", "image": "" }
+  ],
   "coverage": {
     "title": "Wir bringen Sie *überall* hin.",
     "body": "Wien ist unser Zuhause — aber unser Service endet nicht an der Stadtgrenze. Österreichweit. Auf Wunsch in ganz Europa.",
