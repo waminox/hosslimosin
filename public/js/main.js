@@ -761,10 +761,10 @@
           .map((x) => {
             const label = String(x.label || '');
             const img = String(x.image || '');
-            const inner = img
-              ? `<img src="${escHtml(img)}" alt="${escHtml(label)}" loading="lazy">`
-              : escHtml(label);
-            return `<li class="foot__cert">${inner}</li>`;
+            const parts = [];
+            if (img) parts.push(`<img src="${escHtml(img)}" alt="${escHtml(label)}" loading="lazy">`);
+            if (label) parts.push(`<span>${escHtml(label)}</span>`);
+            return `<li class="foot__cert${img ? ' foot__cert--has-img' : ''}">${parts.join('')}</li>`;
           })
           .join('');
       }
