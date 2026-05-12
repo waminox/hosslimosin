@@ -452,6 +452,7 @@
     const nav = document.getElementById('nav');
     const burger = nav?.querySelector('.nav__burger');
     const mobile = document.getElementById('mobileMenu');
+    const backdrop = document.getElementById('navBackdrop');
     const onScroll = () => nav.classList.toggle('is-stuck', window.scrollY > 30);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -460,9 +461,14 @@
         const willOpen = typeof open === 'boolean' ? open : !mobile.classList.contains('is-open');
         mobile.classList.toggle('is-open', willOpen);
         burger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        if (backdrop) backdrop.classList.toggle('is-open', willOpen);
+        // Lock body scroll while the menu is open so the blurred page
+        // doesn't scroll behind the focused menu.
+        document.body.classList.toggle('is-nav-open', willOpen);
       };
       burger.addEventListener('click', () => toggle());
       mobile.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggle(false)));
+      if (backdrop) backdrop.addEventListener('click', () => toggle(false));
     }
   }
 

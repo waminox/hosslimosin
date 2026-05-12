@@ -1,7 +1,10 @@
 {
   "brand": {
     "name": "Hosslimo",
-    "tagline": "Premium Chauffeurservice — eine schwarze Flotte aus Mercedes-Benz und Tesla. Aus Wien.",
+    "tagline": {
+      "de": "Premium Chauffeurservice — eine schwarze Flotte aus Mercedes-Benz und Tesla. Aus Wien.",
+      "en": "Premium chauffeur service — a black fleet of Mercedes-Benz and Tesla. From Vienna."
+    },
     "logoText": "Hosslimo"
   },
   "contact": {
@@ -10,101 +13,173 @@
     "email": "office@hosslimo.com",
     "whatsapp": "WhatsApp",
     "whatsappHref": "https://wa.me/436764121075",
-    "address": "Hoss Limousine Service e.U.\nFeitsingergasse 12/1/5\n1220 Wien",
-    "hours": "24 / 7 für Sie da"
+    "address": {
+      "de": "Hoss Limousine Service e.U.\nFeitsingergasse 12/1/5\n1220 Wien",
+      "en": "Hoss Limousine Service e.U.\nFeitsingergasse 12/1/5\n1220 Vienna"
+    },
+    "hours": {
+      "de": "24 / 7 für Sie da",
+      "en": "24 / 7 at your service"
+    }
   },
   "hero": {
-    "eyebrow": "Chauffeur · Limousine · Vans",
-    "title": "Diskret. Pünktlich. *Erstklassig.*",
-    "subtitle": "Ihre persönliche Limousine mit professionellem Chauffeur — eine schwarze Flotte aus Mercedes-Benz und Tesla, die jedem Anlass gerecht wird. In Wien zuhause. Auf Wunsch europaweit.",
-    "primaryCta": "Jetzt anfragen",
-    "secondaryCta": "Flotte ansehen",
+    "eyebrow": {
+      "de": "Chauffeur · Limousine · Vans",
+      "en": "Chauffeur · Limousine · Vans"
+    },
+    "title": {
+      "de": "Diskret. Pünktlich. *Erstklassig.*",
+      "en": "Discreet. Punctual. *First-class.*"
+    },
+    "subtitle": {
+      "de": "Ihre persönliche Limousine mit professionellem Chauffeur — eine schwarze Flotte aus Mercedes-Benz und Tesla, die jedem Anlass gerecht wird. In Wien zuhause. Auf Wunsch europaweit.",
+      "en": "Your personal limousine with a professional chauffeur — a black fleet of Mercedes-Benz and Tesla, equal to every occasion. At home in Vienna. Across Europe on request."
+    },
+    "primaryCta": {
+      "de": "Jetzt anfragen",
+      "en": "Enquire now"
+    },
+    "secondaryCta": {
+      "de": "Flotte ansehen",
+      "en": "View the fleet"
+    },
     "backgroundImage": ""
   },
   "about": {
-    "eyebrow": "01 — Über Hosslimo",
-    "title": "Mehr als eine Fahrt — *ein Erlebnis.*",
-    "body": "Hosslimo steht für einen Chauffeurservice, der Komfort, Sicherheit und Stil verbindet. Ob Geschäftstermin, Flughafentransfer, Hochzeit oder besonderer Anlass — unsere geschulten Chauffeure bringen Sie diskret, sicher und entspannt an Ihr Ziel. Persönlicher Service. Kein Massengeschäft.",
+    "eyebrow": {
+      "de": "01 — Über Hosslimo",
+      "en": "01 — About Hosslimo"
+    },
+    "title": {
+      "de": "Mehr als eine Fahrt — *ein Erlebnis.*",
+      "en": "More than a ride — *an experience.*"
+    },
+    "body": {
+      "de": "Hosslimo steht für einen Chauffeurservice, der Komfort, Sicherheit und Stil verbindet. Ob Geschäftstermin, Flughafentransfer, Hochzeit oder besonderer Anlass — unsere geschulten Chauffeure bringen Sie diskret, sicher und entspannt an Ihr Ziel. Persönlicher Service. Kein Massengeschäft.",
+      "en": "Hosslimo stands for a chauffeur service that brings together comfort, safety and style. Whether a business appointment, airport transfer, wedding or special occasion — our trained chauffeurs take you to your destination discreetly, safely and at ease. Personal service. Never mass-market."
+    },
     "image": "",
     "highlights": [
       {
         "icon": "shield",
-        "title": "Diskretion",
-        "text": "Geschulte Chauffeure mit langjähriger Erfahrung und absoluter Verschwiegenheit."
+        "title": { "de": "Diskretion", "en": "Discretion" },
+        "text": {
+          "de": "Geschulte Chauffeure mit langjähriger Erfahrung und absoluter Verschwiegenheit.",
+          "en": "Trained chauffeurs with years of experience and absolute confidentiality."
+        }
       },
       {
         "icon": "clock",
-        "title": "Pünktlichkeit",
-        "text": "Wir sind vor der vereinbarten Zeit am Ort — vorbereitet, verlässlich, ohne Ausnahme."
+        "title": { "de": "Pünktlichkeit", "en": "Punctuality" },
+        "text": {
+          "de": "Wir sind vor der vereinbarten Zeit am Ort — vorbereitet, verlässlich, ohne Ausnahme.",
+          "en": "We arrive ahead of the agreed time — prepared, reliable, without exception."
+        }
       },
       {
         "icon": "sparkle",
-        "title": "Premium-Flotte",
-        "text": "Vollständig schwarze Flotte aus Mercedes-Benz und Tesla, gepflegt bis ins kleinste Detail."
+        "title": { "de": "Premium-Flotte", "en": "Premium fleet" },
+        "text": {
+          "de": "Vollständig schwarze Flotte aus Mercedes-Benz und Tesla, gepflegt bis ins kleinste Detail.",
+          "en": "An entirely black fleet of Mercedes-Benz and Tesla, cared for down to the last detail."
+        }
       },
       {
         "icon": "globe",
-        "title": "International",
-        "text": "Wien, Salzburg, München, Zürich — auf Wunsch europaweit, auch über mehrere Tage."
+        "title": { "de": "International", "en": "International" },
+        "text": {
+          "de": "Wien, Salzburg, München, Zürich — auf Wunsch europaweit, auch über mehrere Tage.",
+          "en": "Vienna, Salzburg, Munich, Zurich — across Europe on request, also over multiple days."
+        }
       }
     ]
   },
   "services": [
     {
       "icon": "plane",
-      "title": "Flughafentransfer",
-      "text": "Komfortable Transfers von und zu allen Flughäfen — mit Flugüberwachung, Empfang am Gate und Gepäckservice."
+      "title": { "de": "Flughafentransfer", "en": "Airport transfer" },
+      "text": {
+        "de": "Komfortable Transfers von und zu allen Flughäfen — mit Flugüberwachung, Empfang am Gate und Gepäckservice.",
+        "en": "Comfortable transfers to and from any airport — with flight monitoring, gate meet-and-greet and luggage service."
+      }
     },
     {
       "icon": "briefcase",
-      "title": "Business-Chauffeur",
-      "text": "Repräsentativer Auftritt für Geschäftstermine, Konferenzen und Roadshows — Stunden- oder Tagespauschale."
+      "title": { "de": "Business-Chauffeur", "en": "Business chauffeur" },
+      "text": {
+        "de": "Repräsentativer Auftritt für Geschäftstermine, Konferenzen und Roadshows — Stunden- oder Tagespauschale.",
+        "en": "A polished arrival for meetings, conferences and roadshows — hourly or daily rates."
+      }
     },
     {
       "icon": "ring",
-      "title": "Hochzeiten & Events",
-      "text": "Eine elegante Limousine für den schönsten Tag. Auf Wunsch mit Blumenschmuck und individuellem Ablauf."
+      "title": { "de": "Hochzeiten & Events", "en": "Weddings & events" },
+      "text": {
+        "de": "Eine elegante Limousine für den schönsten Tag. Auf Wunsch mit Blumenschmuck und individuellem Ablauf.",
+        "en": "An elegant limousine for the most beautiful day. With floral arrangements and a tailored timeline on request."
+      }
     },
     {
       "icon": "users",
-      "title": "Gruppen- & VIP-Transfer",
-      "text": "Sprinter-Vans ab 12 Personen für Gruppen, Roadshows oder hochwertige Sammeltransfers."
+      "title": { "de": "Gruppen- & VIP-Transfer", "en": "Group & VIP transfer" },
+      "text": {
+        "de": "Sprinter-Vans ab 12 Personen für Gruppen, Roadshows oder hochwertige Sammeltransfers.",
+        "en": "Sprinter vans for 12+ passengers — groups, roadshows or premium shared transfers."
+      }
     },
     {
       "icon": "route",
-      "title": "Langstrecken",
-      "text": "Diskreter Chauffeur über mehrere Tage in ganz Europa — inklusive Hotelübernachtung des Chauffeurs."
+      "title": { "de": "Langstrecken", "en": "Long-distance" },
+      "text": {
+        "de": "Diskreter Chauffeur über mehrere Tage in ganz Europa — inklusive Hotelübernachtung des Chauffeurs.",
+        "en": "A discreet chauffeur for multi-day journeys across Europe — including the chauffeur's hotel stay."
+      }
     },
     {
       "icon": "star",
-      "title": "Roadshows & Premieren",
-      "text": "Begleitservice für Künstler, Diplomaten und Unternehmer — höchste Diskretion garantiert."
+      "title": { "de": "Roadshows & Premieren", "en": "Roadshows & premieres" },
+      "text": {
+        "de": "Begleitservice für Künstler, Diplomaten und Unternehmer — höchste Diskretion garantiert.",
+        "en": "Dedicated accompaniment for artists, diplomats and executives — utmost discretion guaranteed."
+      }
     },
     {
       "icon": "shield",
-      "title": "Chauffeur-Miete",
-      "text": "Buchen Sie nur unseren zertifizierten Chauffeur — geschult, mehrsprachig und diskret — wenn Sie selbst ein Fahrzeug stellen oder mieten."
+      "title": { "de": "Chauffeur-Miete", "en": "Chauffeur hire" },
+      "text": {
+        "de": "Buchen Sie nur unseren zertifizierten Chauffeur — geschult, mehrsprachig und diskret — wenn Sie selbst ein Fahrzeug stellen oder mieten.",
+        "en": "Book just our certified chauffeur — trained, multilingual and discreet — when you supply or rent your own vehicle."
+      }
     },
     {
       "icon": "clock",
-      "title": "Disponent",
-      "text": "Persönliche Einsatzplanung: Wir koordinieren Ihre Termine, Sonderwünsche und VIP-Logistik — von der Anfrage bis zur Rückfahrt."
+      "title": { "de": "Disponent", "en": "Dispatch coordinator" },
+      "text": {
+        "de": "Persönliche Einsatzplanung: Wir koordinieren Ihre Termine, Sonderwünsche und VIP-Logistik — von der Anfrage bis zur Rückfahrt.",
+        "en": "Personal scheduling: we coordinate your appointments, special requests and VIP logistics — from enquiry through to return trip."
+      }
     },
     {
       "icon": "sparkle",
-      "title": "Hostessen",
-      "text": "Erfahrene Hostessen für Empfänge, Messen und mehrtägige Begleitungen — diskret, mehrsprachig und repräsentativ."
+      "title": { "de": "Hostessen", "en": "Hostesses" },
+      "text": {
+        "de": "Erfahrene Hostessen für Empfänge, Messen und mehrtägige Begleitungen — diskret, mehrsprachig und repräsentativ.",
+        "en": "Experienced hostesses for receptions, trade fairs and multi-day engagements — discreet, multilingual and presentable."
+      }
     },
     {
       "icon": "globe",
-      "title": "Zertifizierte Tourguides",
-      "text": "Lizenzierte Stadt- und Reiseführer mit fundiertem Wissen über Wien und Österreich — ideal für Geschäftsgäste und touristische Besucher."
+      "title": { "de": "Zertifizierte Tourguides", "en": "Certified tour guides" },
+      "text": {
+        "de": "Lizenzierte Stadt- und Reiseführer mit fundiertem Wissen über Wien und Österreich — ideal für Geschäftsgäste und touristische Besucher.",
+        "en": "Licensed city and travel guides with deep knowledge of Vienna and Austria — ideal for business and leisure visitors."
+      }
     }
   ],
   "fleet": [
     {
       "name": "Mercedes-Benz E-Klasse",
-      "category": "Business-Limousine",
+      "category": { "de": "Business-Limousine", "en": "Business sedan" },
       "passengers": "3",
       "luggage": "2",
       "features": ["Lederausstattung", "Klimakomfort", "WLAN", "Stille Kabine"],
@@ -112,7 +187,7 @@
     },
     {
       "name": "Mercedes-Benz EQE",
-      "category": "Elektrische Business-Limousine",
+      "category": { "de": "Elektrische Business-Limousine", "en": "Electric business sedan" },
       "passengers": "3",
       "luggage": "2",
       "features": ["Klimakomfortsitze", "WLAN", "Hyperscreen", "Emissionsfrei"],
@@ -120,7 +195,7 @@
     },
     {
       "name": "Mercedes-Benz S-Klasse",
-      "category": "Luxus-Limousine · LongVersion",
+      "category": { "de": "Luxus-Limousine · LongVersion", "en": "Luxury sedan · Long version" },
       "passengers": "3",
       "luggage": "2",
       "features": ["Chauffeur-Paket", "Burmester 4D", "Massagesitze", "Executive"],
@@ -128,7 +203,7 @@
     },
     {
       "name": "Mercedes-Benz EQS",
-      "category": "Elektrische Luxus-Limousine",
+      "category": { "de": "Elektrische Luxus-Limousine", "en": "Electric luxury sedan" },
       "passengers": "3",
       "luggage": "2",
       "features": ["Massagesitze", "Burmester Sound", "Panoramadach", "Lautlos"],
@@ -136,7 +211,7 @@
     },
     {
       "name": "Mercedes-Benz V-Klasse",
-      "category": "First-Class MiniVan",
+      "category": { "de": "First-Class MiniVan", "en": "First-class minivan" },
       "passengers": "6",
       "luggage": "6",
       "features": ["Konferenzbestuhlung", "Tisch", "Verdunkelung", "Großer Kofferraum"],
@@ -144,7 +219,7 @@
     },
     {
       "name": "Mercedes-Benz EQV",
-      "category": "Elektrischer First-Class MiniVan",
+      "category": { "de": "Elektrischer First-Class MiniVan", "en": "Electric first-class minivan" },
       "passengers": "6",
       "luggage": "6",
       "features": ["Konferenzbestuhlung", "Lautlos", "Emissionsfrei", "Premium"],
@@ -152,7 +227,7 @@
     },
     {
       "name": "Mercedes-Benz Vito",
-      "category": "MiniVan",
+      "category": { "de": "MiniVan", "en": "Minivan" },
       "passengers": "8",
       "luggage": "10",
       "features": ["Komfortable Bestuhlung", "Klimaanlage", "Großer Stauraum", "Bis 8 Personen"],
@@ -160,7 +235,7 @@
     },
     {
       "name": "Mercedes-Benz Sprinter",
-      "category": "Gruppen-Bus",
+      "category": { "de": "Gruppen-Bus", "en": "Group bus" },
       "passengers": "20",
       "luggage": "16",
       "features": ["Komfortbestuhlung", "Klimaanlage", "Stauraum", "Bis 20 Personen"],
@@ -168,7 +243,7 @@
     },
     {
       "name": "Tesla Model S",
-      "category": "Elektrische Performance-Limousine",
+      "category": { "de": "Elektrische Performance-Limousine", "en": "Electric performance sedan" },
       "passengers": "3",
       "luggage": "2",
       "features": ["Autopilot", "Premium Audio", "Glasdach", "Emissionsfrei"],
@@ -176,7 +251,7 @@
     },
     {
       "name": "Tesla Model Y",
-      "category": "Juniper 2026 · Elektrischer Komfort-SUV",
+      "category": { "de": "Juniper 2026 · Elektrischer Komfort-SUV", "en": "Juniper 2026 · Electric comfort SUV" },
       "passengers": "4",
       "luggage": "3",
       "features": ["Juniper-Refresh 2026", "Glasdach", "Premium Audio", "Emissionsfrei"],
@@ -184,7 +259,7 @@
     },
     {
       "name": "Tesla Model 3",
-      "category": "Highland 2026 · Elektrische Business-Limousine",
+      "category": { "de": "Highland 2026 · Elektrische Business-Limousine", "en": "Highland 2026 · Electric business sedan" },
       "passengers": "3",
       "luggage": "2",
       "features": ["Highland-Refresh 2026", "Premium Audio", "Glasdach", "Emissionsfrei"],
@@ -194,27 +269,48 @@
   "testimonials": [
     {
       "author": "Maria K.",
-      "role": "Geschäftsführerin",
-      "quote": "Wir nutzen Hosslimo für all unsere Roadshows. Pünktlichkeit, Stil und ein sehr aufmerksamer Service — jedes Mal."
+      "role": { "de": "Geschäftsführerin", "en": "Managing Director" },
+      "quote": {
+        "de": "Wir nutzen Hosslimo für all unsere Roadshows. Pünktlichkeit, Stil und ein sehr aufmerksamer Service — jedes Mal.",
+        "en": "We use Hosslimo for all our roadshows. Punctuality, style and a deeply attentive service — every single time."
+      }
     },
     {
       "author": "Stefan L.",
-      "role": "Hochzeitspaar",
-      "quote": "Die EQS war traumhaft. Der Chauffeur diskret, freundlich und absolut professionell. Klare Empfehlung."
+      "role": { "de": "Hochzeitspaar", "en": "Wedding couple" },
+      "quote": {
+        "de": "Die EQS war traumhaft. Der Chauffeur diskret, freundlich und absolut professionell. Klare Empfehlung.",
+        "en": "The EQS was a dream. The chauffeur was discreet, friendly and entirely professional. A clear recommendation."
+      }
     },
     {
       "author": "Andreas H.",
-      "role": "Investor",
-      "quote": "Verlässlich, leise, perfekt vorbereitet — genau so muss ein Chauffeurservice sein."
+      "role": { "de": "Investor", "en": "Investor" },
+      "quote": {
+        "de": "Verlässlich, leise, perfekt vorbereitet — genau so muss ein Chauffeurservice sein.",
+        "en": "Reliable, quiet, perfectly prepared — exactly how a chauffeur service should be."
+      }
     }
   ],
   "certifications": [
-    { "label": "TÜV-geprüfte Chauffeur-Ausbildung", "image": "" },
-    { "label": "ISO 9001 zertifiziert", "image": "" }
+    {
+      "label": { "de": "TÜV-geprüfte Chauffeur-Ausbildung", "en": "TÜV-certified chauffeur training" },
+      "image": ""
+    },
+    {
+      "label": { "de": "ISO 9001 zertifiziert", "en": "ISO 9001 certified" },
+      "image": ""
+    }
   ],
   "coverage": {
-    "title": "Wir bringen Sie *überall* hin.",
-    "body": "Wien ist unser Zuhause — aber unser Service endet nicht an der Stadtgrenze. Österreichweit. Auf Wunsch in ganz Europa.",
+    "title": {
+      "de": "Wir bringen Sie *überall* hin.",
+      "en": "We take you *everywhere*."
+    },
+    "body": {
+      "de": "Wien ist unser Zuhause — aber unser Service endet nicht an der Stadtgrenze. Österreichweit. Auf Wunsch in ganz Europa.",
+      "en": "Vienna is our home — but our service doesn't stop at the city limits. Across Austria. Across Europe on request."
+    },
     "cities": [
       "Wien",
       "Salzburg",
@@ -234,9 +330,18 @@
     ]
   },
   "cta": {
-    "title": "Ihre nächste Fahrt verdient *mehr* als ein Taxi.",
-    "subtitle": "Senden Sie uns eine Anfrage — wir antworten persönlich, meist innerhalb weniger Minuten.",
-    "button": "Anfrage senden"
+    "title": {
+      "de": "Ihre nächste Fahrt verdient *mehr* als ein Taxi.",
+      "en": "Your next ride deserves *more* than a taxi."
+    },
+    "subtitle": {
+      "de": "Senden Sie uns eine Anfrage — wir antworten persönlich, meist innerhalb weniger Minuten.",
+      "en": "Send us an enquiry — we'll reply personally, usually within minutes."
+    },
+    "button": {
+      "de": "Anfrage senden",
+      "en": "Send enquiry"
+    }
   },
   "legal": {
     "impressum": "Impressum\n\nAngaben gemäß § 5 ECG, § 14 UGB und § 25 MedienG\n\nHoss Limousine Service e.U.\nRechtsform: Einzelunternehmer\nFirmenbuchnummer: FN 488514d\nFirmenbuchgericht: Handelsgericht Wien\nUID-Nummer: ATU73262514\n\nAnschrift\nFeitsingergasse 12/1/5\n1220 Wien\nÖsterreich\n\nKontakt\nTelefon: +43 676 4121075\nE-Mail: office@hosslimo.com\n\nBankverbindung\nIBAN: AT86 2011 1295 6897 1403\nBIC: GIBAATWWXXX\n\nUnternehmensgegenstand\nLimousinen- und Chauffeurservice (Personenbeförderung mit Personenkraftwagen)\n\nAufsichtsbehörde / Gewerbebehörde\nMagistrat der Stadt Wien (MBA des jeweiligen Bezirks)\n\nAnwendbare Rechtsvorschriften\nGewerbeordnung (GewO), Gelegenheitsverkehrs-Gesetz (GelverkG)\n\nOnline-Streitbeilegung\nDie Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit, die Sie unter https://ec.europa.eu/consumers/odr finden. Wir sind weder verpflichtet noch grundsätzlich bereit, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.\n\nHaftungsausschluss\nFür die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir trotz sorgfältiger Prüfung keine Gewähr übernehmen. Für Inhalte externer Links sind ausschließlich deren Betreiber verantwortlich.\n\nUrheberrecht\nAlle Inhalte dieser Website (Texte, Bilder, Grafiken) unterliegen dem Urheberrecht. Eine Verwendung außerhalb des Rahmens des Urheberrechtsgesetzes ist ohne schriftliche Zustimmung untersagt.",
@@ -244,8 +349,14 @@
     "agb": "Allgemeine Geschäftsbedingungen (AGB)\n\n§ 1 Geltungsbereich\n\nDiese Allgemeinen Geschäftsbedingungen gelten für sämtliche Verträge zwischen der Hoss Limousine Service e.U. (im Folgenden „Anbieter\") und ihren Kunden über die Erbringung von Chauffeur- und Limousinendiensten. Abweichende Bedingungen des Kunden werden nicht anerkannt, sofern der Anbieter ihrer Geltung nicht ausdrücklich zugestimmt hat.\n\n§ 2 Vertragsabschluss\n\nBuchungen können telefonisch, per E-Mail oder über das Online-Kontaktformular auf hosslimo.com erfolgen. Der Vertrag kommt mit der schriftlichen oder elektronischen Auftragsbestätigung des Anbieters zustande. Vor der Bestätigung handelt es sich um eine unverbindliche Anfrage.\n\n§ 3 Leistungsumfang\n\nDer Anbieter stellt einen professionellen Chauffeurservice mit Fahrzeugen der Premium-Klasse (Mercedes-Benz und Tesla) zur Verfügung. Die konkret zu erbringenden Leistungen, das Fahrzeug, der Abhol- und Zielort sowie der Zeitpunkt ergeben sich aus der jeweiligen Auftragsbestätigung.\n\n§ 4 Preise und Zahlung\n\nDie Preise werden pro Auftrag individuell vereinbart und in der Auftragsbestätigung ausgewiesen. Sofern nicht anders vereinbart, ist die Zahlung unverzüglich nach Erbringung der Leistung fällig. Akzeptierte Zahlungsmittel werden bei Buchung mitgeteilt.\n\n§ 5 Stornierung und Änderungen\n\nStornierungen und Änderungen sind bis 24 Stunden vor dem vereinbarten Abholzeitpunkt kostenfrei möglich. Bei späteren Stornierungen ist der Anbieter berechtigt, eine angemessene Bearbeitungspauschale zu verrechnen, höchstens jedoch den vollen vereinbarten Preis. Bei kurzfristigen Buchungen (weniger als 24 Stunden vor Abholung) entfällt das Stornorecht, sofern keine andere Vereinbarung getroffen wurde.\n\n§ 6 Pflichten des Kunden\n\nDer Kunde ist verpflichtet, korrekte und vollständige Angaben zu Abhol- und Zielort, Datum, Uhrzeit, Personen- und Gepäckanzahl sowie zu besonderen Wünschen zu machen. Wartezeiten und Mehraufwände, die durch unvollständige oder fehlerhafte Angaben entstehen, können dem Kunden gesondert in Rechnung gestellt werden. Der Kunde sorgt dafür, dass er und seine Begleitpersonen rechtzeitig am vereinbarten Abholort eintreffen.\n\n§ 7 Haftung\n\nDer Anbieter haftet im Rahmen der gesetzlichen Bestimmungen. Eine Haftung für leichte Fahrlässigkeit ist – soweit gesetzlich zulässig – ausgeschlossen, ausgenommen für Personenschäden. Für Schäden, die auf höherer Gewalt, außergewöhnlichen Verkehrsverhältnissen, behördlichen Maßnahmen oder Streiks beruhen, übernimmt der Anbieter keine Haftung.\n\n§ 8 Verhalten an Bord\n\nDer Kunde verpflichtet sich, das Fahrzeug pfleglich zu behandeln. Bei mutwilligen oder grob fahrlässigen Verschmutzungen oder Beschädigungen kann der Anbieter Reinigungs- oder Reparaturkosten in Rechnung stellen. Aus Sicherheitsgründen sind die Anweisungen des Chauffeurs zu befolgen.\n\n§ 9 Datenschutz\n\nDie Verarbeitung personenbezogener Daten erfolgt ausschließlich gemäß der Datenschutzerklärung des Anbieters.\n\n§ 10 Anwendbares Recht und Gerichtsstand\n\nEs gilt österreichisches Recht unter Ausschluss des UN-Kaufrechts. Gerichtsstand ist – soweit gesetzlich zulässig – Wien. Bei Verbrauchern bleiben die zwingenden Bestimmungen des Konsumentenschutzgesetzes (KSchG) unberührt.\n\n§ 11 Salvatorische Klausel\n\nSollten einzelne Bestimmungen dieser AGB unwirksam oder undurchführbar sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt. An die Stelle der unwirksamen Bestimmung tritt eine Regelung, die dem wirtschaftlichen Zweck am nächsten kommt.\n\nStand: 2026"
   },
   "seo": {
-    "title": "Hosslimo – Premium Chauffeurservice in Wien & Österreich",
-    "description": "Diskret, pünktlich, erstklassig: Limousinen- und Chauffeurservice mit schwarzer Mercedes- und Tesla-Flotte in Wien, Österreich und Europa.",
+    "title": {
+      "de": "Hosslimo – Premium Chauffeurservice in Wien & Österreich",
+      "en": "Hosslimo – Premium chauffeur service in Vienna & Austria"
+    },
+    "description": {
+      "de": "Diskret, pünktlich, erstklassig: Limousinen- und Chauffeurservice mit schwarzer Mercedes- und Tesla-Flotte in Wien, Österreich und Europa.",
+      "en": "Discreet, punctual, first-class: limousine and chauffeur service with a black Mercedes and Tesla fleet in Vienna, Austria and Europe."
+    },
     "ogImage": "/img/og.jpg"
   }
 }
