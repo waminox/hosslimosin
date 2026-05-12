@@ -1,6 +1,173 @@
 (() => {
   'use strict';
 
+  // ------- Locale -------
+  // _locale is initialised from localStorage so the user's last choice survives
+  // a page reload. Wrapped in try/catch because some private-browsing modes
+  // throw on access. The site default is 'de'.
+  let _locale = 'de';
+  try {
+    const saved = window.localStorage && window.localStorage.getItem('hosslimo.lang');
+    if (saved === 'en' || saved === 'de') _locale = saved;
+  } catch (_) {}
+
+  // pick() reads a translatable value. Admin-managed text fields accept either
+  // a plain string (legacy / DE-only) or a `{de, en}` object. Falls back across
+  // locales so an empty EN slot still shows the DE text rather than going blank.
+  function pick(v) {
+    if (v == null) return '';
+    if (typeof v === 'string') return v;
+    if (typeof v !== 'object') return '';
+    return v[_locale] || v.de || v.en || '';
+  }
+
+  // Cached snapshot of the last /api/content payload — so the locale toggle can
+  // re-run applyContent() without re-fetching (avoids a flicker and a race).
+  let _content = null;
+
+  // Hard-coded UI strings that don't live in /api/content. Keeping them here
+  // lets the language toggle update the static markup of the original design
+  // without re-templating it.
+  const T_STRINGS = {
+    // Nav
+    navAbout:     { de: 'Über uns',          en: 'About' },
+    navService:   { de: 'Service',           en: 'Services' },
+    navFleet:     { de: 'Flotte',            en: 'Fleet' },
+    navCoverage:  { de: 'Reichweite',        en: 'Coverage' },
+    navVoices:    { de: 'Stimmen',           en: 'Voices' },
+    navContact:   { de: 'Kontakt',           en: 'Contact' },
+    navCta:       { de: 'Anfragen',          en: 'Enquire' },
+    navMenuLabel: { de: 'Menü',              en: 'Menu' },
+    navHauptnav:  { de: 'Hauptnavigation',   en: 'Main navigation' },
+    mobileSend:   { de: 'Anfrage senden',    en: 'Send enquiry' },
+    // Hero
+    heroEyebrow:  { de: 'Wien · Österreich · Europa', en: 'Vienna · Austria · Europe' },
+    heroScroll:   { de: 'Scroll',            en: 'Scroll' },
+    heroScrollAria: { de: 'Weiter scrollen', en: 'Continue scrolling' },
+    heroMeta1L:   { de: 'Rasch',             en: 'Swift' },
+    heroMeta1V:   { de: 'Verfügbar',         en: 'Available' },
+    heroMeta2L:   { de: '10+',               en: '10+' },
+    heroMeta2V:   { de: 'Jahre Erfahrung',   en: 'Years of experience' },
+    heroMeta3L:   { de: 'EU',                en: 'EU' },
+    heroMeta3V:   { de: 'Auch Europaweit',   en: 'Across Europe too' },
+    // Cert band
+    certLabel:    { de: 'Zertifiziert',      en: 'Certified' },
+    certBandAria: { de: 'Zertifizierungen',  en: 'Certifications' },
+    // Section eyebrows (kept stable across re-renders)
+    eyebrowAbout:    { de: '01 — Über Hosslimo',  en: '01 — About Hosslimo' },
+    eyebrowServices: { de: '02 — Was wir bieten', en: '02 — What we offer' },
+    eyebrowFleet:    { de: '03 — Unsere Flotte',  en: '03 — Our fleet' },
+    eyebrowCoverage: { de: '04 — Reichweite',     en: '04 — Coverage' },
+    eyebrowVoices:   { de: '05 — Stimmen',        en: '05 — Testimonials' },
+    eyebrowContact:  { de: '06 — Anfrage',        en: '06 — Enquiry' },
+    // Services / Fleet / Voices section heads (only those NOT in content)
+    servicesTitle:   { de: 'Service auf *höchstem* Niveau.',
+                       en: 'Service at the *highest* level.' },
+    servicesLead:    { de: 'Sechs Anlässe, ein Anspruch: höchste Qualität, individuell auf Ihre Reise zugeschnitten.',
+                       en: 'Six occasions, one standard: the highest quality, tailored to your journey.' },
+    fleetTitle:      { de: 'Schwarz. Geräuschlos. *Eindrucksvoll.*',
+                       en: 'Black. Silent. *Striking.*' },
+    fleetLead:       { de: 'Mercedes-Benz im Mittelpunkt, ergänzt durch eine kompakte Tesla-Auswahl — gepflegt, geprüft und immer einsatzbereit. Andere Fahrzeugklassen auf Anfrage.',
+                       en: 'Mercedes-Benz at the centre, complemented by a compact Tesla selection — maintained, inspected and always ready. Other vehicle classes on request.' },
+    voicesTitle:     { de: 'Was unsere *Gäste* sagen.',
+                       en: 'What our *guests* say.' },
+    // Fleet filters + cards
+    chipAll:      { de: 'Alle',                  en: 'All' },
+    chipMercedes: { de: 'Mercedes-Benz',         en: 'Mercedes-Benz' },
+    chipTesla:    { de: 'Tesla',                 en: 'Tesla' },
+    chipVan:      { de: 'Vans & Sprinter',       en: 'Vans & Sprinter' },
+    fleetPers:    { de: 'Pers.',                 en: 'Pax' },
+    fleetLug:     { de: 'Gepäck',                en: 'Luggage' },
+    carCta:       { de: 'Diese Klasse anfragen →', en: 'Enquire about this class →' },
+    svcCta:       { de: 'Anfragen →',            en: 'Enquire →' },
+    // CTA / contact aside
+    ctaReachTitle: { de: 'Direkt erreichbar.',   en: 'Reach us directly.' },
+    // Form
+    fldName:      { de: 'Name',                  en: 'Name' },
+    fldEmail:     { de: 'E-Mail',                en: 'Email' },
+    fldPhone:     { de: 'Telefon',               en: 'Phone' },
+    fldDatetime:  { de: 'Datum & Uhrzeit',       en: 'Date & time' },
+    fldPickup:    { de: 'Abholung',              en: 'Pick-up' },
+    fldDropoff:   { de: 'Ziel',                  en: 'Destination' },
+    fldService:   { de: 'Anlass',                en: 'Occasion' },
+    fldVehicle:   { de: 'Fahrzeug',              en: 'Vehicle' },
+    fldMessage:   { de: 'Nachricht',             en: 'Message' },
+    phName:       { de: 'Ihr Name',              en: 'Your name' },
+    phEmail:      { de: 'ihre@email.com',        en: 'your@email.com' },
+    phPhone:      { de: '+43 …',                 en: '+43 …' },
+    phAddress:    { de: 'Adresse, Hotel, Flughafen…', en: 'Address, hotel, airport…' },
+    phMessage:    { de: 'Anzahl Personen, Sonderwünsche …',
+                    en: 'Number of passengers, special requests …' },
+    optService0:  { de: 'Allgemeine Anfrage',    en: 'General enquiry' },
+    optService1:  { de: 'Flughafentransfer',     en: 'Airport transfer' },
+    optService2:  { de: 'Business-Chauffeur',    en: 'Business chauffeur' },
+    optService3:  { de: 'Hochzeiten & Events',   en: 'Weddings & events' },
+    optService4:  { de: 'Gruppen- & VIP-Transfer', en: 'Group & VIP transfer' },
+    optService5:  { de: 'Langstrecken',          en: 'Long-distance' },
+    optService6:  { de: 'Roadshows & Premieren', en: 'Roadshows & premieres' },
+    optService7:  { de: 'Andere — auf Anfrage',  en: 'Other — on request' },
+    optVehicleAny: { de: 'Beliebig',             en: 'Any' },
+    optVehicleOther: { de: 'Andere Klasse — auf Anfrage', en: 'Other class — on request' },
+    formReqNote:  { de: 'Mit * markierte Felder sind Pflichtfelder.',
+                    en: 'Fields marked with * are required.' },
+    formSubmit:   { de: 'Anfrage senden',        en: 'Send enquiry' },
+    formHint:     { de: 'Wir antworten persönlich — keine Auto-Mails, kein Spam.',
+                    en: 'We reply personally — no auto-mails, no spam.' },
+    sendingStatus: { de: 'Wird gesendet …',      en: 'Sending …' },
+    toastOkTitle: { de: 'Vielen Dank für Ihre Anfrage',
+                    en: 'Thank you for your enquiry' },
+    toastOkMsg:   { de: 'Wir haben Ihre Nachricht erhalten und melden uns persönlich bei Ihnen — meist noch am selben Tag.',
+                    en: "We've received your message and will get back to you personally — usually the same day." },
+    toastErrTitle: { de: 'Senden nicht möglich', en: 'Unable to send' },
+    toastErrMsg:   { de: 'Bitte versuchen Sie es erneut oder rufen Sie uns direkt an.',
+                    en: 'Please try again or call us directly.' },
+    sendFailed:   { de: 'Senden fehlgeschlagen.', en: 'Send failed.' },
+    valName:      { de: 'Bitte geben Sie Ihren Namen an.',
+                    en: 'Please enter your name.' },
+    valEmail:     { de: 'Bitte geben Sie eine gültige E-Mail-Adresse an.',
+                    en: 'Please enter a valid email address.' },
+    valMessage:   { de: 'Bitte beschreiben Sie kurz Ihre Anfrage.',
+                    en: 'Please describe your enquiry briefly.' },
+    // Footer
+    footColContact: { de: 'Kontakt',           en: 'Contact' },
+    footColService: { de: 'Service',           en: 'Services' },
+    footColLegal:   { de: 'Rechtliches',       en: 'Legal' },
+    footLnk1:     { de: 'Flughafentransfer',   en: 'Airport transfer' },
+    footLnk2:     { de: 'Business-Chauffeur',  en: 'Business chauffeur' },
+    footLnk3:     { de: 'Hochzeiten & Events', en: 'Weddings & events' },
+    footLnk4:     { de: 'Gruppen-Transfer',    en: 'Group transfer' },
+    footImpressum:  { de: 'Impressum',         en: 'Legal notice' },
+    footDatenschutz:{ de: 'Datenschutz',       en: 'Privacy' },
+    footAgb:        { de: 'AGB',               en: 'Terms' },
+    footRights:   { de: 'Alle Rechte vorbehalten.', en: 'All rights reserved.' },
+    // Legal modal headings
+    legalImpressum:   { de: 'Impressum',          en: 'Legal notice' },
+    legalDatenschutz: { de: 'Datenschutz',        en: 'Privacy policy' },
+    legalAgb:         { de: 'AGB',                en: 'Terms & conditions' },
+    legalPlaceholderImpr:   { de: 'Bitte ergänzen Sie Ihre Impressums-Angaben im Admin-Bereich.',
+                              en: 'Please add your legal notice in the admin area.' },
+    legalPlaceholderDs:     { de: 'Bitte ergänzen Sie Ihre Datenschutzerklärung im Admin-Bereich.',
+                              en: 'Please add your privacy policy in the admin area.' },
+    legalPlaceholderAgb:    { de: 'Bitte ergänzen Sie Ihre AGB im Admin-Bereich.',
+                              en: 'Please add your terms & conditions in the admin area.' },
+    // Language button (shows the OPPOSITE locale)
+    langToBtn:    { de: 'EN',                  en: 'DE' },
+    langToAria:   { de: 'Switch to English',   en: 'Auf Deutsch wechseln' },
+  };
+
+  function T(key) {
+    const entry = T_STRINGS[key];
+    if (!entry) return '';
+    return entry[_locale] || entry.de || entry.en || '';
+  }
+
+  // Reflect the active locale on the <html lang> attribute for screen readers
+  // and CSS hyphenation. Kept idempotent so toggling is cheap.
+  function setHtmlLang(loc) {
+    try { document.documentElement.setAttribute('lang', loc); } catch (_) {}
+  }
+  setHtmlLang(_locale);
+
   // Escape HTML and convert *segment* markers into <em>segment</em> for safe
   // innerHTML rendering of admin-managed copy. Also escapes both quote types
   // so the same helper is safe inside HTML attributes (e.g. data-bg="…").
@@ -106,6 +273,9 @@
         bgImage: `var(${c.img})`,
       }));
     }
+    const pers = T('fleetPers');
+    const lug = T('fleetLug');
+    const carCta = T('carCta');
     grid.innerHTML = cars.map((c) => `
       <article class="car reveal" data-bucket="${escHtml(c.bucket)}">
         <div class="car__media" data-bg="${escHtml(c.bgImage)}">
@@ -115,11 +285,11 @@
           <h3 class="car__name">${escHtml(c.name)}</h3>
           <span class="car__class">${escHtml(c.category)}</span>
           <div class="car__specs">
-            <span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><strong>${escHtml(c.passengers)}</strong> Pers.</span>
-            <span><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><strong>${escHtml(c.luggage)}</strong> Gepäck</span>
+            <span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><strong>${escHtml(c.passengers)}</strong> ${escHtml(pers)}</span>
+            <span><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><strong>${escHtml(c.luggage)}</strong> ${escHtml(lug)}</span>
           </div>
           <ul class="car__feats">${c.features.map((f) => `<li>${escHtml(f)}</li>`).join('')}</ul>
-          <a class="car__cta" href="#contact" data-car-name="${escHtml(c.name)}">Diese Klasse anfragen →</a>
+          <a class="car__cta" href="#contact" data-car-name="${escHtml(c.name)}">${escHtml(carCta)}</a>
         </div>
       </article>
     `).join('');
@@ -220,7 +390,7 @@
     const norm = (s) => String(s || '').toLowerCase().trim();
     const existing = new Set(Array.from(select.options).map((o) => norm(o.value || o.textContent)));
     services.forEach((item) => {
-      const title = item && item.title;
+      const title = item && pick(item.title);
       if (!title) return;
       const key = norm(title);
       if (key && !existing.has(key)) {
@@ -313,25 +483,25 @@
     onScroll();
   }
 
-  // ------- Legal (text loaded from /api/content) -------
-  let LEGAL = {
-    impressum: 'Bitte ergänzen Sie Ihre Impressums-Angaben im Admin-Bereich.',
-    datenschutz: 'Bitte ergänzen Sie Ihre Datenschutzerklärung im Admin-Bereich.',
-    agb: 'Bitte ergänzen Sie Ihre AGB im Admin-Bereich.',
-  };
+  // ------- Legal (text loaded from /api/content; values are localizable) -------
+  // LEGAL holds the admin-managed value for each key, which may be a plain
+  // string OR a {de, en} object. pick() resolves at open time so the dialog
+  // always shows the active locale.
+  let LEGAL = { impressum: '', datenschutz: '', agb: '' };
   function setupLegal() {
     const dialog = document.getElementById('legalDialog');
     const title = document.getElementById('legalTitle');
     const body = document.getElementById('legalBody');
     const close = dialog?.querySelector('.legal__close');
     if (!dialog || !title || !body || !close) return;
+    const labelKey = { impressum: 'legalImpressum', datenschutz: 'legalDatenschutz', agb: 'legalAgb' };
+    const placeholderKey = { impressum: 'legalPlaceholderImpr', datenschutz: 'legalPlaceholderDs', agb: 'legalPlaceholderAgb' };
     document.querySelectorAll('[data-legal]').forEach(a => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
         const key = a.dataset.legal;
-        const labels = { impressum: 'Impressum', datenschutz: 'Datenschutz', agb: 'AGB' };
-        title.textContent = labels[key] || '';
-        body.textContent = LEGAL[key] || '';
+        title.textContent = T(labelKey[key] || '');
+        body.textContent = pick(LEGAL[key]) || T(placeholderKey[key] || '');
         if (typeof dialog.showModal === 'function') dialog.showModal();
       });
     });
@@ -402,9 +572,9 @@
     if (!form) return;
 
     const REQUIRED = [
-      { name: 'name', test: (v) => v.length >= 2, msg: 'Bitte geben Sie Ihren Namen an.' },
-      { name: 'email', test: (v) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v), msg: 'Bitte geben Sie eine gültige E-Mail-Adresse an.' },
-      { name: 'message', test: (v) => v.length >= 5, msg: 'Bitte beschreiben Sie kurz Ihre Anfrage.' },
+      { name: 'name', test: (v) => v.length >= 2, msgKey: 'valName' },
+      { name: 'email', test: (v) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v), msgKey: 'valEmail' },
+      { name: 'message', test: (v) => v.length >= 5, msgKey: 'valMessage' },
     ];
 
     // Clear the per-field error highlight as soon as the user types in a field.
@@ -426,7 +596,7 @@
         const value = (field?.value || '').trim();
         if (!r.test(value)) {
           field?.closest('label')?.classList.add('is-invalid');
-          if (!firstInvalid) { firstInvalid = field; firstError = r.msg; }
+          if (!firstInvalid) { firstInvalid = field; firstError = T(r.msgKey); }
         }
       }
       if (firstInvalid) {
@@ -439,7 +609,7 @@
         return;
       }
 
-      status.textContent = 'Wird gesendet …';
+      status.textContent = T('sendingStatus');
       const data = Object.fromEntries(new FormData(form).entries());
       try {
         data.recaptchaToken = await getRecaptchaToken('contact');
@@ -449,23 +619,13 @@
           body: JSON.stringify(data),
         });
         const json = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(json.error || 'Senden fehlgeschlagen.');
+        if (!res.ok) throw new Error(json.error || T('sendFailed'));
         status.textContent = '';
-        showToast(
-          'Vielen Dank für Ihre Anfrage',
-          'Wir haben Ihre Nachricht erhalten und melden uns persönlich bei Ihnen — meist noch am selben Tag.',
-          'ok',
-          8000
-        );
+        showToast(T('toastOkTitle'), T('toastOkMsg'), 'ok', 8000);
         form.reset();
       } catch (err) {
         status.textContent = '';
-        showToast(
-          'Senden nicht möglich',
-          err.message || 'Bitte versuchen Sie es erneut oder rufen Sie uns direkt an.',
-          'err',
-          0
-        );
+        showToast(T('toastErrTitle'), err.message || T('toastErrMsg'), 'err', 0);
       }
     });
   }
@@ -473,10 +633,15 @@
   // ------- Apply admin-managed content (overrides only when set) -------
   function applyContent(c) {
     if (!c) return;
-    if (c.seo?.title) document.title = c.seo.title;
+    _content = c;
+    const seoTitle = pick(c.seo && c.seo.title);
+    if (seoTitle) document.title = seoTitle;
     const md = document.querySelector('meta[name="description"]');
-    if (md && c.seo?.description) md.setAttribute('content', c.seo.description);
+    const seoDesc = pick(c.seo && c.seo.description);
+    if (md && seoDesc) md.setAttribute('content', seoDesc);
     if (c.legal) {
+      // Store the raw values (string or {de,en}); pick() resolves at open time
+      // so toggling locale immediately updates an already-open dialog re-open.
       LEGAL = {
         impressum: c.legal.impressum || LEGAL.impressum,
         datenschutz: c.legal.datenschutz || LEGAL.datenschutz,
@@ -502,11 +667,11 @@
 
     // ------- Hero -------
     const hero = c.hero || {};
-    setEm(document.querySelector('.hero__title'), hero.title);
-    setText(document.querySelector('.hero__subtitle'), hero.subtitle);
+    setEm(document.querySelector('.hero__title'), pick(hero.title));
+    setText(document.querySelector('.hero__subtitle'), pick(hero.subtitle));
     const ctas = document.querySelectorAll('.hero__cta a');
-    setText(ctas[0], hero.primaryCta);
-    setText(ctas[1], hero.secondaryCta);
+    setText(ctas[0], pick(hero.primaryCta));
+    setText(ctas[1], pick(hero.secondaryCta));
     const heroBg = document.getElementById('heroBg');
     if (heroBg) {
       heroBg.style.backgroundImage = hero.backgroundImage
@@ -519,7 +684,7 @@
     if (brand.logoText) {
       document.querySelectorAll('.nav__wordmark, .foot__mark').forEach((el) => setText(el, brand.logoText));
     }
-    setText(document.querySelector('.foot__brand p'), brand.tagline);
+    setText(document.querySelector('.foot__brand p'), pick(brand.tagline));
     if (brand.name && brand.name !== 'Hosslimo') {
       const yearEl = document.getElementById('year');
       let n = yearEl?.nextSibling;
@@ -534,9 +699,9 @@
 
     // ------- About -------
     const about = c.about || {};
-    setText(document.querySelector('#about .section__num'), about.eyebrow);
-    setEm(document.querySelector('#about .section__title'), about.title);
-    setText(document.querySelector('#about .about__body'), about.body);
+    setText(document.querySelector('#about .section__num'), pick(about.eyebrow));
+    setEm(document.querySelector('#about .section__title'), pick(about.title));
+    setText(document.querySelector('#about .about__body'), pick(about.body));
 
     // About media image (left of the text). Empty value clears the inline
     // override so the design's CSS-variable image (--img-about) stays.
@@ -548,20 +713,24 @@
     }
 
     // About highlights (Diskretion, Pünktlichkeit, …)
-    const highlights = Array.isArray(about.highlights) ? about.highlights.filter((x) => x && (x.title || x.text)) : [];
+    const highlights = Array.isArray(about.highlights) ? about.highlights.filter((x) => x && (pick(x.title) || pick(x.text))) : [];
     const hlList = document.querySelector('.about__highlights');
     if (hlList && highlights.length) {
       const current = Array.from(hlList.querySelectorAll('.hl')).map((li) => ({
         title: norm(li.querySelector('.hl__title')?.textContent || ''),
         text: norm(li.querySelector('.hl__text')?.textContent || ''),
       }));
-      const next = highlights.map((h) => ({
-        title: norm(h.title || ''),
-        text: norm(h.text || ''),
-        icon: String(h.icon || 'star').trim(),
-        rawTitle: String(h.title || ''),
-        rawText: String(h.text || ''),
-      }));
+      const next = highlights.map((h) => {
+        const t = pick(h.title);
+        const x = pick(h.text);
+        return {
+          title: norm(t),
+          text: norm(x),
+          icon: String(h.icon || 'star').trim(),
+          rawTitle: String(t),
+          rawText: String(x),
+        };
+      });
       const same =
         current.length === next.length &&
         current.every((cur, i) => cur.title === next[i].title && cur.text === next[i].text);
@@ -580,8 +749,8 @@
 
     // ------- Coverage -------
     const cov = c.coverage || {};
-    setEm(document.querySelector('#coverage .section__title'), cov.title);
-    setText(document.querySelector('#coverage .section__lead'), cov.body);
+    setEm(document.querySelector('#coverage .section__title'), pick(cov.title));
+    setText(document.querySelector('#coverage .section__lead'), pick(cov.body));
     const citiesHost = document.querySelector('#coverage .coverage__cities');
     if (citiesHost && Array.isArray(cov.cities) && cov.cities.length) {
       const next = cov.cities.map((x) => String(x).trim()).filter(Boolean);
@@ -596,9 +765,9 @@
 
     // ------- CTA -------
     const cta = c.cta || {};
-    setEm(document.querySelector('#contact .section__title'), cta.title);
-    setText(document.querySelector('#contact .section__lead'), cta.subtitle);
-    setText(document.querySelector('#contactForm button[type="submit"]'), cta.button);
+    setEm(document.querySelector('#contact .section__title'), pick(cta.title));
+    setText(document.querySelector('#contact .section__lead'), pick(cta.subtitle));
+    setText(document.querySelector('#contactForm button[type="submit"]'), pick(cta.button));
 
     // ------- Kontakt -------
     const ct = c.contact || {};
@@ -616,42 +785,49 @@
       if (ctaLines[1]) setText(ctaLines[1].querySelector('span'), ct.email);
       document.querySelectorAll('a[href^="mailto:"]').forEach((a) => a.setAttribute('href', 'mailto:' + ct.email));
     }
-    if (ct.whatsapp && ctaLines[2]) setText(ctaLines[2].querySelector('span'), ct.whatsapp);
+    const waLabel = pick(ct.whatsapp);
+    if (waLabel && ctaLines[2]) setText(ctaLines[2].querySelector('span'), waLabel);
     if (ct.whatsappHref && ctaLines[2]) ctaLines[2].setAttribute('href', ct.whatsappHref);
-    if (ct.address) {
+    const addrText = pick(ct.address);
+    if (addrText) {
       const addr = document.querySelector('.cta__address');
       if (addr) {
-        const html = String(ct.address).split(/\r?\n/).map(escHtml).join('<br>');
+        const html = String(addrText).split(/\r?\n/).map(escHtml).join('<br>');
         const currentEquiv = addr.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/g, ' ').trim();
-        if (currentEquiv !== ct.address.trim()) addr.innerHTML = html;
+        if (currentEquiv !== addrText.trim()) addr.innerHTML = html;
       }
       const footAddr = document.querySelector('.foot__cols div:first-child span');
       if (footAddr) {
-        const single = String(ct.address).replace(/\s+/g, ' ').trim();
+        const single = String(addrText).replace(/\s+/g, ' ').trim();
         if (single !== footAddr.textContent.trim()) footAddr.textContent = single;
       }
     }
-    setText(document.querySelector('.cta__hours'), ct.hours);
+    setText(document.querySelector('.cta__hours'), pick(ct.hours));
 
     // ------- Services -------
-    const services = Array.isArray(c.services) ? c.services.filter((x) => x && (x.title || x.text)) : [];
+    const services = Array.isArray(c.services) ? c.services.filter((x) => x && (pick(x.title) || pick(x.text))) : [];
     const svcGrid = document.querySelector('.services__grid');
     if (svcGrid && services.length) {
       const current = Array.from(svcGrid.querySelectorAll('.svc')).map((s) => ({
         title: norm(s.querySelector('.svc__title')?.textContent || ''),
         text: norm(s.querySelector('.svc__text')?.textContent || ''),
       }));
-      const next = services.map((s) => ({
-        title: norm(s.title || ''),
-        text: norm(s.text || ''),
-        icon: String(s.icon || 'star').trim(),
-        rawTitle: String(s.title || ''),
-        rawText: String(s.text || ''),
-      }));
+      const next = services.map((s) => {
+        const t = pick(s.title);
+        const x = pick(s.text);
+        return {
+          title: norm(t),
+          text: norm(x),
+          icon: String(s.icon || 'star').trim(),
+          rawTitle: String(t),
+          rawText: String(x),
+        };
+      });
       const same =
         current.length === next.length &&
         current.every((cur, i) => cur.title === next[i].title && cur.text === next[i].text);
       if (!same) {
+        const svcCta = T('svcCta');
         svcGrid.innerHTML = next
           .map((s, i) => `
             <article class="svc reveal">
@@ -659,7 +835,7 @@
               <span class="svc__icon">${SERVICE_ICONS[s.icon] || SERVICE_ICONS.star}</span>
               <h3 class="svc__title">${escHtml(s.rawTitle)}</h3>
               <p class="svc__text">${escHtml(s.rawText)}</p>
-              <a class="svc__more" href="#contact" data-service-name="${escHtml(s.rawTitle)}">Anfragen →</a>
+              <a class="svc__more" href="#contact" data-service-name="${escHtml(s.rawTitle)}">${escHtml(svcCta)}</a>
             </article>
           `)
           .join('');
@@ -682,7 +858,18 @@
             bg: normBg(card.querySelector('.car__media')?.style.backgroundImage || ''),
           }))
         : [];
-      const next = fleet.map((item) => ({
+      // Resolve translatable fields once, then keep them on the item so
+      // renderFleet receives plain strings — the renderer itself stays
+      // locale-agnostic.
+      const resolved = fleet.map((item) => ({
+        name: item.name,
+        category: pick(item.category),
+        passengers: item.passengers,
+        luggage: item.luggage,
+        features: item.features,
+        image: item.image,
+      }));
+      const next = resolved.map((item) => ({
         name: norm(item.name || ''),
         category: norm(item.category || ''),
         passengers: norm(item.passengers || ''),
@@ -699,14 +886,14 @@
           cur.bg === next[i].bg
         );
       if (!same) {
-        renderFleet(fleet);
+        renderFleet(resolved);
         if (grid) setupReveal(grid);
       }
       syncVehicleOptions(fleet);
     }
 
     // ------- Stimmen -------
-    const voices = Array.isArray(c.testimonials) ? c.testimonials.filter((x) => x && (x.author || x.quote)) : [];
+    const voices = Array.isArray(c.testimonials) ? c.testimonials.filter((x) => x && (x.author || pick(x.quote))) : [];
     const voicesGrid = document.querySelector('.voices__grid');
     if (voicesGrid && voices.length) {
       const current = Array.from(voicesGrid.querySelectorAll('.voice')).map((v) => ({
@@ -714,14 +901,18 @@
         author: norm(v.querySelector('.voice__who strong')?.textContent || ''),
         role: norm(v.querySelector('.voice__who span')?.textContent || ''),
       }));
-      const next = voices.map((v) => ({
-        quote: norm(v.quote || ''),
-        author: norm(v.author || ''),
-        role: norm(v.role || ''),
-        rawQuote: String(v.quote || ''),
-        rawAuthor: String(v.author || ''),
-        rawRole: String(v.role || ''),
-      }));
+      const next = voices.map((v) => {
+        const q = pick(v.quote);
+        const r = pick(v.role);
+        return {
+          quote: norm(q),
+          author: norm(v.author || ''),
+          role: norm(r),
+          rawQuote: String(q),
+          rawAuthor: String(v.author || ''),
+          rawRole: String(r),
+        };
+      });
       const same =
         current.length === next.length &&
         current.every((cur, i) =>
@@ -742,13 +933,13 @@
     }
 
     // ------- Certifications (top band + footer) -------
-    const certs = Array.isArray(c.certifications) ? c.certifications.filter((x) => x && (x.label || x.image)) : [];
+    const certs = Array.isArray(c.certifications) ? c.certifications.filter((x) => x && (pick(x.label) || x.image)) : [];
     if (certs.length) {
       const certList = document.querySelector('.cert__list');
       if (certList) {
         certList.innerHTML = certs
           .map((x) => {
-            const label = String(x.label || '');
+            const label = String(pick(x.label) || '');
             const img = String(x.image || '');
             const inner = img
               ? `<img src="${escHtml(img)}" alt="${escHtml(label)}" loading="lazy"><span>${escHtml(label)}</span>`
@@ -761,7 +952,7 @@
       if (footCerts) {
         footCerts.innerHTML = certs
           .map((x) => {
-            const label = String(x.label || '');
+            const label = String(pick(x.label) || '');
             const img = String(x.image || '');
             const parts = [];
             if (img) parts.push(`<img src="${escHtml(img)}" alt="${escHtml(label)}" loading="lazy">`);
@@ -769,6 +960,219 @@
             return `<li class="foot__cert${img ? ' foot__cert--has-img' : ''}">${parts.join('')}</li>`;
           })
           .join('');
+      }
+    }
+  }
+
+  // ------- Static UI translation (non-content labels) -------
+  // Translates the parts of the original design markup that are NOT driven by
+  // /api/content. Targets only stable selectors that applyContent() does not
+  // also touch, so both functions can run in either order without fighting.
+  function setEmInline(el, val) {
+    if (!el || !val) return;
+    el.innerHTML = emphasize(val);
+  }
+  function translateStaticUi() {
+    const navKeys = ['navAbout', 'navService', 'navFleet', 'navCoverage', 'navVoices', 'navContact'];
+
+    // Top nav
+    document.querySelectorAll('.nav__menu a').forEach((a, i) => {
+      if (navKeys[i]) a.textContent = T(navKeys[i]);
+    });
+    const navMenuEl = document.querySelector('.nav__menu');
+    if (navMenuEl) navMenuEl.setAttribute('aria-label', T('navHauptnav'));
+    const navCta = document.querySelector('.nav__cta');
+    if (navCta) navCta.textContent = T('navCta');
+    const burger = document.querySelector('.nav__burger');
+    if (burger) burger.setAttribute('aria-label', T('navMenuLabel'));
+
+    // Mobile menu (6 nav links + 1 send-enquiry CTA)
+    const mobLinks = document.querySelectorAll('.nav__mobile a');
+    mobLinks.forEach((a, i) => {
+      if (i < navKeys.length) a.textContent = T(navKeys[i]);
+      else if (i === navKeys.length) a.textContent = T('mobileSend');
+    });
+
+    // Hero static parts
+    const heroEyeb = document.querySelector('.hero__content .eyebrow');
+    if (heroEyeb) heroEyeb.textContent = T('heroEyebrow');
+    const heroMeta = document.querySelectorAll('.hero__meta > div');
+    const metaPairs = [['heroMeta1L', 'heroMeta1V'], ['heroMeta2L', 'heroMeta2V'], ['heroMeta3L', 'heroMeta3V']];
+    metaPairs.forEach((pair, i) => {
+      if (!heroMeta[i]) return;
+      const s = heroMeta[i].querySelector('strong');
+      const v = heroMeta[i].querySelector('span');
+      if (s) s.textContent = T(pair[0]);
+      if (v) v.textContent = T(pair[1]);
+    });
+    const heroScroll = document.querySelector('.hero__scroll');
+    if (heroScroll) {
+      heroScroll.textContent = T('heroScroll');
+      heroScroll.setAttribute('aria-label', T('heroScrollAria'));
+    }
+
+    // Certifications band (only the static eyebrow; items are content-driven)
+    const certBand = document.querySelector('.cert');
+    if (certBand) certBand.setAttribute('aria-label', T('certBandAria'));
+    const certLabel = document.querySelector('.cert__label');
+    if (certLabel) certLabel.textContent = T('certLabel');
+
+    // Section eyebrows that have no content-field counterpart
+    const setEb = (sel, key) => { const el = document.querySelector(sel); if (el) el.textContent = T(key); };
+    setEb('#services .section__num', 'eyebrowServices');
+    setEb('#fleet .section__num', 'eyebrowFleet');
+    setEb('#coverage .section__num', 'eyebrowCoverage');
+    setEb('#voices .section__num', 'eyebrowVoices');
+    setEb('#contact .section__num', 'eyebrowContact');
+
+    // Static section titles + leads (no content-field counterpart)
+    setEmInline(document.querySelector('#services .section__title'), T('servicesTitle'));
+    const svcLead = document.querySelector('#services .section__lead');
+    if (svcLead) svcLead.textContent = T('servicesLead');
+    setEmInline(document.querySelector('#fleet .section__title'), T('fleetTitle'));
+    const fleetLead = document.querySelector('#fleet .section__lead');
+    if (fleetLead) fleetLead.textContent = T('fleetLead');
+    setEmInline(document.querySelector('#voices .section__title'), T('voicesTitle'));
+
+    // Fleet filter chips
+    const chips = document.querySelectorAll('.fleet__filters .chip');
+    const chipKeys = ['chipAll', 'chipMercedes', 'chipTesla', 'chipVan'];
+    chips.forEach((c, i) => { if (chipKeys[i]) c.textContent = T(chipKeys[i]); });
+
+    // CTA aside heading
+    const reachH3 = document.querySelector('.cta__contact h3');
+    if (reachH3) reachH3.textContent = T('ctaReachTitle');
+
+    // Form labels (preserve the gold * marker on required fields)
+    const setLabel = (name, key, required) => {
+      const fld = document.querySelector(`#contactForm [name="${name}"]`);
+      if (!fld) return;
+      const span = fld.closest('label')?.querySelector(':scope > span');
+      if (!span) return;
+      if (required) span.innerHTML = `${escHtml(T(key))} <em class="req">*</em>`;
+      else span.textContent = T(key);
+    };
+    setLabel('name', 'fldName', true);
+    setLabel('email', 'fldEmail', true);
+    setLabel('phone', 'fldPhone', false);
+    setLabel('datetime', 'fldDatetime', false);
+    setLabel('pickup', 'fldPickup', false);
+    setLabel('dropoff', 'fldDropoff', false);
+    setLabel('service', 'fldService', false);
+    setLabel('vehicle', 'fldVehicle', false);
+    setLabel('message', 'fldMessage', true);
+
+    // Form placeholders
+    const setPh = (name, key) => {
+      const el = document.querySelector(`#contactForm [name="${name}"]`);
+      if (el) el.setAttribute('placeholder', T(key));
+    };
+    setPh('name', 'phName');
+    setPh('email', 'phEmail');
+    setPh('phone', 'phPhone');
+    setPh('pickup', 'phAddress');
+    setPh('dropoff', 'phAddress');
+    setPh('message', 'phMessage');
+
+    // Select options tagged at boot (skip admin-appended options without tag)
+    document.querySelectorAll('#contactForm option[data-i18n-key]').forEach((o) => {
+      o.textContent = T(o.dataset.i18nKey);
+    });
+
+    // Required-fields note + submit-area hint
+    const hints = document.querySelectorAll('#contactForm .cta__hint');
+    if (hints[0]) {
+      hints[0].innerHTML =
+        _locale === 'en'
+          ? 'Fields marked with <em class="req">*</em> are required.'
+          : 'Mit <em class="req">*</em> markierte Felder sind Pflichtfelder.';
+    }
+    if (hints.length >= 2) hints[hints.length - 1].textContent = T('formHint');
+
+    // Footer column headings + links
+    const footCols = document.querySelectorAll('.foot__cols > div');
+    if (footCols[0]) {
+      const h = footCols[0].querySelector('h4');
+      if (h) h.textContent = T('footColContact');
+    }
+    if (footCols[1]) {
+      const h = footCols[1].querySelector('h4');
+      if (h) h.textContent = T('footColService');
+      const lks = footCols[1].querySelectorAll('a');
+      const k = ['footLnk1', 'footLnk2', 'footLnk3', 'footLnk4'];
+      lks.forEach((a, i) => { if (k[i]) a.textContent = T(k[i]); });
+    }
+    if (footCols[2]) {
+      const h = footCols[2].querySelector('h4');
+      if (h) h.textContent = T('footColLegal');
+      const impr = footCols[2].querySelector('[data-legal="impressum"]');
+      const ds = footCols[2].querySelector('[data-legal="datenschutz"]');
+      const agb = footCols[2].querySelector('[data-legal="agb"]');
+      if (impr) impr.textContent = T('footImpressum');
+      if (ds) ds.textContent = T('footDatenschutz');
+      if (agb) agb.textContent = T('footAgb');
+    }
+
+    // Footer copyright suffix — rebuilt so the year span stays a child node.
+    const footBottomSpan = document.querySelector('.foot__bottom > span');
+    if (footBottomSpan) {
+      const inlineYear = footBottomSpan.querySelector('#year');
+      const year = (inlineYear && inlineYear.textContent) || String(new Date().getFullYear());
+      const brandName = (_content && _content.brand && _content.brand.name) || 'Hosslimo';
+      footBottomSpan.innerHTML =
+        `© <span id="year">${escHtml(year)}</span> ${escHtml(brandName)}. ${escHtml(T('footRights'))}`;
+    }
+  }
+
+  // ------- Floating language toggle -------
+  // The button always shows the OPPOSITE locale (so a German visitor sees "EN
+  // + UK cross" inviting them to switch). Persists to localStorage and re-runs
+  // applyContent + translateStaticUi on every click.
+  const FLAG_GB = '<svg viewBox="0 0 60 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="60" height="36" fill="#ffffff"/><rect x="26" y="0" width="8" height="36" fill="#CE1124"/><rect x="0" y="14" width="60" height="8" fill="#CE1124"/></svg>';
+  const FLAG_DE = '<svg viewBox="0 0 60 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="60" height="12" fill="#000000"/><rect y="12" width="60" height="12" fill="#DD0000"/><rect y="24" width="60" height="12" fill="#FFCE00"/></svg>';
+
+  function refreshLocaleButton() {
+    const btn = document.getElementById('langToggle');
+    if (!btn) return;
+    const label = btn.querySelector('.lang-toggle__label');
+    const flag = btn.querySelector('.lang-toggle__flag');
+    if (label) label.textContent = T('langToBtn');
+    if (flag) flag.innerHTML = _locale === 'de' ? FLAG_GB : FLAG_DE;
+    btn.setAttribute('aria-label', T('langToAria'));
+    btn.setAttribute('data-locale', _locale);
+  }
+
+  function setupLocaleToggle() {
+    const btn = document.getElementById('langToggle');
+    if (!btn) return;
+    refreshLocaleButton();
+    btn.addEventListener('click', () => {
+      _locale = _locale === 'de' ? 'en' : 'de';
+      try {
+        if (window.localStorage) window.localStorage.setItem('hosslimo.lang', _locale);
+      } catch (_) {}
+      setHtmlLang(_locale);
+      refreshLocaleButton();
+      // Static labels first so any flicker happens before the content re-render.
+      translateStaticUi();
+      if (_content) applyContent(_content);
+    });
+  }
+
+  // Tag the markup's known select options so translateStaticUi can find them
+  // after syncServiceOptions / syncVehicleOptions append admin-defined entries
+  // (which we deliberately do NOT translate — they're already locale-aware).
+  function tagMarkupOptions() {
+    const svc = document.querySelector('#contactForm select[name="service"]');
+    if (svc) {
+      Array.from(svc.options).forEach((o, i) => { o.dataset.i18nKey = `optService${i}`; });
+    }
+    const veh = document.querySelector('#contactForm select[name="vehicle"]');
+    if (veh) {
+      const opts = veh.options;
+      if (opts.length) {
+        opts[0].dataset.i18nKey = 'optVehicleAny';
+        opts[opts.length - 1].dataset.i18nKey = 'optVehicleOther';
       }
     }
   }
@@ -786,6 +1190,9 @@
   setupToast();
   setupCarCta();
   setupServiceCta();
+  tagMarkupOptions();
+  translateStaticUi();
+  setupLocaleToggle();
 
   // Public config (reCAPTCHA site key) — non-blocking.
   fetch('/api/config')
@@ -801,6 +1208,11 @@
   // Admin-managed text (legal, SEO meta) — non-blocking.
   fetch('/api/content')
     .then((r) => (r.ok ? r.json() : null))
-    .then(applyContent)
+    .then((c) => {
+      if (c) applyContent(c);
+      // Re-run static translations after applyContent so dynamically rendered
+      // grids (fleet, services) get their CTA labels too.
+      translateStaticUi();
+    })
     .catch(() => {});
 })();

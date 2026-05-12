@@ -5,6 +5,38 @@
   var content = {};
   var cities = [];
 
+  // ─── Locale (editing language for translatable content) ──────────────────
+  // The dashboard edits one locale at a time. Saving in EN mode merges the
+  // typed value into the EN slot while preserving DE, and vice versa.
+  var _locale = 'de';
+  try {
+    var saved = window.localStorage && window.localStorage.getItem('hosslimo.lang.admin');
+    if (saved === 'en' || saved === 'de') _locale = saved;
+  } catch (_) {}
+
+  function pick(v) {
+    if (v == null) return '';
+    if (typeof v === 'string') return v;
+    if (typeof v !== 'object') return '';
+    return v[_locale] || v.de || v.en || '';
+  }
+
+  // Merge a typed value into the current locale, preserving the OTHER locale's
+  // existing text. Always returns an object; the server's localizable() helper
+  // collapses {de:"x", en:""} back to a plain string when EN is empty.
+  function localMerge(existing, newVal, loc) {
+    var existDe = '';
+    var existEn = '';
+    if (existing && typeof existing === 'object') {
+      existDe = existing.de || '';
+      existEn = existing.en || '';
+    } else if (typeof existing === 'string') {
+      existDe = existing;
+    }
+    if (loc === 'en') return { de: existDe, en: newVal };
+    return { de: newVal, en: existEn };
+  }
+
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
   function toast(msg, ok) {
@@ -125,6 +157,7 @@
     }
 
     setupNav();
+    setupLocaleToggle();
     setupSaveHandlers();
     setupCityEditor();
     setupArrayEditors();
@@ -134,6 +167,33 @@
     setupLogout();
     setupPicker();
     setupReorder();
+  }
+
+  function setupLocaleToggle() {
+    var host = document.getElementById('admLocale');
+    if (!host) return;
+    function refresh() {
+      host.querySelectorAll('.adm-locale-btn').forEach(function (b) {
+        b.classList.toggle('is-active', b.dataset.lang === _locale);
+        b.setAttribute('aria-pressed', b.dataset.lang === _locale ? 'true' : 'false');
+      });
+    }
+    refresh();
+    host.addEventListener('click', function (e) {
+      var btn = e.target.closest('.adm-locale-btn');
+      if (!btn) return;
+      var lang = btn.dataset.lang;
+      if (lang !== 'de' && lang !== 'en') return;
+      if (lang === _locale) return;
+      _locale = lang;
+      try {
+        if (window.localStorage) window.localStorage.setItem('hosslimo.lang.admin', _locale);
+      } catch (_) {}
+      refresh();
+      // Re-render every editor from the cached `content`. Any unsaved edits
+      // typed into the previous locale are discarded — make sure to Save first.
+      populateForms();
+    });
   }
 
   function setupReorder() {
@@ -274,44 +334,44 @@
     var c = content;
     // Brand
     setVal('brandName', c.brand && c.brand.name);
-    setVal('brandTagline', c.brand && c.brand.tagline);
+    setVal('brandTagline', pick(c.brand && c.brand.tagline));
     setVal('brandLogoText', c.brand && c.brand.logoText);
     // Hero
-    setVal('heroEyebrow', c.hero && c.hero.eyebrow);
-    setVal('heroTitle', c.hero && c.hero.title);
-    setVal('heroSubtitle', c.hero && c.hero.subtitle);
-    setVal('heroPrimaryCta', c.hero && c.hero.primaryCta);
-    setVal('heroSecondaryCta', c.hero && c.hero.secondaryCta);
+    setVal('heroEyebrow', pick(c.hero && c.hero.eyebrow));
+    setVal('heroTitle', pick(c.hero && c.hero.title));
+    setVal('heroSubtitle', pick(c.hero && c.hero.subtitle));
+    setVal('heroPrimaryCta', pick(c.hero && c.hero.primaryCta));
+    setVal('heroSecondaryCta', pick(c.hero && c.hero.secondaryCta));
     setVal('heroBackground', c.hero && c.hero.backgroundImage);
     // About
-    setVal('aboutEyebrow', c.about && c.about.eyebrow);
-    setVal('aboutTitle', c.about && c.about.title);
-    setVal('aboutBody', c.about && c.about.body);
+    setVal('aboutEyebrow', pick(c.about && c.about.eyebrow));
+    setVal('aboutTitle', pick(c.about && c.about.title));
+    setVal('aboutBody', pick(c.about && c.about.body));
     setVal('aboutImage', c.about && c.about.image);
     // Coverage
-    setVal('coverageTitle', c.coverage && c.coverage.title);
-    setVal('coverageBody', c.coverage && c.coverage.body);
+    setVal('coverageTitle', pick(c.coverage && c.coverage.title));
+    setVal('coverageBody', pick(c.coverage && c.coverage.body));
     cities = (c.coverage && Array.isArray(c.coverage.cities)) ? c.coverage.cities.slice() : [];
     renderCityTags();
     // CTA
-    setVal('ctaTitle', c.cta && c.cta.title);
-    setVal('ctaSubtitle', c.cta && c.cta.subtitle);
-    setVal('ctaButton', c.cta && c.cta.button);
+    setVal('ctaTitle', pick(c.cta && c.cta.title));
+    setVal('ctaSubtitle', pick(c.cta && c.cta.subtitle));
+    setVal('ctaButton', pick(c.cta && c.cta.button));
     // Contact
     setVal('contactPhone', c.contact && c.contact.phone);
     setVal('contactPhoneHref', c.contact && c.contact.phoneHref);
     setVal('contactEmail', c.contact && c.contact.email);
-    setVal('contactWhatsapp', c.contact && c.contact.whatsapp);
+    setVal('contactWhatsapp', pick(c.contact && c.contact.whatsapp));
     setVal('contactWhatsappHref', c.contact && c.contact.whatsappHref);
-    setVal('contactAddress', c.contact && c.contact.address);
-    setVal('contactHours', c.contact && c.contact.hours);
+    setVal('contactAddress', pick(c.contact && c.contact.address));
+    setVal('contactHours', pick(c.contact && c.contact.hours));
     // Legal
-    setVal('legalImpressum', c.legal && c.legal.impressum);
-    setVal('legalDatenschutz', c.legal && c.legal.datenschutz);
-    setVal('legalAgb', c.legal && c.legal.agb);
+    setVal('legalImpressum', pick(c.legal && c.legal.impressum));
+    setVal('legalDatenschutz', pick(c.legal && c.legal.datenschutz));
+    setVal('legalAgb', pick(c.legal && c.legal.agb));
     // SEO
-    setVal('seoTitle', c.seo && c.seo.title);
-    setVal('seoDescription', c.seo && c.seo.description);
+    setVal('seoTitle', pick(c.seo && c.seo.title));
+    setVal('seoDescription', pick(c.seo && c.seo.description));
     setVal('seoOgImage', c.seo && c.seo.ogImage);
     // Array editors
     renderServices();
@@ -381,9 +441,9 @@
             return '<option value="' + ic + '"' + (item.icon === ic ? ' selected' : '') + '>' + ic + '</option>';
           }).join('') +
           '</select></div>' +
-          '<div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" data-svc-title maxlength="120" value="' + esc(item.title) + '" /></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" data-svc-title maxlength="120" value="' + esc(pick(item.title)) + '" /></div>' +
         '</div>' +
-        '<div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" data-svc-text maxlength="600" rows="3">' + esc(item.text) + '</textarea></div>' +
+        '<div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" data-svc-text maxlength="600" rows="3">' + esc(pick(item.text)) + '</textarea></div>' +
       '</div>';
     div.querySelector('[data-remove]').addEventListener('click', function () {
       content.services = readServices();
@@ -395,12 +455,14 @@
 
   function readServices() {
     var host = document.getElementById('servicesList');
+    var existing = Array.isArray(content.services) ? content.services : [];
     var items = [];
-    host.querySelectorAll('.adm-item').forEach(function (item) {
+    host.querySelectorAll('.adm-item').forEach(function (item, i) {
+      var ex = (existing[i] && typeof existing[i] === 'object') ? existing[i] : {};
       items.push({
         icon: item.querySelector('[data-svc-icon]').value,
-        title: item.querySelector('[data-svc-title]').value,
-        text: item.querySelector('[data-svc-text]').value,
+        title: localMerge(ex.title, item.querySelector('[data-svc-title]').value, _locale),
+        text: localMerge(ex.text, item.querySelector('[data-svc-text]').value, _locale),
       });
     });
     return items;
@@ -434,9 +496,9 @@
             return '<option value="' + ic + '"' + (item.icon === ic ? ' selected' : '') + '>' + ic + '</option>';
           }).join('') +
           '</select></div>' +
-          '<div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" data-hl-title maxlength="120" value="' + esc(item.title) + '" /></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Titel</label><input class="adm-input" data-hl-title maxlength="120" value="' + esc(pick(item.title)) + '" /></div>' +
         '</div>' +
-        '<div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" data-hl-text maxlength="400" rows="2">' + esc(item.text) + '</textarea></div>' +
+        '<div class="adm-field"><label class="adm-field-label">Beschreibung</label><textarea class="adm-textarea" data-hl-text maxlength="400" rows="2">' + esc(pick(item.text)) + '</textarea></div>' +
       '</div>';
     div.querySelector('[data-remove]').addEventListener('click', function () {
       content.about = content.about || {};
@@ -449,12 +511,14 @@
 
   function readHighlights() {
     var host = document.getElementById('highlightsList');
+    var existing = (content.about && Array.isArray(content.about.highlights)) ? content.about.highlights : [];
     var items = [];
-    host.querySelectorAll('.adm-item').forEach(function (item) {
+    host.querySelectorAll('.adm-item').forEach(function (item, i) {
+      var ex = (existing[i] && typeof existing[i] === 'object') ? existing[i] : {};
       items.push({
         icon: item.querySelector('[data-hl-icon]').value,
-        title: item.querySelector('[data-hl-title]').value,
-        text: item.querySelector('[data-hl-text]').value,
+        title: localMerge(ex.title, item.querySelector('[data-hl-title]').value, _locale),
+        text: localMerge(ex.text, item.querySelector('[data-hl-text]').value, _locale),
       });
     });
     return items;
@@ -483,7 +547,7 @@
       '<div class="adm-item-header"><span class="adm-item-num"><span class="adm-grip" aria-hidden="true">⋮⋮</span>Zertifikat ' + (i + 1) + '</span>' +
       '<button class="adm-btn adm-btn--danger" data-remove="' + i + '">Entfernen</button></div>' +
       '<div class="adm-item-fields">' +
-        '<div class="adm-field"><label class="adm-field-label">Bezeichnung</label><input class="adm-input" data-cert-label maxlength="80" value="' + esc(item.label) + '" /></div>' +
+        '<div class="adm-field"><label class="adm-field-label">Bezeichnung</label><input class="adm-input" data-cert-label maxlength="80" value="' + esc(pick(item.label)) + '" /></div>' +
         '<div class="adm-field"><label class="adm-field-label">Logo (optional)</label>' +
           '<div class="adm-img-field">' +
             '<input class="adm-input" data-cert-img value="' + esc(item.image) + '" placeholder="/uploads/… oder leer für Text-Badge" />' +
@@ -505,10 +569,12 @@
 
   function readCertifications() {
     var host = document.getElementById('certificationsList');
+    var existing = Array.isArray(content.certifications) ? content.certifications : [];
     var items = [];
-    host.querySelectorAll('.adm-item').forEach(function (item) {
+    host.querySelectorAll('.adm-item').forEach(function (item, i) {
+      var ex = (existing[i] && typeof existing[i] === 'object') ? existing[i] : {};
       items.push({
-        label: item.querySelector('[data-cert-label]').value,
+        label: localMerge(ex.label, item.querySelector('[data-cert-label]').value, _locale),
         image: item.querySelector('[data-cert-img]').value,
       });
     });
@@ -540,7 +606,7 @@
       '<div class="adm-item-fields">' +
         '<div class="adm-grid2">' +
           '<div class="adm-field"><label class="adm-field-label">Name</label><input class="adm-input" data-fl-name maxlength="80" value="' + esc(item.name) + '" /></div>' +
-          '<div class="adm-field"><label class="adm-field-label">Kategorie</label><input class="adm-input" data-fl-cat maxlength="60" value="' + esc(item.category) + '" /></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Kategorie</label><input class="adm-input" data-fl-cat maxlength="60" value="' + esc(pick(item.category)) + '" /></div>' +
         '</div>' +
         '<div class="adm-grid2">' +
           '<div class="adm-field"><label class="adm-field-label">Passagiere</label><input class="adm-input" data-fl-pax maxlength="20" value="' + esc(item.passengers) + '" /></div>' +
@@ -568,12 +634,14 @@
 
   function readFleet() {
     var host = document.getElementById('fleetList');
+    var existing = Array.isArray(content.fleet) ? content.fleet : [];
     var items = [];
-    host.querySelectorAll('.adm-item').forEach(function (item) {
+    host.querySelectorAll('.adm-item').forEach(function (item, i) {
       var featsRaw = item.querySelector('[data-fl-feats]').value;
+      var ex = (existing[i] && typeof existing[i] === 'object') ? existing[i] : {};
       items.push({
         name: item.querySelector('[data-fl-name]').value,
-        category: item.querySelector('[data-fl-cat]').value,
+        category: localMerge(ex.category, item.querySelector('[data-fl-cat]').value, _locale),
         passengers: item.querySelector('[data-fl-pax]').value,
         luggage: item.querySelector('[data-fl-lug]').value,
         features: featsRaw.split(',').map(function (f) { return f.trim(); }).filter(Boolean),
@@ -606,9 +674,9 @@
       '<div class="adm-item-fields">' +
         '<div class="adm-grid2">' +
           '<div class="adm-field"><label class="adm-field-label">Name</label><input class="adm-input" data-vc-author maxlength="120" value="' + esc(item.author) + '" /></div>' +
-          '<div class="adm-field"><label class="adm-field-label">Rolle</label><input class="adm-input" data-vc-role maxlength="120" value="' + esc(item.role) + '" /></div>' +
+          '<div class="adm-field"><label class="adm-field-label">Rolle</label><input class="adm-input" data-vc-role maxlength="120" value="' + esc(pick(item.role)) + '" /></div>' +
         '</div>' +
-        '<div class="adm-field"><label class="adm-field-label">Zitat</label><textarea class="adm-textarea" data-vc-quote maxlength="800" rows="3">' + esc(item.quote) + '</textarea></div>' +
+        '<div class="adm-field"><label class="adm-field-label">Zitat</label><textarea class="adm-textarea" data-vc-quote maxlength="800" rows="3">' + esc(pick(item.quote)) + '</textarea></div>' +
       '</div>';
     div.querySelector('[data-remove]').addEventListener('click', function () {
       content.testimonials = readVoices();
@@ -620,12 +688,14 @@
 
   function readVoices() {
     var host = document.getElementById('voicesList');
+    var existing = Array.isArray(content.testimonials) ? content.testimonials : [];
     var items = [];
-    host.querySelectorAll('.adm-item').forEach(function (item) {
+    host.querySelectorAll('.adm-item').forEach(function (item, i) {
+      var ex = (existing[i] && typeof existing[i] === 'object') ? existing[i] : {};
       items.push({
         author: item.querySelector('[data-vc-author]').value,
-        role: item.querySelector('[data-vc-role]').value,
-        quote: item.querySelector('[data-vc-quote]').value,
+        role: localMerge(ex.role, item.querySelector('[data-vc-role]').value, _locale),
+        quote: localMerge(ex.quote, item.querySelector('[data-vc-quote]').value, _locale),
       });
     });
     return items;
@@ -680,19 +750,43 @@
 
   function saveGeneral() {
     saveSection('msgGeneral', function () {
-      content.brand = { name: val('brandName'), tagline: val('brandTagline'), logoText: val('brandLogoText') };
+      // Snapshot the existing objects before mutating content.* so localMerge
+      // can preserve the other locale's text.
+      var oldBrand = content.brand;
+      var oldHero = content.hero;
+      var oldAbout = content.about;
+      var oldCoverage = content.coverage;
+      var oldCta = content.cta;
+      content.brand = {
+        name: val('brandName'),
+        tagline: localMerge(oldBrand && oldBrand.tagline, val('brandTagline'), _locale),
+        logoText: val('brandLogoText'),
+      };
       content.hero = {
-        eyebrow: val('heroEyebrow'), title: val('heroTitle'),
-        subtitle: val('heroSubtitle'), primaryCta: val('heroPrimaryCta'),
-        secondaryCta: val('heroSecondaryCta'), backgroundImage: val('heroBackground'),
+        eyebrow: localMerge(oldHero && oldHero.eyebrow, val('heroEyebrow'), _locale),
+        title: localMerge(oldHero && oldHero.title, val('heroTitle'), _locale),
+        subtitle: localMerge(oldHero && oldHero.subtitle, val('heroSubtitle'), _locale),
+        primaryCta: localMerge(oldHero && oldHero.primaryCta, val('heroPrimaryCta'), _locale),
+        secondaryCta: localMerge(oldHero && oldHero.secondaryCta, val('heroSecondaryCta'), _locale),
+        backgroundImage: val('heroBackground'),
       };
       content.about = Object.assign({}, content.about, {
-        eyebrow: val('aboutEyebrow'), title: val('aboutTitle'), body: val('aboutBody'),
+        eyebrow: localMerge(oldAbout && oldAbout.eyebrow, val('aboutEyebrow'), _locale),
+        title: localMerge(oldAbout && oldAbout.title, val('aboutTitle'), _locale),
+        body: localMerge(oldAbout && oldAbout.body, val('aboutBody'), _locale),
         image: val('aboutImage'),
         highlights: readHighlights(),
       });
-      content.coverage = { title: val('coverageTitle'), body: val('coverageBody'), cities: cities.slice() };
-      content.cta = { title: val('ctaTitle'), subtitle: val('ctaSubtitle'), button: val('ctaButton') };
+      content.coverage = {
+        title: localMerge(oldCoverage && oldCoverage.title, val('coverageTitle'), _locale),
+        body: localMerge(oldCoverage && oldCoverage.body, val('coverageBody'), _locale),
+        cities: cities.slice(),
+      };
+      content.cta = {
+        title: localMerge(oldCta && oldCta.title, val('ctaTitle'), _locale),
+        subtitle: localMerge(oldCta && oldCta.subtitle, val('ctaSubtitle'), _locale),
+        button: localMerge(oldCta && oldCta.button, val('ctaButton'), _locale),
+      };
       content.certifications = readCertifications();
     });
   }
@@ -709,24 +803,38 @@
 
   function saveContact() {
     saveSection('msgContact', function () {
+      var old = content.contact;
       content.contact = {
-        phone: val('contactPhone'), phoneHref: val('contactPhoneHref'),
-        email: val('contactEmail'), whatsapp: val('contactWhatsapp'),
-        whatsappHref: val('contactWhatsappHref'), address: val('contactAddress'),
-        hours: val('contactHours'),
+        phone: val('contactPhone'),
+        phoneHref: val('contactPhoneHref'),
+        email: val('contactEmail'),
+        whatsapp: localMerge(old && old.whatsapp, val('contactWhatsapp'), _locale),
+        whatsappHref: val('contactWhatsappHref'),
+        address: localMerge(old && old.address, val('contactAddress'), _locale),
+        hours: localMerge(old && old.hours, val('contactHours'), _locale),
       };
     });
   }
 
   function saveLegal() {
     saveSection('msgLegal', function () {
-      content.legal = { impressum: val('legalImpressum'), datenschutz: val('legalDatenschutz'), agb: val('legalAgb') };
+      var old = content.legal;
+      content.legal = {
+        impressum: localMerge(old && old.impressum, val('legalImpressum'), _locale),
+        datenschutz: localMerge(old && old.datenschutz, val('legalDatenschutz'), _locale),
+        agb: localMerge(old && old.agb, val('legalAgb'), _locale),
+      };
     });
   }
 
   function saveSeo() {
     saveSection('msgSeo', function () {
-      content.seo = { title: val('seoTitle'), description: val('seoDescription'), ogImage: val('seoOgImage') };
+      var old = content.seo;
+      content.seo = {
+        title: localMerge(old && old.title, val('seoTitle'), _locale),
+        description: localMerge(old && old.description, val('seoDescription'), _locale),
+        ogImage: val('seoOgImage'),
+      };
     });
   }
 

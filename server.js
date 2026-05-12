@@ -644,54 +644,69 @@ function asUrl(v) {
   return '';
 }
 
+// Translatable text field. Accepts either a plain string (DE-only, the legacy
+// shape) or a `{ de, en }` object. Collapses back to a plain string when only
+// DE is non-empty so existing entries stay untouched; keeps the object form
+// whenever EN is set so EN-only entries are not mistaken for DE.
+function localizable(v, max = 2000) {
+  if (v == null) return '';
+  if (typeof v === 'string') return asString(v, max);
+  if (typeof v !== 'object') return '';
+  const de = asString(v.de, max);
+  const en = asString(v.en, max);
+  if (!de && !en) return '';
+  if (de && !en) return de;
+  return { de, en };
+}
+
 function sanitizeContent(c) {
   const out = {};
   out.brand = {
     name: asString(c?.brand?.name, 80),
-    tagline: asString(c?.brand?.tagline, 160),
+    tagline: localizable(c?.brand?.tagline, 160),
     logoText: asString(c?.brand?.logoText, 40),
   };
   out.contact = {
     phone: asString(c?.contact?.phone, 60),
     phoneHref: asString(c?.contact?.phoneHref, 60),
     email: asString(c?.contact?.email, 120),
-    whatsapp: asString(c?.contact?.whatsapp, 60),
+    whatsapp: localizable(c?.contact?.whatsapp, 60),
     whatsappHref: asString(c?.contact?.whatsappHref, 200),
-    address: asString(c?.contact?.address, 240),
-    hours: asString(c?.contact?.hours, 200),
+    address: localizable(c?.contact?.address, 240),
+    hours: localizable(c?.contact?.hours, 200),
   };
   out.hero = {
-    eyebrow: asString(c?.hero?.eyebrow, 80),
-    title: asString(c?.hero?.title, 240),
-    subtitle: asString(c?.hero?.subtitle, 400),
-    primaryCta: asString(c?.hero?.primaryCta, 60),
-    secondaryCta: asString(c?.hero?.secondaryCta, 60),
+    eyebrow: localizable(c?.hero?.eyebrow, 80),
+    title: localizable(c?.hero?.title, 240),
+    subtitle: localizable(c?.hero?.subtitle, 400),
+    primaryCta: localizable(c?.hero?.primaryCta, 60),
+    secondaryCta: localizable(c?.hero?.secondaryCta, 60),
     backgroundImage: asUrl(c?.hero?.backgroundImage),
   };
   out.about = {
-    eyebrow: asString(c?.about?.eyebrow, 80),
-    title: asString(c?.about?.title, 240),
-    body: asString(c?.about?.body, 4000),
+    eyebrow: localizable(c?.about?.eyebrow, 80),
+    title: localizable(c?.about?.title, 240),
+    body: localizable(c?.about?.body, 4000),
     image: asUrl(c?.about?.image),
     highlights: Array.isArray(c?.about?.highlights)
       ? c.about.highlights.slice(0, 8).map((h) => ({
           icon: asString(h?.icon, 40),
-          title: asString(h?.title, 120),
-          text: asString(h?.text, 400),
+          title: localizable(h?.title, 120),
+          text: localizable(h?.text, 400),
         }))
       : [],
   };
   out.services = Array.isArray(c?.services)
     ? c.services.slice(0, 24).map((s) => ({
         icon: asString(s?.icon, 40),
-        title: asString(s?.title, 120),
-        text: asString(s?.text, 600),
+        title: localizable(s?.title, 120),
+        text: localizable(s?.text, 600),
       }))
     : [];
   out.fleet = Array.isArray(c?.fleet)
     ? c.fleet.slice(0, 24).map((v) => ({
         name: asString(v?.name, 80),
-        category: asString(v?.category, 60),
+        category: localizable(v?.category, 60),
         passengers: asString(v?.passengers, 20),
         luggage: asString(v?.luggage, 20),
         features: Array.isArray(v?.features)
@@ -703,36 +718,36 @@ function sanitizeContent(c) {
   out.testimonials = Array.isArray(c?.testimonials)
     ? c.testimonials.slice(0, 16).map((t) => ({
         author: asString(t?.author, 120),
-        role: asString(t?.role, 120),
-        quote: asString(t?.quote, 800),
+        role: localizable(t?.role, 120),
+        quote: localizable(t?.quote, 800),
       }))
     : [];
   out.certifications = Array.isArray(c?.certifications)
     ? c.certifications.slice(0, 8).map((x) => ({
-        label: asString(x?.label, 80),
+        label: localizable(x?.label, 80),
         image: asUrl(x?.image),
       }))
     : [];
   out.coverage = {
-    title: asString(c?.coverage?.title, 240),
-    body: asString(c?.coverage?.body, 1200),
+    title: localizable(c?.coverage?.title, 240),
+    body: localizable(c?.coverage?.body, 1200),
     cities: Array.isArray(c?.coverage?.cities)
       ? c.coverage.cities.slice(0, 50).map((x) => asString(x, 80))
       : [],
   };
   out.cta = {
-    title: asString(c?.cta?.title, 240),
-    subtitle: asString(c?.cta?.subtitle, 400),
-    button: asString(c?.cta?.button, 60),
+    title: localizable(c?.cta?.title, 240),
+    subtitle: localizable(c?.cta?.subtitle, 400),
+    button: localizable(c?.cta?.button, 60),
   };
   out.legal = {
-    impressum: asString(c?.legal?.impressum, 8000),
-    datenschutz: asString(c?.legal?.datenschutz, 16000),
-    agb: asString(c?.legal?.agb, 16000),
+    impressum: localizable(c?.legal?.impressum, 8000),
+    datenschutz: localizable(c?.legal?.datenschutz, 16000),
+    agb: localizable(c?.legal?.agb, 16000),
   };
   out.seo = {
-    title: asString(c?.seo?.title, 120),
-    description: asString(c?.seo?.description, 320),
+    title: localizable(c?.seo?.title, 120),
+    description: localizable(c?.seo?.description, 320),
     ogImage: asUrl(c?.seo?.ogImage),
   };
   return out;

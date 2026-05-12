@@ -394,6 +394,31 @@ textarea, input, select { font: inherit; }
 .adm-img-field .adm-input { flex: 1; min-width: 0; }
 .adm-img-field .adm-btn { white-space: nowrap; }
 
+/* Locale toggle (editing language) inside the sidebar */
+.adm-locale {
+  display: flex; margin-top: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+}
+.adm-locale-btn {
+  flex: 1; padding: 7px 0;
+  font-size: 0.62rem; letter-spacing: 0.32em;
+  text-transform: uppercase; font-weight: 500;
+  color: #6f6759; cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.adm-locale-btn + .adm-locale-btn { border-left: 1px solid rgba(255,255,255,0.06); }
+.adm-locale-btn:hover { color: #d8d0c4; background: rgba(255,255,255,0.03); }
+.adm-locale-btn.is-active {
+  background: rgba(201,168,106,0.12);
+  color: #c9a86a;
+}
+.adm-locale-hint {
+  font-size: 0.6rem; color: #6f6759;
+  margin-top: 8px; line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+
 /* Image picker modal */
 .adm-picker {
   position: fixed; inset: 0; z-index: 1000;
@@ -458,6 +483,11 @@ textarea, input, select { font: inherit; }
     <div class="adm-brand">
       <span class="adm-wordmark">Hosslimo</span>
       <span class="adm-tag">Admin</span>
+      <div class="adm-locale" id="admLocale" role="group" aria-label="Editing language">
+        <button type="button" class="adm-locale-btn is-active" data-lang="de" aria-pressed="true">DE</button>
+        <button type="button" class="adm-locale-btn" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <p class="adm-locale-hint">Sprache zum Bearbeiten. Vor dem Wechseln speichern, sonst gehen Eingaben verloren.</p>
     </div>
     <nav class="adm-nav" id="admNav">
       <button class="adm-nav-item is-active" data-panel="general">
