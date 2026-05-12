@@ -48,6 +48,136 @@ if (!fs.existsSync(CONTENT_FILE) && fs.existsSync(DEFAULT_CONTENT_FILE)) {
   fs.copyFileSync(DEFAULT_CONTENT_FILE, CONTENT_FILE);
 }
 
+// One-time migration: when the shipped defaults gain `{de, en}` translations
+// for a field that the existing content.json still has as a plain DE string
+// matching the default's `de` value, upgrade the live value to the full
+// bilingual object. Admin-customised values (where the live string differs
+// from the default's de) are left untouched so the admin's edits never get
+// overwritten by a future translation update.
+if (fs.existsSync(CONTENT_FILE) && fs.existsSync(DEFAULT_CONTENT_FILE)) {
+  try {
+    const live = JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8'));
+    const defs = JSON.parse(fs.readFileSync(DEFAULT_CONTENT_FILE, 'utf8'));
+    if (upgradeBilinguals(live, defs)) {
+      fs.writeFileSync(CONTENT_FILE, JSON.stringify(live, null, 2), 'utf8');
+      console.log('[init] Upgraded plain-string fields in content.json with EN translations from defaults.');
+    }
+  } catch (err) {
+    console.warn('[init] bilingual migration skipped:', err.message);
+  }
+}
+
+// Helpers used by the migration above. Defined here (function declarations
+// hoist to module top) so they're available where the migration runs.
+function isLocalizableObject(v) {
+  return v && typeof v === 'object' && !Array.isArray(v)
+    && typeof v.de === 'string' && typeof v.en === 'string';
+}
+function upgradeField(parent, key, defVal) {
+  if (!isLocalizableObject(defVal)) return false;
+  const cur = parent[key];
+  if (typeof cur === 'string' && cur === defVal.de) {
+    parent[key] = { de: defVal.de, en: defVal.en };
+    return true;
+  }
+  return false;
+}
+function pickDe(v) {
+  if (typeof v === 'string') return v;
+  if (v && typeof v === 'object' && typeof v.de === 'string') return v.de;
+  return '';
+}
+function findByDe(arr, key, value) {
+  if (!Array.isArray(arr)) return null;
+  return arr.find((item) => item && pickDe(item[key]) === value) || null;
+}
+function upgradeBilinguals(live, defs) {
+  let changed = false;
+  // Brand
+  if (live.brand && defs.brand) {
+    if (upgradeField(live.brand, 'tagline', defs.brand.tagline)) changed = true;
+  }
+  // Hero
+  if (live.hero && defs.hero) {
+    ['eyebrow', 'title', 'subtitle', 'primaryCta', 'secondaryCta'].forEach((k) => {
+      if (upgradeField(live.hero, k, defs.hero[k])) changed = true;
+    });
+  }
+  // About
+  if (live.about && defs.about) {
+    ['eyebrow', 'title', 'body'].forEach((k) => {
+      if (upgradeField(live.about, k, defs.about[k])) changed = true;
+    });
+    if (Array.isArray(live.about.highlights) && Array.isArray(defs.about.highlights)) {
+      live.about.highlights.forEach((h) => {
+        const def = findByDe(defs.about.highlights, 'title', pickDe(h.title));
+        if (!def) return;
+        if (upgradeField(h, 'title', def.title)) changed = true;
+        if (upgradeField(h, 'text', def.text)) changed = true;
+      });
+    }
+  }
+  // Services — match by current de title
+  if (Array.isArray(live.services) && Array.isArray(defs.services)) {
+    live.services.forEach((s) => {
+      const def = findByDe(defs.services, 'title', pickDe(s.title));
+      if (!def) return;
+      if (upgradeField(s, 'title', def.title)) changed = true;
+      if (upgradeField(s, 'text', def.text)) changed = true;
+    });
+  }
+  // Fleet — match by name (which isn't translated)
+  if (Array.isArray(live.fleet) && Array.isArray(defs.fleet)) {
+    live.fleet.forEach((v) => {
+      const def = defs.fleet.find((d) => d && d.name === v.name);
+      if (!def) return;
+      if (upgradeField(v, 'category', def.category)) changed = true;
+    });
+  }
+  // Testimonials — match by author
+  if (Array.isArray(live.testimonials) && Array.isArray(defs.testimonials)) {
+    live.testimonials.forEach((t) => {
+      const def = defs.testimonials.find((d) => d && d.author === t.author);
+      if (!def) return;
+      if (upgradeField(t, 'role', def.role)) changed = true;
+      if (upgradeField(t, 'quote', def.quote)) changed = true;
+    });
+  }
+  // Coverage
+  if (live.coverage && defs.coverage) {
+    ['title', 'body'].forEach((k) => {
+      if (upgradeField(live.coverage, k, defs.coverage[k])) changed = true;
+    });
+  }
+  // CTA
+  if (live.cta && defs.cta) {
+    ['title', 'subtitle', 'button'].forEach((k) => {
+      if (upgradeField(live.cta, k, defs.cta[k])) changed = true;
+    });
+  }
+  // Certifications — match by current de label
+  if (Array.isArray(live.certifications) && Array.isArray(defs.certifications)) {
+    live.certifications.forEach((c) => {
+      const def = findByDe(defs.certifications, 'label', pickDe(c.label));
+      if (!def) return;
+      if (upgradeField(c, 'label', def.label)) changed = true;
+    });
+  }
+  // Contact
+  if (live.contact && defs.contact) {
+    ['whatsapp', 'address', 'hours'].forEach((k) => {
+      if (upgradeField(live.contact, k, defs.contact[k])) changed = true;
+    });
+  }
+  // SEO
+  if (live.seo && defs.seo) {
+    ['title', 'description'].forEach((k) => {
+      if (upgradeField(live.seo, k, defs.seo[k])) changed = true;
+    });
+  }
+  return changed;
+}
+
 // Seed admin user from env on first boot.
 if (!fs.existsSync(USERS_FILE)) {
   const username = process.env.ADMIN_USERNAME || 'admin';

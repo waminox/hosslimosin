@@ -198,6 +198,21 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 .nav__mobile a:nth-child(2) { animation-delay: 0.10s; }
 .nav__mobile a:nth-child(3) { animation-delay: 0.14s; }
 .nav__mobile a:nth-child(4) { animation-delay: 0.18s; }
+
+/* Backdrop that blurs the page behind the open mobile menu so the menu
+   stays the focused surface. Sits below the nav (z-index 100) but above
+   page content. Click to dismiss. */
+.nav__backdrop {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(5, 5, 5, 0.55);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.nav__backdrop.is-open { opacity: 1; pointer-events: auto; }
+body.is-nav-open { overflow: hidden; }
 .nav__mobile a:nth-child(5) { animation-delay: 0.22s; }
 .nav__mobile a:nth-child(6) { animation-delay: 0.26s; }
 .nav__mobile a:nth-child(7) { animation-delay: 0.32s; }
@@ -694,13 +709,14 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 }
 .toast__close:hover { color: var(--gold); }
 
-/* Floating language toggle — bottom-right; shows the opposite locale so a
-   DE visitor sees an English flag inviting the switch. z-index is below the
-   toast (200) and the native legal <dialog> (which uses the browser's top
-   layer), so it never covers either. */
+/* Floating language toggle — bottom-LEFT (the right side belongs to the
+   reCAPTCHA badge); shows the opposite locale so a DE visitor sees an
+   English flag inviting the switch. z-index is below the toast (200) and
+   the native legal <dialog> (which uses the browser's top layer), so it
+   never covers either. */
 .lang-toggle {
   position: fixed;
-  right: 24px;
+  left: 24px;
   bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 18px));
   z-index: 50;
   display: inline-flex; align-items: center; gap: 9px;
@@ -736,7 +752,7 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
 .lang-toggle__label { line-height: 1; }
 @media (max-width: 720px) {
   .lang-toggle {
-    right: 16px;
+    left: 16px;
     bottom: max(16px, calc(env(safe-area-inset-bottom, 0px) + 14px));
     padding: 9px 14px; font-size: 0.66rem; gap: 8px;
   }
@@ -878,6 +894,7 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; letter-spacing: -0
     <a class="btn btn--gold" href="#contact">Anfrage senden</a>
   </div>
 </header>
+<div class="nav__backdrop" id="navBackdrop" aria-hidden="true"></div>
 
 <main id="main">
 
