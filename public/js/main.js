@@ -57,8 +57,10 @@
       features: ["Komfortbestuhlung", "Klimaanlage", "Stauraum", "Bis 20 Personen"], img: "--img-sprinter" },
     { name: "Tesla Model S", category: "Elektrische Performance-Limousine", bucket: "Tesla", passengers: "3", luggage: "2",
       features: ["Autopilot", "Premium Audio", "Glasdach", "Emissionsfrei"], img: "--img-tesla-s" },
-    { name: "Tesla Model Y", category: "Elektrischer Komfort-SUV", bucket: "Tesla", passengers: "4", luggage: "3",
-      features: ["Glasdach", "Premium Audio", "Innenraum", "Emissionsfrei"], img: "--img-tesla-y" },
+    { name: "Tesla Model Y", category: "Juniper 2026 · Elektrischer Komfort-SUV", bucket: "Tesla", passengers: "4", luggage: "3",
+      features: ["Juniper-Refresh 2026", "Glasdach", "Premium Audio", "Emissionsfrei"], img: "--img-tesla-y" },
+    { name: "Tesla Model 3", category: "Highland 2026 · Elektrische Business-Limousine", bucket: "Tesla", passengers: "3", luggage: "2",
+      features: ["Highland-Refresh 2026", "Premium Audio", "Glasdach", "Emissionsfrei"], img: "--img-tesla-3" },
   ];
 
   // Lookup: design's CSS-variable image keyed by car name (used as a fallback
