@@ -709,6 +709,85 @@ body.is-nav-open { overflow: hidden; }
 }
 .toast__close:hover { color: var(--gold); }
 
+/* Cookie consent banner — fixed at the bottom edge, slides up on first
+   visit, persists the user's choice in localStorage so it never shows
+   again. z-index sits above the lang-toggle (50) but below the toast
+   (200) and the legal <dialog> (top layer). The site uses only
+   technically necessary cookies + reCAPTCHA, so Accept / Decline both
+   simply dismiss the banner — declining doesn't disable reCAPTCHA
+   because the contact form would stop working otherwise. */
+.consent {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 60;
+  padding: 0 18px 18px;
+  transform: translateY(120%);
+  transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+  pointer-events: none;
+}
+.consent.is-visible {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.consent[hidden] { display: none; }
+.consent__inner {
+  max-width: 760px;
+  margin: 0 auto;
+  background: rgba(10, 10, 10, 0.96);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(201, 168, 106, 0.45);
+  padding: 22px 26px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 22px;
+  align-items: center;
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.55);
+}
+.consent__text {
+  margin: 0;
+  font-size: 0.82rem; line-height: 1.65;
+  color: var(--ink-dim); font-weight: 300;
+}
+.consent__text a {
+  color: var(--gold);
+  border-bottom: 1px solid rgba(201, 168, 106, 0.35);
+  transition: border-color 0.2s, color 0.2s;
+}
+.consent__text a:hover { color: var(--gold-2); border-color: var(--gold); }
+.consent__title {
+  display: block;
+  font-family: var(--serif); font-style: italic; font-weight: 500;
+  font-size: 1.05rem; color: var(--ink);
+  margin-bottom: 4px; letter-spacing: 0.01em;
+}
+.consent__actions {
+  display: inline-flex; gap: 10px; flex-shrink: 0;
+}
+.consent__btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 11px 22px; font-size: 0.7rem; letter-spacing: 0.24em;
+  text-transform: uppercase; font-weight: 500;
+  border: 1px solid transparent;
+  transition: all 0.3s ease; cursor: pointer;
+  white-space: nowrap;
+}
+.consent__btn--gold { background: var(--gold); color: #0c0a06; }
+.consent__btn--gold:hover { background: var(--gold-2); }
+.consent__btn--ghost { border-color: rgba(255, 255, 255, 0.22); color: var(--ink); }
+.consent__btn--ghost:hover { border-color: var(--gold); color: var(--gold); }
+.consent__btn:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+@media (max-width: 720px) {
+  .consent { padding: 0 14px 14px; }
+  .consent__inner {
+    grid-template-columns: 1fr;
+    gap: 14px; padding: 18px 20px;
+  }
+  .consent__text { font-size: 0.78rem; }
+  .consent__actions { width: 100%; }
+  .consent__btn { flex: 1; padding: 10px 16px; font-size: 0.66rem; }
+}
+
 /* Floating language toggle — bottom-LEFT (the right side belongs to the
    reCAPTCHA badge); shows the opposite locale so a DE visitor sees an
    English flag inviting the switch. z-index is below the toast (200) and
@@ -1236,6 +1315,19 @@ body.is-nav-open { overflow: hidden; }
   </div>
   <button type="button" class="toast__close" aria-label="Schließen">×</button>
 </div>
+
+<aside class="consent" id="cookieConsent" role="dialog" aria-live="polite" aria-labelledby="consentTitle" hidden>
+  <div class="consent__inner">
+    <div>
+      <strong class="consent__title" id="consentTitle">Cookies</strong>
+      <p class="consent__text" id="consentText"></p>
+    </div>
+    <div class="consent__actions">
+      <button type="button" class="consent__btn consent__btn--ghost" id="consentDecline">Ablehnen</button>
+      <button type="button" class="consent__btn consent__btn--gold" id="consentAccept">Akzeptieren</button>
+    </div>
+  </div>
+</aside>
 
 <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch to English" data-locale="de">
   <span class="lang-toggle__flag" aria-hidden="true"></span>

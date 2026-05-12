@@ -4,11 +4,17 @@
   // ------- Locale -------
   // _locale is initialised from localStorage so the user's last choice survives
   // a page reload. Wrapped in try/catch because some private-browsing modes
-  // throw on access. The site default is 'de'.
+  // throw on access. On a fresh visit with no saved value we sniff the
+  // browser's preferred language: an English browser sees the EN copy first
+  // rather than landing on German and having to toggle.
   let _locale = 'de';
   try {
     const saved = window.localStorage && window.localStorage.getItem('hosslimo.lang');
-    if (saved === 'en' || saved === 'de') _locale = saved;
+    if (saved === 'en' || saved === 'de') {
+      _locale = saved;
+    } else if (typeof navigator !== 'undefined' && navigator.language && /^en\b/i.test(navigator.language)) {
+      _locale = 'en';
+    }
   } catch (_) {}
 
   // pick() reads a translatable value. Admin-managed text fields accept either
@@ -153,6 +159,17 @@
     // Language button (shows the OPPOSITE locale)
     langToBtn:    { de: 'EN',                  en: 'DE' },
     langToAria:   { de: 'Switch to English',   en: 'Auf Deutsch wechseln' },
+    // Cookie consent
+    consentTitle: { de: 'Cookies & Datenschutz', en: 'Cookies & privacy' },
+    // The {link}…{/link} markers are replaced with a real anchor that opens
+    // the Datenschutz modal (data-legal="datenschutz" — wired by setupLegal).
+    consentBody:  {
+      de: 'Wir verwenden ausschließlich technisch notwendige Cookies sowie Google reCAPTCHA, um unsere Website sicher und funktional zu halten. Wir setzen keine Tracking- oder Werbe-Cookies ein. Mehr Informationen finden Sie in unserer {link}Datenschutzerklärung{/link}.',
+      en: "We use only technically necessary cookies and Google reCAPTCHA to keep our website secure and functional. We don't set any tracking or advertising cookies. More information is available in our {link}privacy policy{/link}.",
+    },
+    consentAccept:  { de: 'Akzeptieren',      en: 'Accept' },
+    consentDecline: { de: 'Ablehnen',         en: 'Decline' },
+    consentPrivacy: { de: 'Datenschutzerklärung', en: 'privacy policy' },
   };
 
   function T(key) {
@@ -502,14 +519,17 @@
     if (!dialog || !title || !body || !close) return;
     const labelKey = { impressum: 'legalImpressum', datenschutz: 'legalDatenschutz', agb: 'legalAgb' };
     const placeholderKey = { impressum: 'legalPlaceholderImpr', datenschutz: 'legalPlaceholderDs', agb: 'legalPlaceholderAgb' };
-    document.querySelectorAll('[data-legal]').forEach(a => {
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        const key = a.dataset.legal;
-        title.textContent = T(labelKey[key] || '');
-        body.textContent = pick(LEGAL[key]) || T(placeholderKey[key] || '');
-        if (typeof dialog.showModal === 'function') dialog.showModal();
-      });
+    // Document-level delegation so anchors added later (e.g. the link inside
+    // the cookie-consent banner, which gets its href re-rendered on every
+    // locale toggle) trigger the modal without needing per-anchor binding.
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest && e.target.closest('[data-legal]');
+      if (!a) return;
+      e.preventDefault();
+      const key = a.dataset.legal;
+      title.textContent = T(labelKey[key] || '');
+      body.textContent = pick(LEGAL[key]) || T(placeholderKey[key] || '');
+      if (typeof dialog.showModal === 'function') dialog.showModal();
     });
     close.addEventListener('click', () => dialog.close?.());
     dialog.addEventListener('click', (e) => {
@@ -1162,7 +1182,60 @@
       // Static labels first so any flicker happens before the content re-render.
       translateStaticUi();
       if (_content) applyContent(_content);
+      refreshConsentText();
     });
+  }
+
+  // ------- Cookie consent -------
+  // Renders the consent body for the current locale, replacing the
+  // {link}…{/link} marker with an inline anchor that triggers the
+  // existing Datenschutz modal (setupLegal listens for data-legal clicks).
+  function refreshConsentText() {
+    const title = document.getElementById('consentTitle');
+    if (title) title.textContent = T('consentTitle');
+    const body = document.getElementById('consentText');
+    if (body) {
+      const tmpl = T('consentBody');
+      const linkLabel = T('consentPrivacy');
+      // Split on {link}…{/link} so the static segments are HTML-escaped
+      // and only the anchor itself is injected as markup.
+      const m = tmpl.match(/^([\s\S]*?)\{link\}([\s\S]*?)\{\/link\}([\s\S]*)$/);
+      if (m) {
+        body.innerHTML =
+          escHtml(m[1]) +
+          `<a href="#" data-legal="datenschutz">${escHtml(m[2] || linkLabel)}</a>` +
+          escHtml(m[3]);
+      } else {
+        body.textContent = tmpl;
+      }
+    }
+    const acc = document.getElementById('consentAccept');
+    if (acc) acc.textContent = T('consentAccept');
+    const dec = document.getElementById('consentDecline');
+    if (dec) dec.textContent = T('consentDecline');
+  }
+
+  function setupConsent() {
+    const el = document.getElementById('cookieConsent');
+    if (!el) return;
+    let saved = '';
+    try { saved = (window.localStorage && window.localStorage.getItem('hosslimo.consent')) || ''; } catch (_) {}
+    refreshConsentText();
+    if (saved === 'accepted' || saved === 'declined') return; // already answered — stay hidden
+
+    el.removeAttribute('hidden');
+    // requestAnimationFrame so the transition runs from the off-screen state
+    // even though we just toggled `hidden` and re-flowed in the same tick.
+    requestAnimationFrame(() => el.classList.add('is-visible'));
+
+    function dismiss(value) {
+      try { if (window.localStorage) window.localStorage.setItem('hosslimo.consent', value); } catch (_) {}
+      el.classList.remove('is-visible');
+      // Match the CSS transition duration before hiding from layout.
+      setTimeout(() => el.setAttribute('hidden', ''), 600);
+    }
+    document.getElementById('consentAccept')?.addEventListener('click', () => dismiss('accepted'));
+    document.getElementById('consentDecline')?.addEventListener('click', () => dismiss('declined'));
   }
 
   // Tag the markup's known select options so translateStaticUi can find them
@@ -1199,6 +1272,7 @@
   tagMarkupOptions();
   translateStaticUi();
   setupLocaleToggle();
+  setupConsent();
 
   // Public config (reCAPTCHA site key) — non-blocking.
   fetch('/api/config')
